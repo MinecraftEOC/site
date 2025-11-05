@@ -1,0 +1,9 @@
+{
+    "extends": ["stylelint-config-hudochenkov/full"],
+    "overrides": [
+        {
+            "files": ["**/*.vue"],
+            "customSyntax": "postcss-html"
+        }
+    ]
+}
