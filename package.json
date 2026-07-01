@@ -1,35 +1,35 @@
 {
-  "name": "nuxt-template",
-  "type": "module",
-  "version": "1.0.0",
-  "private": true,
-  "author": "undefined-dev",
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "test:run": "vitest run",
-    "test:watch": "vitest",
-    "el:check": "npx eslint .",
-    "sl:check": "npx stylelint \"**/*.{scss,vue}\"",
-    "lint:check": "npm run el:check && npm run sl:check",
-    "el:fix": "npx eslint . --fix",
-    "sl:fix": "npx stylelint \"**/*.{scss,vue}\" --fix",
-    "lint:fix": "npm run el:fix && npm run sl:fix"
-  },
-  "dependencies": {
-    "nuxt": "4.2.0",
-    "pinia": "2.3.1",
-    "vue": "3.5.22"
-  },
-  "devDependencies": {
-    "@antfu/eslint-config": "^6.2.0",
-    "@nuxt/eslint": "1.10.0",
-    "@pinia/nuxt": "0.9.0",
-    "postcss-html": "^1.8.0",
-    "sass-embedded": "^1.93.3",
-    "stylelint-config-hudochenkov": "^12.0.0"
-  }
+    "name": "nuxt-template",
+    "type": "module",
+    "version": "1.0.0",
+    "private": true,
+    "author": "undef1ned-dev",
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "test:run": "vitest run",
+        "test:watch": "vitest",
+        "el:check": "npx eslint .",
+        "sl:check": "npx stylelint \"**/*.{scss,vue}\"",
+        "lint:check": "npm run el:check && npm run sl:check",
+        "el:fix": "npx eslint . --fix",
+        "sl:fix": "npx stylelint \"**/*.{scss,vue}\" --fix",
+        "lint:fix": "npm run el:fix && npm run sl:fix"
+    },
+    "dependencies": {
+        "nuxt": "4.4.8",
+        "pinia": "3.0.4",
+        "vue": "3.5.39"
+    },
+    "devDependencies": {
+        "@antfu/eslint-config": "^9.1.0",
+        "@nuxt/eslint": "1.16.0",
+        "@pinia/nuxt": "0.11.3",
+        "postcss-html": "^1.8.1",
+        "sass-embedded": "^1.100.0",
+        "stylelint-config-hudochenkov": "^13.0.2"
+    }
 }
