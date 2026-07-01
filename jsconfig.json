@@ -1,13 +1,13 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "baseUrl": ".",
-    "module": "es6",
-    "paths": {
-      "~/*": ["./*"],
-      "@/*": ["./*"]
+    "compilerOptions": {
+        "target": "es6",
+        "baseUrl": ".",
+        "module": "es6",
+        "paths": {
+            "~/*": ["./*"],
+            "@/*": ["./*"]
+        },
+        "allowSyntheticDefaultImports": true
     },
-    "allowSyntheticDefaultImports": true
-  },
-  "exclude": [".nuxt"]
+    "exclude": [".nuxt"]
 }
