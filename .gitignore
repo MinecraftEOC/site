@@ -158,3 +158,5 @@ bun.lockb
 
 # Settings vscode
 .vscode
+
+/generated/prisma

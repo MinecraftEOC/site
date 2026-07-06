@@ -1,12 +1,12 @@
 {
     "*.js": [
-      "eslint --fix"
+        "eslint --fix"
     ],
     "*.vue": [
-          "eslint --fix",
-          "stylelint --fix",
+        "eslint --fix",
+        "stylelint --fix"
     ],
     "*.scss": [
-      "stylelint --fix"
+        "stylelint --fix"
     ]
 }

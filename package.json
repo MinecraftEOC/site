@@ -9,7 +9,7 @@
         "dev": "nuxt dev",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
-        "postinstall": "nuxt prepare",
+        "postinstall": "prisma generate && nuxt prepare",
         "test:run": "vitest run",
         "test:watch": "vitest",
         "el:check": "npx eslint .",
@@ -17,10 +17,17 @@
         "lint:check": "npm run el:check && npm run sl:check",
         "el:fix": "npx eslint . --fix",
         "sl:fix": "npx stylelint \"**/*.{scss,vue}\" --fix",
-        "lint:fix": "npm run el:fix && npm run sl:fix"
+        "lint:fix": "npm run el:fix && npm run sl:fix",
+        "db:migrate": "prisma migrate dev",
+        "db:deploy": "prisma migrate deploy",
+        "db:studio": "prisma studio",
+        "db:generate": "prisma generate"
     },
     "dependencies": {
+        "@prisma/adapter-pg": "^7.8.0",
+        "@prisma/client": "^7.8.0",
         "nuxt": "4.4.8",
+        "pg": "^8.22.0",
         "pinia": "3.0.4",
         "vue": "3.5.39"
     },
@@ -29,6 +36,7 @@
         "@nuxt/eslint": "1.16.0",
         "@pinia/nuxt": "0.11.3",
         "postcss-html": "^1.8.1",
+        "prisma": "^7.8.0",
         "sass-embedded": "^1.100.0",
         "stylelint-config-hudochenkov": "^13.0.2"
     }
