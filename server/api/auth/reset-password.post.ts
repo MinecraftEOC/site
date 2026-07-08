@@ -1,0 +1,36 @@
+import type { ResetPasswordBody } from '~~/server/types/auth';
+
+import bcrypt from 'bcryptjs';
+
+import { AUTH_STATUSES } from '~~/server/utils/constants/auth';
+
+export default defineEventHandler(async (event) => {
+    const body = await readBody<ResetPasswordBody>(event);
+    const token = body.token;
+    const password = body.password;
+
+    if (!token) {
+        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.EMPTY_RESET_TOKEN });
+    }
+
+    if (!password || password.length < 8) {
+        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.INVALID_PASSWORD });
+    }
+
+    const user = await prisma.user.findUnique({ where: { resetToken: token } });
+    if (!user?.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.INVALID_RESET_TOKEN });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await prisma.$transaction([
+        prisma.user.update({
+            where: { id: user.id },
+            data: { password: passwordHash, resetToken: null, resetTokenExpiry: null },
+        }),
+        prisma.session.deleteMany({ where: { userId: user.id } }),
+    ]);
+
+    return { success: true };
+});

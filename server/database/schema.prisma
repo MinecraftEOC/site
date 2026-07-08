@@ -8,3 +8,90 @@ datasource db {
 }
 
 // MODELS
+model User {
+    id               Int       @id @default(autoincrement())
+    email            String    @unique
+    password         String
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
+    resetToken       String?   @unique
+    resetTokenExpiry DateTime?
+    sessions         Session[]
+
+    role           UserRole        @default(USER)
+    characters     Character[]
+    discordAccount DiscordAccount?
+}
+
+model Session {
+    id        String   @id @default(cuid()) // это значение кладём в cookie
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+
+    userId Int
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([expiresAt])
+}
+
+model DiscordAccount {
+    id           Int               @id @default(autoincrement())
+    discordId    String?           @unique
+    username     String?
+    avatar       String?
+    status       DiscordLinkStatus @default(PENDING)
+    verifyCode   String?
+    verifyExpiry DateTime?
+
+    userId Int  @unique
+    user   User @relation(fields: [userId], references: [id])
+}
+
+model Character {
+    id          Int      @id @default(autoincrement())
+    uuid        String   @unique
+    username    String   @unique
+    password    String
+    accessToken String?
+    serverId    String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    biography     String
+    states        Json
+    startingItems Json
+    status        CharacterStatus @default(UNVERIFIED)
+    skins         Skin[]
+    comment       String?
+
+    userId Int
+    user   User @relation(fields: [userId], references: [id])
+}
+
+model Skin {
+    id   Int    @id @default(autoincrement())
+    hash String @unique
+
+    characterId Int
+    character   Character @relation(fields: [characterId], references: [id])
+}
+
+// ENUMS
+enum UserRole {
+    USER
+    ADMIN
+}
+
+enum CharacterStatus {
+    UNVERIFIED
+    RETURNED
+    ACTIVE
+    BANNED
+    DEAD
+}
+
+enum DiscordLinkStatus {
+    PENDING
+    LINKED
+}

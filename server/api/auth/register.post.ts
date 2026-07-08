@@ -1,0 +1,33 @@
+import type { AuthBody } from '~~/server/types/auth';
+
+import bcrypt from 'bcryptjs';
+
+import { AUTH_STATUSES } from '~~/server/utils/constants/auth';
+
+const EMAIL_REGEX = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+
+export default defineEventHandler(async (event) => {
+    const body = await readBody<AuthBody>(event);
+    const email = body.email?.trim().toLowerCase();
+    const password = body.password;
+
+    if (!email || !EMAIL_REGEX.test(email)) {
+        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.INVALID_EMAIL });
+    }
+
+    if (!password || password.length < 8) {
+        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.INVALID_PASSWORD });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+        throw createError({ statusCode: 409, statusMessage: AUTH_STATUSES.USER_EXISTS });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    return await prisma.user.create({
+        data: { email, password: passwordHash },
+        select: { id: true, email: true, createdAt: true },
+    });
+});
