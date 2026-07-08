@@ -1,13 +1,13 @@
-import type { AuthBody } from '~~/server/types/auth';
+import type { IAuthBody } from '~~/server/types/auth';
 
 import bcrypt from 'bcryptjs';
 
-import { AUTH_STATUSES } from '~~/server/utils/constants/auth';
+import { AUTH_STATUSES } from '~~/server/constants/auth';
 
 const EMAIL_REGEX = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody<AuthBody>(event);
+    const body = await readBody<IAuthBody>(event);
     const email = body.email?.trim().toLowerCase();
     const password = body.password;
 

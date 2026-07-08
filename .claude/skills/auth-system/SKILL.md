@@ -8,7 +8,6 @@ description: >-
   auth, middleware, хелперы, константы и типы, а также правила безопасности,
   принятые в проекте.
 ---
-
 # Система авторизации проекта
 
 Авторизация **session-based**: сервер хранит сессии в БД, а браузеру отдаёт
@@ -29,18 +28,18 @@ httpOnly-cookie с id сессии. На каждый запрос middleware п
 
 ## Эндпоинты (`server/api/auth/`)
 
-| Файл | Метод/маршрут | Назначение |
-|---|---|---|
-| `register.post.ts` | `POST /api/auth/register` | регистрация: валидация, проверка уникальности email, хэш пароля, создание юзера |
-| `login.post.ts` | `POST /api/auth/login` | вход: `bcrypt.compare`, создание `Session`, установка cookie |
-| `logout.post.ts` | `POST /api/auth/logout` | выход: удаление текущей сессии (id из `event.context.session`), стирание cookie, идемпотентен |
-| `me.get.ts` | `GET /api/auth/me` | текущий юзер; защищён через `requireUser(event)` |
-| `forgot-password.post.ts` | `POST /api/auth/forgot-password` | генерация reset-токена (`randomBytes` из `node:crypto`) + срок; отправка письма — TODO (SMTP не настроен) |
-| `reset-password.post.ts` | `POST /api/auth/reset-password` | смена пароля по токену: проверка срока, хэш, гашение токена, удаление всех сессий юзера |
+| Файл                    | Метод/маршрут          | Назначение                                                                                                                                           |
+| --------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `register.post.ts`        | `POST /api/auth/register`        | регистрация: валидация, проверка уникальности email, хэш пароля, создание юзера                  |
+| `login.post.ts`           | `POST /api/auth/login`           | вход:`bcrypt.compare`, создание `Session`, установка cookie                                                                           |
+| `logout.post.ts`          | `POST /api/auth/logout`          | выход: удаление текущей сессии (id из`event.context.session`), стирание cookie, идемпотентен                 |
+| `forgot-password.post.ts` | `POST /api/auth/forgot-password` | генерация reset-токена (`randomBytes` из `node:crypto`) + срок; отправка письма — TODO (SMTP не настроен)    |
+| `reset-password.post.ts`  | `POST /api/auth/reset-password`  | смена пароля по токену: проверка срока, хэш, гашение токена, удаление всех сессий юзера |
 
 ## Middleware (`server/middleware/auth.ts`)
 
 Выполняется Nitro **на каждый запрос**. Логика:
+
 1. читает cookie `SESSION_COOKIE`; нет — `return` (аноним, ошибку НЕ кидает);
 2. ищет `Session` по id вместе с `user`;
 3. сессии нет → стирает битую cookie, `return`;
@@ -54,11 +53,11 @@ Middleware только **опознаёт** юзера. **Требование*
 
 - `server/utils/auth.ts` → **`requireUser(event)`** — возвращает юзера из
   контекста или кидает `401 UNAUTHORIZED`. Использовать в защищённых эндпоинтах.
-- `server/utils/constants/auth.ts` → `AUTH_STATUSES` (тексты ошибок),
+- `server/constants/auth.ts` → `AUTH_STATUSES` (тексты ошибок),
   `SESSION_COOKIE` (`'sessionid'`), `SESSION_MAX_AGE` (7 дней, сек),
   `RESET_TOKEN_MAX_AGE` (1 час, сек).
-- `server/types/auth.ts` → `AuthBody`, `ResetPasswordBody`, `SafeUser`,
-  `SessionContext`, и **аугментация `H3EventContext`** (`user?`, `session?`).
+- `server/types/auth.ts` → `IAuthBody`, `IResetPasswordBody`, `ISafeUser`,
+  `ISessionContext`, и **аугментация `H3EventContext`** (`user?`, `session?`).
 
 ## Параметры cookie сессии (login)
 

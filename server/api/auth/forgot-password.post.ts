@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 
-import { AUTH_STATUSES, RESET_TOKEN_MAX_AGE } from '~~/server/utils/constants/auth';
+import { AUTH_STATUSES, RESET_TOKEN_MAX_AGE } from '~~/server/constants/auth';
 
 export default defineEventHandler(async (event) => {
     const body = await readBody<{ email?: string }>(event);

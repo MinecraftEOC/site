@@ -1,4 +1,4 @@
-import { SESSION_COOKIE } from '~~/server/utils/constants/auth';
+import { SESSION_COOKIE } from '~~/server/constants/auth';
 
 export default defineEventHandler(async (event) => {
     const sessionId = getCookie(event, SESSION_COOKIE);
