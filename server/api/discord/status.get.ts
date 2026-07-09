@@ -1,4 +1,4 @@
-import type { IDiscordStatusResponse } from '~~/shared/types/response';
+import type { IDiscordStatusResponse } from '~~/shared/@types/response';
 
 import { DiscordLinkStatus } from '~~/generated/prisma/enums';
 

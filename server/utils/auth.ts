@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3';
-import { AUTH_STATUSES } from '~~/server/constants/auth';
+import { AUTH_STATUSES } from '~~/server/common/constants/auth';
 
 /**
  * Требует авторизованного пользователя для защищённого эндпоинта.

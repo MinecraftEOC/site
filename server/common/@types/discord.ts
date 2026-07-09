@@ -1,4 +1,4 @@
-import type { ELinkReasons } from '~~/server/enums/discord';
+import type { ELinkReasons } from '~~/server/common/enums/discord';
 
 /** Данные Discord-пользователя, которые бот передаёт в `linkDiscordByCode` при привязке. */
 export interface IDiscordUserData {

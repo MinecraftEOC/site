@@ -1,8 +1,8 @@
-import type { ISuccessResponse } from '~~/shared/types/response';
+import type { ISuccessResponse } from '~~/shared/@types/response';
 
 import { randomBytes } from 'node:crypto';
 
-import { AUTH_STATUSES, RESET_TOKEN_MAX_AGE } from '~~/server/constants/auth';
+import { AUTH_STATUSES, RESET_TOKEN_MAX_AGE } from '~~/server/common/constants/auth';
 
 export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const body = await readBody<{ email?: string }>(event);

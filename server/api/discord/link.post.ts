@@ -1,7 +1,7 @@
-import type { IDiscordLinkResponse } from '~~/shared/types/response';
+import type { IDiscordLinkResponse } from '~~/shared/@types/response';
 
 import { DiscordLinkStatus } from '~~/generated/prisma/enums';
-import { DISCORD_STATUSES, VERIFY_CODE_TTL } from '~~/server/constants/discord';
+import { DISCORD_STATUSES, VERIFY_CODE_TTL } from '~~/server/common/constants/discord';
 
 export default defineEventHandler(async (event): Promise<IDiscordLinkResponse> => {
     const user = requireUser(event);

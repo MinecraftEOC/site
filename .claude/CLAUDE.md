@@ -39,16 +39,18 @@
 - **Серверные автоимпорты Nitro** работают только внутри `server/`
   (`prisma`, `readBody`, `getCookie`, `createError` и т.п. — без `import`).
   Пользовательские утилиты из `server/utils/` тоже автоимпортируются.
-- **Раскладка по папкам:** константы — в `server/constants/`, типы — в
-  `server/types/`, enum-ы — в `server/enums/`, утилиты — в `server/utils/`.
+- **Раскладка по папкам:** «данные» бэка собраны в `server/common/` — константы в
+  `server/common/constants/`, enum-ы в `server/common/enums/`, типы в
+  `server/common/@types/`; утилиты — в `server/utils/` (автоимпортируется Nitro,
+  поэтому остаётся на верхнем уровне).
 - **Ошибки API** бросаются через `createError({ statusCode, statusMessage })`,
-  тексты сообщений — из констант (`AUTH_STATUSES` в `server/constants/auth.ts`).
+  тексты сообщений — из констант (`AUTH_STATUSES` в `server/common/constants/auth.ts`).
 - Файлы эндпоинтов именуются по методу: `*.post.ts`, `*.get.ts`.
 
 ### Общие контракты фронта и бэка (`shared/`)
 
 Папка `shared/` в Nuxt 4 доступна **и серверу, и клиенту**. Интерфейсы **ответов
-эндпоинтов** живут в `shared/types/response.ts` (`ILoginResponse`,
+эндпоинтов** живут в `shared/@types/response.ts` (`ILoginResponse`,
 `IDiscordLinkResponse`, `ISuccessResponse` и т.п.):
 
 - каждый хендлер **явно** типизирует возврат:
@@ -70,17 +72,17 @@
 ### Константы вместо литералов
 
 По возможности **не хардкодить строковые/числовые литералы** — выносить их в
-константу (`server/constants/`) или enum (`server/enums/`). Строковые «коды»
+константу (`server/common/constants/`) или enum (`server/common/enums/`). Строковые «коды»
 (причины, статусы, имена команд и т.п.) должны иметь единый источник истины,
 а не дублироваться литералами по коду.
 
 ### JSDoc-комментарии (обязательно)
 
 Каждому **экспортируемому** объявлению — JSDoc-комментарий (`/** ... */`):
-- **константам** (`server/constants/`) — только **самой константе**; отдельные
+- **константам** (`server/common/constants/`) — только **самой константе**; отдельные
   поля объектов-словарей комментировать **не нужно**;
-- **enum-ам** (`server/enums/`) — и самому enum, и его членам;
-- **интерфейсам и типам** (`server/types/`, `shared/types/`) — и полям интерфейсов;
+- **enum-ам** (`server/common/enums/`) — и самому enum, и его членам;
+- **интерфейсам и типам** (`server/common/@types/`, `shared/@types/`) — и полям интерфейсов;
 - **методам/функциям в `server/utils/`** — с `@param`/`@returns`/`@throws`,
   где это уместно.
 

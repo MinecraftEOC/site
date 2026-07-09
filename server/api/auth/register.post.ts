@@ -1,9 +1,9 @@
-import type { IAuthBody } from '~~/server/types/auth';
-import type { IRegisterResponse } from '~~/shared/types/response';
+import type { IAuthBody } from '~~/server/common/@types/auth';
+import type { IRegisterResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
-import { AUTH_STATUSES } from '~~/server/constants/auth';
+import { AUTH_STATUSES } from '~~/server/common/constants/auth';
 
 const EMAIL_REGEX = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 

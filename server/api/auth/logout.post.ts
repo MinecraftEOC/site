@@ -1,6 +1,6 @@
-import type { ISuccessResponse } from '~~/shared/types/response';
+import type { ISuccessResponse } from '~~/shared/@types/response';
 
-import { SESSION_COOKIE } from '~~/server/constants/auth';
+import { SESSION_COOKIE } from '~~/server/common/constants/auth';
 
 export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const sessionId = event.context.session?.id;

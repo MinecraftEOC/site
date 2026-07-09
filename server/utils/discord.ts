@@ -1,10 +1,10 @@
-import type { IDiscordUserData, TLinkResult } from '~~/server/types/discord';
+import type { IDiscordUserData, TLinkResult } from '~~/server/common/@types/discord';
 
 import { randomInt } from 'node:crypto';
 
 import { DiscordLinkStatus, Prisma } from '~~/generated/prisma/client';
-import { VERIFY_CODE_ALPHABET, VERIFY_CODE_LENGTH } from '~~/server/constants/discord';
-import { ELinkReasons } from '~~/server/enums/discord';
+import { VERIFY_CODE_ALPHABET, VERIFY_CODE_LENGTH } from '~~/server/common/constants/discord';
+import { ELinkReasons } from '~~/server/common/enums/discord';
 
 /**
  * Генерирует криптослучайный код привязки Discord.

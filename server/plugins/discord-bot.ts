@@ -1,6 +1,6 @@
 import { Client, Events, GatewayIntentBits, MessageFlags, REST, Routes, SlashCommandBuilder } from 'discord.js';
 
-import { DISCORD_STATUSES, VERIFY_COMMAND_NAME } from '~~/server/constants/discord';
+import { DISCORD_STATUSES, VERIFY_COMMAND_NAME } from '~~/server/common/constants/discord';
 
 const globalForDiscord = globalThis as unknown as { discordClient?: Client };
 
