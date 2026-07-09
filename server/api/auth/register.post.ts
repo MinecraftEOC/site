@@ -1,4 +1,5 @@
 import type { IAuthBody } from '~~/server/types/auth';
+import type { IRegisterResponse } from '~~/shared/types/response';
 
 import bcrypt from 'bcryptjs';
 
@@ -6,7 +7,7 @@ import { AUTH_STATUSES } from '~~/server/constants/auth';
 
 const EMAIL_REGEX = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
     const body = await readBody<IAuthBody>(event);
     const email = body.email?.trim().toLowerCase();
     const password = body.password;
@@ -26,8 +27,10 @@ export default defineEventHandler(async (event) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    return await prisma.user.create({
+    const created = await prisma.user.create({
         data: { email, password: passwordHash },
         select: { id: true, email: true, createdAt: true },
     });
+
+    return { id: created.id, email: created.email, createdAt: created.createdAt.toISOString() };
 });

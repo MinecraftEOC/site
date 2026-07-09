@@ -1,10 +1,11 @@
 import type { IResetPasswordBody } from '~~/server/types/auth';
+import type { ISuccessResponse } from '~~/shared/types/response';
 
 import bcrypt from 'bcryptjs';
 
 import { AUTH_STATUSES } from '~~/server/constants/auth';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const body = await readBody<IResetPasswordBody>(event);
     const token = body.token;
     const password = body.password;

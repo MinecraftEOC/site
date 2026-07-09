@@ -1,10 +1,11 @@
 import type { IAuthBody } from '~~/server/types/auth';
+import type { ILoginResponse } from '~~/shared/types/response';
 
 import bcrypt from 'bcryptjs';
 
 import { AUTH_STATUSES, SESSION_COOKIE, SESSION_MAX_AGE } from '~~/server/constants/auth';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<ILoginResponse> => {
     const body = await readBody<IAuthBody>(event);
     const email = body.email?.trim().toLowerCase();
     const password = body.password;
