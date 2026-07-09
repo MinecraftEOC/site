@@ -6,4 +6,10 @@ export default defineNuxtConfig({
         '@nuxt/eslint',
         '@pinia/nuxt',
     ],
+    runtimeConfig: {
+        discordBotToken: '',
+        discordClientId: '',
+        discordGuildId: '',
+        discordChannelId: '',
+    },
 });
