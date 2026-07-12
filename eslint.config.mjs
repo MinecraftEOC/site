@@ -5,4 +5,8 @@ export default antfu({
         semi: true,
         indent: 4,
     },
+}, {
+    rules: {
+        'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],
+    },
 });
