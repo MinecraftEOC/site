@@ -1,6 +1,6 @@
 import { Client, Events, GatewayIntentBits, MessageFlags, REST, Routes, SlashCommandBuilder } from 'discord.js';
 
-import { DISCORD_STATUSES, VERIFY_COMMAND_NAME } from '~~/server/common/constants/discord';
+import { DISCORD_ERRORS, VERIFY_COMMAND_NAME } from '~~/server/common/constants/discord';
 
 const globalForDiscord = globalThis as unknown as { discordClient?: Client };
 
@@ -34,8 +34,7 @@ export default defineNitroPlugin(async () => {
     client.once(Events.ClientReady, async () => {
         try {
             await rest.put(Routes.applicationGuildCommands(discordClientId, discordGuildId), { body: [command.toJSON()] });
-        }
-        catch (error) {
+        } catch (error) {
             console.error('[discord-bot] Не удалось зарегистрировать команду:', error);
         }
     });
@@ -46,7 +45,7 @@ export default defineNitroPlugin(async () => {
         }
 
         if (interaction.channelId !== discordChannelId) {
-            await interaction.reply({ content: DISCORD_STATUSES.WRONG_CHANNEL, flags: MessageFlags.Ephemeral });
+            await interaction.reply({ content: DISCORD_ERRORS.WRONG_CHANNEL, flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -61,14 +60,13 @@ export default defineNitroPlugin(async () => {
             });
 
             const message = result.ok
-                ? DISCORD_STATUSES.LINK_SUCCESS
-                : DISCORD_STATUSES[result.reason];
+                ? DISCORD_ERRORS.LINK_SUCCESS
+                : DISCORD_ERRORS[result.reason];
 
             await interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
-        }
-        catch (error) {
+        } catch (error) {
             console.error('[discord-bot] Ошибка привязки:', error);
-            await interaction.reply({ content: DISCORD_STATUSES.INTERNAL_ERROR, flags: MessageFlags.Ephemeral });
+            await interaction.reply({ content: DISCORD_ERRORS.INTERNAL_ERROR, flags: MessageFlags.Ephemeral });
         }
     });
 
@@ -76,8 +74,7 @@ export default defineNitroPlugin(async () => {
 
     try {
         await client.login(discordBotToken);
-    }
-    catch (error) {
+    } catch (error) {
         console.error('[discord-bot] Не удалось залогиниться в Discord:', error);
         globalForDiscord.discordClient = undefined;
     }

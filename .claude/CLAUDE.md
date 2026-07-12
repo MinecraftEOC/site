@@ -44,7 +44,7 @@
   `server/common/@types/`; утилиты — в `server/utils/` (автоимпортируется Nitro,
   поэтому остаётся на верхнем уровне).
 - **Ошибки API** бросаются через `createError({ statusCode, statusMessage })`,
-  тексты сообщений — из констант (`AUTH_STATUSES` в `server/common/constants/auth.ts`).
+  тексты сообщений — из констант (`AUTH_ERRORS` в `server/common/constants/auth.ts`).
 - Файлы эндпоинтов именуются по методу: `*.post.ts`, `*.get.ts`.
 
 ### Внутренние ручки под server-to-server токеном (`/api/server`)

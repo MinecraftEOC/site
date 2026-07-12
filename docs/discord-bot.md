@@ -80,7 +80,7 @@
 |---|---|---|
 | `server/plugins/discord-bot.ts` | Сам бот: подключение к Gateway, регистрация и обработка `/verify` | ✅ есть |
 | `server/utils/discord.ts` | `generateVerifyCode()` и `linkDiscordByCode()` (логика привязки + работа с БД) | ✅ есть |
-| `server/constants/discord.ts` | Тексты (`DISCORD_STATUSES`), TTL/длина/алфавит кода, имя команды | ✅ есть |
+| `server/constants/discord.ts` | Тексты (`DISCORD_ERRORS`), TTL/длина/алфавит кода, имя команды | ✅ есть |
 | `server/enums/discord.ts` | `ELinkReasons` — машинные коды причин отказа | ✅ есть |
 | `server/types/discord.ts` | Доменные типы: `IDiscordUserData`, `IDiscordInfo`, `TLinkResult` | ✅ есть |
 | `shared/types/response.ts` | Контракты ответов эндпоинтов (`IDiscordLinkResponse`, `IDiscordStatusResponse`) — общие с фронтом | ✅ есть |
@@ -99,7 +99,7 @@
 
 ### `POST /api/discord/link` — запросить код
 
-- Если аккаунт уже `LINKED` → `409` (`DISCORD_STATUSES.ALREADY_LINKED`).
+- Если аккаунт уже `LINKED` → `409` (`DISCORD_ERRORS.ALREADY_LINKED`).
 - Иначе генерирует новый `verifyCode` + `verifyExpiry` (now + TTL) и **upsert**-ит
   строку `DiscordAccount` по `userId` (status остаётся `PENDING`).
 - Повторный вызов **перезаписывает** старый код новым (старый сразу инвалидируется).
@@ -227,7 +227,7 @@ NUXT_DISCORD_CHANNEL_ID=id_канала_из_шага_8
    - пропускаем всё, кроме команды `verify`;
    - если канал не совпадает с `NUXT_DISCORD_CHANNEL_ID` → эфемерный отказ;
    - иначе достаём `code`, вызываем `linkDiscordByCode(code, { id, username, avatar })`;
-   - отвечаем эфемерно: успех либо текст причины по `DISCORD_STATUSES[result.reason]`;
+   - отвечаем эфемерно: успех либо текст причины по `DISCORD_ERRORS[result.reason]`;
    - любые неожиданные ошибки логируются, пользователю — нейтральный текст.
 7. **`client.login(token)`** открывает Gateway-соединение. После успешного логина
    срабатывает `ClientReady` (регистрация команды) и начинают приходить

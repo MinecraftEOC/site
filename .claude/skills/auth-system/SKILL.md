@@ -53,7 +53,7 @@ Middleware только **опознаёт** юзера. **Требование*
 
 - `server/utils/auth.ts` → **`requireUser(event)`** — возвращает юзера из
   контекста или кидает `401 UNAUTHORIZED`. Использовать в защищённых эндпоинтах.
-- `server/constants/auth.ts` → `AUTH_STATUSES` (тексты ошибок),
+- `server/constants/auth.ts` → `AUTH_ERRORS` (тексты ошибок),
   `SESSION_COOKIE` (`'sessionid'`), `SESSION_MAX_AGE` (7 дней, сек),
   `RESET_TOKEN_MAX_AGE` (1 час, сек).
 - `server/types/auth.ts` → `IAuthBody`, `IResetPasswordBody`, `ISafeUser`,

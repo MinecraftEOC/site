@@ -1,21 +1,15 @@
 /** Тексты ошибок авторизации, возвращаемые эндпоинтами через `createError`. */
-export const ERROR_STATUSES = {
+export const AUTH_ERRORS = {
     INVALID_EMAIL: 'Некорректный email',
     INVALID_PASSWORD: 'Пароль должен быть не короче 8 символов',
-    USER_EXISTS: 'Пользователь с таким email уже существует',
     EMPTY_EMAIL: 'Email не задан',
     EMPTY_PASSWORD: 'Пароль не задан',
     EMPTY_RESET_TOKEN: 'Токен не задан',
     INVALID_DATA: 'Неверный email или пароль',
     INVALID_RESET_TOKEN: 'Неверный токен',
     UNAUTHORIZED: 'Требуется авторизация',
-    USER_NOT_FOUND: 'Пользователь не найден',
-    CHARACTER_NOT_FOUND: 'Персонаж не найден',
     FORBIDDEN: 'Доступ запрещен',
-    NO_FILTERS: 'Не передан ни один параметр фильтрации',
     SERVER_TOKEN_NOT_CONFIGURED: 'Серверный токен не настроен',
-    EMPTY_ID: 'ID не задан',
-    EMPTY_UUID: 'UUID не задан',
 };
 
 /** Имя httpOnly-cookie, в которой хранится id сессии. */

@@ -3,7 +3,7 @@ import type { ISuccessResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
-import { ERROR_STATUSES } from '~~/server/common/constants/auth';
+import { AUTH_ERRORS } from '~~/server/common/constants/auth';
 
 /**
  * `POST /api/auth/reset-password` — установка нового пароля по reset-токену.
@@ -19,16 +19,16 @@ export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const password = body.password;
 
     if (!token) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_RESET_TOKEN });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.EMPTY_RESET_TOKEN });
     }
 
     if (!password || password.length < 8) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.INVALID_PASSWORD });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.INVALID_PASSWORD });
     }
 
     const user = await prisma.user.findUnique({ where: { resetToken: token } });
     if (!user?.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.INVALID_RESET_TOKEN });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.INVALID_RESET_TOKEN });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);

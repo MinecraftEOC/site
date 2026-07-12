@@ -3,7 +3,7 @@ import type { ILoginResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
-import { ERROR_STATUSES, SESSION_COOKIE, SESSION_MAX_AGE } from '~~/server/common/constants/auth';
+import { AUTH_ERRORS, SESSION_COOKIE, SESSION_MAX_AGE } from '~~/server/common/constants/auth';
 
 /**
  * `POST /api/auth/login` — вход по email и паролю.
@@ -19,18 +19,18 @@ export default defineEventHandler(async (event): Promise<ILoginResponse> => {
     const password = body.password;
 
     if (!email) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_EMAIL });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.EMPTY_EMAIL });
     }
 
     if (!password) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_PASSWORD });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.EMPTY_PASSWORD });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     const isPasswordCorrect = user ? await bcrypt.compare(password, user.password) : false;
 
     if (!user || !isPasswordCorrect) {
-        throw createError({ statusCode: 401, statusMessage: ERROR_STATUSES.INVALID_DATA });
+        throw createError({ statusCode: 401, statusMessage: AUTH_ERRORS.INVALID_DATA });
     }
 
     const session = await prisma.session.create({

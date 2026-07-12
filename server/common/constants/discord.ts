@@ -3,7 +3,7 @@
  * `/api/discord/link` и сообщения бота на команду `/verify`.
  * Ключи `INVALID_CODE`/`DISCORD_TAKEN` совпадают со значениями {@link ELinkReasons}.
  */
-export const DISCORD_STATUSES = {
+export const DISCORD_ERRORS = {
     ALREADY_LINKED: 'Discord уже привязан к этому аккаунту',
     LINK_SUCCESS: 'Аккаунт успешно привязан',
     INVALID_CODE: 'Код неверный или устарел',

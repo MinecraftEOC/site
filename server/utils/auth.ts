@@ -4,7 +4,7 @@ import { Buffer } from 'node:buffer';
 import { timingSafeEqual } from 'node:crypto';
 
 import { UserRole } from '~~/generated/prisma/enums';
-import { ERROR_STATUSES, SERVER_TOKEN_SCHEME } from '~~/server/common/constants/auth';
+import { AUTH_ERRORS, SERVER_TOKEN_SCHEME } from '~~/server/common/constants/auth';
 
 /**
  * Требует авторизованного пользователя для защищённого эндпоинта.
@@ -19,7 +19,7 @@ import { ERROR_STATUSES, SERVER_TOKEN_SCHEME } from '~~/server/common/constants/
 export function requireUser(event: H3Event) {
     const user = event.context.user;
     if (!user) {
-        throw createError({ statusCode: 401, statusMessage: ERROR_STATUSES.UNAUTHORIZED });
+        throw createError({ statusCode: 401, statusMessage: AUTH_ERRORS.UNAUTHORIZED });
     }
 
     return user;
@@ -35,7 +35,7 @@ export function requireUser(event: H3Event) {
 export function requireAdmin(event: H3Event) {
     const user = requireUser(event);
     if (user.role !== UserRole.ADMIN) {
-        throw createError({ statusCode: 403, statusMessage: ERROR_STATUSES.FORBIDDEN });
+        throw createError({ statusCode: 403, statusMessage: AUTH_ERRORS.FORBIDDEN });
     }
 
     return user;
@@ -57,7 +57,7 @@ export function requireAdmin(event: H3Event) {
 export function requireServerToken(event: H3Event) {
     const expected = useRuntimeConfig(event).serverApiToken;
     if (!expected) {
-        throw createError({ statusCode: 500, statusMessage: ERROR_STATUSES.SERVER_TOKEN_NOT_CONFIGURED });
+        throw createError({ statusCode: 500, statusMessage: AUTH_ERRORS.SERVER_TOKEN_NOT_CONFIGURED });
     }
 
     const header = getHeader(event, 'authorization');
@@ -66,7 +66,7 @@ export function requireServerToken(event: H3Event) {
         : undefined;
 
     if (!token || !safeEqual(token, expected)) {
-        throw createError({ statusCode: 403, statusMessage: ERROR_STATUSES.FORBIDDEN });
+        throw createError({ statusCode: 403, statusMessage: AUTH_ERRORS.FORBIDDEN });
     }
 }
 

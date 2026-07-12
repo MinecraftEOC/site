@@ -2,7 +2,7 @@ import type { ISuccessResponse } from '~~/shared/@types/response';
 
 import { randomBytes } from 'node:crypto';
 
-import { ERROR_STATUSES, RESET_TOKEN_MAX_AGE } from '~~/server/common/constants/auth';
+import { AUTH_ERRORS, RESET_TOKEN_MAX_AGE } from '~~/server/common/constants/auth';
 
 /**
  * `POST /api/auth/forgot-password` — запрос на восстановление пароля.
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const email = body.email?.trim().toLowerCase();
 
     if (!email) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_EMAIL });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.EMPTY_EMAIL });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

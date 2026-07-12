@@ -67,8 +67,7 @@ export async function linkDiscordByCode(rawCode: string, discord: IDiscordUserDa
                 verifyExpiry: null,
             },
         });
-    }
-    catch (error) {
+    } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
             return { ok: false, reason: ELinkReasons.DISCORD_TAKEN };
         }

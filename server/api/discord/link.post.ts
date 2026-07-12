@@ -1,7 +1,7 @@
 import type { IDiscordLinkResponse } from '~~/shared/@types/response';
 
 import { DiscordLinkStatus } from '~~/generated/prisma/enums';
-import { DISCORD_STATUSES, VERIFY_CODE_TTL } from '~~/server/common/constants/discord';
+import { DISCORD_ERRORS, VERIFY_CODE_TTL } from '~~/server/common/constants/discord';
 
 /**
  * `POST /api/discord/link` — запуск привязки аккаунта к Discord.
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event): Promise<IDiscordLinkResponse> =
     });
 
     if (discordAccount?.status === DiscordLinkStatus.LINKED) {
-        throw createError({ statusCode: 409, statusMessage: DISCORD_STATUSES.ALREADY_LINKED });
+        throw createError({ statusCode: 409, statusMessage: DISCORD_ERRORS.ALREADY_LINKED });
     }
 
     const verifyCode = generateVerifyCode();

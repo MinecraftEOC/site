@@ -1,7 +1,6 @@
 import type { IMeResponse } from '~~/shared/@types/response';
 
-import { ERROR_STATUSES } from '~~/server/common/constants/auth';
-import { USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
+import { USER_ERRORS, USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
 
 /**
  * `GET /api/me` — данные текущего авторизованного пользователя.
@@ -21,7 +20,7 @@ export default defineEventHandler(async (event): Promise<IMeResponse> => {
     });
 
     if (!user) {
-        throw createError({ statusCode: 404, statusMessage: ERROR_STATUSES.USER_NOT_FOUND });
+        throw createError({ statusCode: 404, statusMessage: USER_ERRORS.USER_NOT_FOUND });
     }
 
     return user;

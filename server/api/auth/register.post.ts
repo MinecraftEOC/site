@@ -3,7 +3,8 @@ import type { IRegisterResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
-import { ERROR_STATUSES } from '~~/server/common/constants/auth';
+import { AUTH_ERRORS } from '~~/server/common/constants/auth';
+import { USER_ERRORS } from '~~/server/common/constants/user';
 
 const EMAIL_REGEX = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
@@ -22,16 +23,16 @@ export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
     const password = body.password;
 
     if (!email || !EMAIL_REGEX.test(email)) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.INVALID_EMAIL });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.INVALID_EMAIL });
     }
 
     if (!password || password.length < 8) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.INVALID_PASSWORD });
+        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.INVALID_PASSWORD });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (user) {
-        throw createError({ statusCode: 409, statusMessage: ERROR_STATUSES.USER_EXISTS });
+        throw createError({ statusCode: 409, statusMessage: USER_ERRORS.USER_EXISTS });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
