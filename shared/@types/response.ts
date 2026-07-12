@@ -1,5 +1,5 @@
 import type { DiscordLinkStatus, UserRole } from '~~/generated/prisma/client';
-import type { ICharacter, IDiscordAccount } from '~~/shared/@types/user';
+import type { ICharacter, IDiscordAccount, IServerCharacter } from '~~/shared/@types/user';
 
 /** Ответ `POST /api/auth/register` — созданный пользователь без чувствительных полей. */
 export interface IRegisterResponse {
@@ -55,3 +55,6 @@ export interface IDiscordStatusResponse {
     /** Статус привязки Discord. */
     status: DiscordLinkStatus;
 }
+
+/** Ответ `GET /api/server/character` — персонаж по uuid. Запрос для сервера */
+export interface IServerCharacterResponse extends IServerCharacter {}

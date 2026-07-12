@@ -1,4 +1,3 @@
-import type { IUserParams } from '~~/server/common/@types/user';
 import type { IUserResponse } from '~~/shared/@types/response';
 
 import { ERROR_STATUSES } from '~~/server/common/constants/auth';
@@ -12,7 +11,10 @@ import { USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
 export default defineEventHandler(async (event): Promise<IUserResponse> => {
     requireAdmin(event);
 
-    const { id } = getQuery<IUserParams>(event);
+    const { id } = getQuery<{ id?: string }>(event);
+    if (id === undefined) {
+        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_ID });
+    }
 
     const user = await prisma.user.findUnique({
         where: { id: Number(id) },

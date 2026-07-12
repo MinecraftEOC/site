@@ -11,5 +11,6 @@ export default defineNuxtConfig({
         discordClientId: '',
         discordGuildId: '',
         discordChannelId: '',
+        serverApiToken: '',
     },
 });
