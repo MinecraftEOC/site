@@ -1,5 +1,5 @@
 /** Тексты ошибок авторизации, возвращаемые эндпоинтами через `createError`. */
-export const AUTH_STATUSES = {
+export const ERROR_STATUSES = {
     INVALID_EMAIL: 'Некорректный email',
     INVALID_PASSWORD: 'Пароль должен быть не короче 8 символов',
     USER_EXISTS: 'Пользователь с таким email уже существует',
@@ -10,6 +10,8 @@ export const AUTH_STATUSES = {
     INVALID_RESET_TOKEN: 'Неверный токен',
     UNAUTHORIZED: 'Требуется авторизация',
     USER_NOT_FOUND: 'Пользователь не найден',
+    FORBIDDEN: 'Доступ запрещен',
+    NO_FILTERS: 'Не передан ни один параметр фильтрации',
 };
 
 /** Имя httpOnly-cookie, в которой хранится id сессии. */

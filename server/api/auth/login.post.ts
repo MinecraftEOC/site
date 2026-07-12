@@ -3,26 +3,34 @@ import type { ILoginResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
-import { AUTH_STATUSES, SESSION_COOKIE, SESSION_MAX_AGE } from '~~/server/common/constants/auth';
+import { ERROR_STATUSES, SESSION_COOKIE, SESSION_MAX_AGE } from '~~/server/common/constants/auth';
 
+/**
+ * `POST /api/auth/login` — вход по email и паролю.
+ *
+ * При успехе создаёт сессию и кладёт её id в httpOnly-cookie.
+ *
+ * @throws 400 если email или пароль не переданы.
+ * @throws 401 если пользователь не найден или пароль неверный.
+ */
 export default defineEventHandler(async (event): Promise<ILoginResponse> => {
     const body = await readBody<IAuthBody>(event);
     const email = body.email?.trim().toLowerCase();
     const password = body.password;
 
     if (!email) {
-        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.EMPTY_EMAIL });
+        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_EMAIL });
     }
 
     if (!password) {
-        throw createError({ statusCode: 400, statusMessage: AUTH_STATUSES.EMPTY_PASSWORD });
+        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_PASSWORD });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     const isPasswordCorrect = user ? await bcrypt.compare(password, user.password) : false;
 
     if (!user || !isPasswordCorrect) {
-        throw createError({ statusCode: 401, statusMessage: AUTH_STATUSES.INVALID_DATA });
+        throw createError({ statusCode: 401, statusMessage: ERROR_STATUSES.INVALID_DATA });
     }
 
     const session = await prisma.session.create({

@@ -1,5 +1,7 @@
 import type { H3Event } from 'h3';
-import { AUTH_STATUSES } from '~~/server/common/constants/auth';
+
+import { UserRole } from '~~/generated/prisma/enums';
+import { ERROR_STATUSES } from '~~/server/common/constants/auth';
 
 /**
  * Требует авторизованного пользователя для защищённого эндпоинта.
@@ -14,7 +16,23 @@ import { AUTH_STATUSES } from '~~/server/common/constants/auth';
 export function requireUser(event: H3Event) {
     const user = event.context.user;
     if (!user) {
-        throw createError({ statusCode: 401, statusMessage: AUTH_STATUSES.UNAUTHORIZED });
+        throw createError({ statusCode: 401, statusMessage: ERROR_STATUSES.UNAUTHORIZED });
+    }
+
+    return user;
+}
+
+/**
+ * Требует роли администратора для защищенного ресурса.
+ *
+ * @param event Текущее событие H3.
+ * @returns Администратор ({@link ISafeUser}).
+ * @throws `403` если пользователь не администратор.
+ */
+export function requireAdmin(event: H3Event) {
+    const user = requireUser(event);
+    if (user.role !== UserRole.ADMIN) {
+        throw createError({ statusCode: 403, statusMessage: ERROR_STATUSES.FORBIDDEN });
     }
 
     return user;
