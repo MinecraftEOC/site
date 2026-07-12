@@ -62,6 +62,10 @@ dist
 *.mo
 *.pot
 
+# Uploaded skins (runtime-контент, не версионируем)
+/storage/skins/*
+!/storage/skins/.gitkeep
+
 # Environments
 .env
 .venv

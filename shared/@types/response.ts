@@ -36,6 +36,9 @@ export interface IUserResponse {
 /** Ответ `GET /api/me` — текущий авторизованный пользователь. */
 export interface IMeResponse extends IUserResponse {}
 
+/** Ответ `POST`/`PATCH /api/character` — персонаж пользователя. */
+export interface ICharacterResponse extends ICharacter {}
+
 /** Универсальный ответ об успехе для операций без полезной нагрузки (logout, сброс пароля и т.п.). */
 export interface ISuccessResponse {
     /** Признак успешного выполнения операции. */

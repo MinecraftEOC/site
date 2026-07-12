@@ -1,5 +1,7 @@
 import type { Prisma } from '~~/generated/prisma/client';
 
+import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+
 /** Тексты ошибок, относящихся к пользователю, возвращаемые через `createError`. */
 export const USER_ERRORS = {
     USER_EXISTS: 'Пользователь с таким email уже существует',
@@ -18,21 +20,7 @@ export const USER_PUBLIC_SELECT = {
     email: true,
     role: true,
     characters: {
-        select: {
-            id: true,
-            username: true,
-            biography: true,
-            states: true,
-            startingItems: true,
-            status: true,
-            skins: {
-                select: {
-                    id: true,
-                    hash: true,
-                },
-            },
-            comment: true,
-        },
+        select: CHARACTER_PUBLIC_SELECT,
     },
     discordAccount: {
         select: {

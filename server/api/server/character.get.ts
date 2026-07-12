@@ -1,6 +1,6 @@
 import type { IServerCharacterResponse } from '~~/shared/@types/response';
 
-import { ERROR_STATUSES } from '~~/server/common/constants/auth';
+import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 
 /**
  * `GET /api/server/character` — данные персонажа по uuid для игрового сервера.
@@ -14,7 +14,7 @@ import { ERROR_STATUSES } from '~~/server/common/constants/auth';
 export default defineEventHandler(async (event): Promise<IServerCharacterResponse> => {
     const { uuid } = getQuery<{ uuid?: string }>(event);
     if (!uuid) {
-        throw createError({ statusCode: 400, statusMessage: ERROR_STATUSES.EMPTY_UUID });
+        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_UUID });
     }
 
     const character = await prisma.character.findUnique({
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event): Promise<IServerCharacterRespons
     });
 
     if (!character) {
-        throw createError({ statusCode: 404, statusMessage: ERROR_STATUSES.CHARACTER_NOT_FOUND });
+        throw createError({ statusCode: 404, statusMessage: CHARACTER_ERRORS.NOT_FOUND });
     }
 
     return character;
