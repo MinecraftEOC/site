@@ -58,19 +58,16 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         data.startingItems = parseJson(startingItems, CHARACTER_ERRORS.INVALID_STARTING_ITEMS);
     }
 
-    // Валидируем новые файлы скинов до любых записей.
     const skinBuffers = collectSkinFiles(parts);
-
-    // Должно быть хоть одно изменение: поле или новый скин.
     if (Object.keys(data).length === 0 && skinBuffers.length === 0) {
         throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.NOTHING_TO_UPDATE });
     }
 
-    // Доработке подлежит только свой персонаж в редактируемом статусе.
     const character = await prisma.character.findFirst({
         where: { userId, status: { in: CHARACTER_EDITABLE_STATUSES } },
         select: { id: true, _count: { select: { skins: true } } },
     });
+
     if (!character) {
         throw createError({ statusCode: 404, statusMessage: CHARACTER_ERRORS.NOT_EDITABLE });
     }
@@ -79,7 +76,6 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw createError({ statusCode: 409, statusMessage: SKIN_ERRORS.LIMIT_REACHED });
     }
 
-    // Правка возвращает персонажа на модерацию и снимает старый комментарий.
     data.status = CharacterStatus.UNVERIFIED;
     data.comment = null;
 
@@ -96,9 +92,11 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         });
     } catch (error) {
         await deleteSkinFiles(hashes);
+
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
             throw createError({ statusCode: 409, statusMessage: CHARACTER_ERRORS.USERNAME_TAKEN });
         }
+
         throw error;
     }
 });
