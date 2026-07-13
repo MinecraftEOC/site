@@ -7,6 +7,18 @@
 
 set -euo pipefail
 
+# --- PATH для неинтерактивного SSH ---
+# GitHub Actions заходит по SSH неинтерактивно, поэтому ~/.bashrc не читается,
+# а bun/node ставят себя в PATH именно там. Прописываем нужные пути вручную.
+export BUN_INSTALL="${BUN_INSTALL:-$HOME/.bun}"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Если node/pm2 установлены через nvm — подгружаем nvm.
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+fi
+
 # Директория проекта на сервере (при клонировании: /var/www/site).
 APP_DIR="${APP_DIR:-/var/www/site}"
 # Имя процесса в pm2.
