@@ -11,6 +11,9 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-/var/www/site}"
 # Имя процесса в pm2.
 PM2_NAME="${PM2_NAME:-site}"
+# Порт, на котором Nitro поднимает сервер (3000 занят другим проектом на сервере).
+PORT="${PORT:-3001}"
+export PORT
 
 cd "$APP_DIR"
 

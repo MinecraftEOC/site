@@ -6,6 +6,11 @@ export default defineNuxtConfig({
         '@nuxt/eslint',
         '@pinia/nuxt',
     ],
+    vite: {
+        server: {
+            allowedHosts: ['eoc-rp.ru', 'www.eoc-rp.ru'],
+        },
+    },
     runtimeConfig: {
         discordBotToken: '',
         discordClientId: '',
