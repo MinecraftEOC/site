@@ -19,7 +19,7 @@ jobs:
                     host: ${{ secrets.SSH_HOST }}
                     port: ${{ secrets.SSH_PORT }}
                     username: ${{ secrets.SSH_USER }}
-                    key: ${{ secrets.SSH_KEY }}
+                    key: ${{ secrets.SSH_PRIVATE_KEY }}
                     script_stop: true
                     script: |
                         APP_DIR="${{ secrets.APP_DIR }}" PM2_NAME="${{ secrets.PM2_NAME }}" bash ${{ secrets.APP_DIR }}/deploy.sh
