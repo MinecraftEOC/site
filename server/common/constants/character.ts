@@ -44,5 +44,5 @@ export const CHARACTER_PUBLIC_SELECT = {
 /** Статусы, в которых пользователь может редактировать своего персонажа. */
 export const CHARACTER_EDITABLE_STATUSES: CharacterStatus[] = [CharacterStatus.UNVERIFIED, CharacterStatus.RETURNED];
 
-/** Регулярка имени персонажа: 3–16 символов, только кириллица. */
-export const USERNAME_REGEX = /^[а-яёА-ЯЁ]{3,16}$/;
+/** Регулярка имени персонажа: 3–16 символов, кириллица и пробелы (не по краям). */
+export const USERNAME_REGEX = /^[а-яёА-ЯЁ][а-яёА-ЯЁ ]{1,14}[а-яёА-ЯЁ]$/;
