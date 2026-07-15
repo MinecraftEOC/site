@@ -29,6 +29,17 @@ export PORT
 
 cd "$APP_DIR"
 
+# Подгружаем .env в окружение шелла, чтобы pm2 передал переменные
+# (DATABASE_URL и т.д.) в спавнимый процесс. Собранный Nitro-бандл
+# (.output/server/index.mjs) сам .env не читает — только явный process.env.
+if [ -f "$APP_DIR/.env" ]; then
+    set -a
+    . "$APP_DIR/.env"
+    set +a
+else
+    echo "==> ВНИМАНИЕ: $APP_DIR/.env не найден, приложение стартует без переменных окружения" >&2
+fi
+
 echo "==> Обновляем код из main"
 git fetch --all
 git reset --hard origin/main
