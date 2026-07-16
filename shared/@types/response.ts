@@ -61,8 +61,3 @@ export interface IDiscordStatusResponse {
 
 /** Ответ `GET /api/server/character` — персонаж по uuid. Запрос для сервера */
 export interface IServerCharacterResponse extends IServerCharacter {}
-
-/** Ответ `GET /api/server/skins` — список хешей скинов. Запрос для сервера */
-export interface IServerSkinsResponse {
-    hashes: string[];
-}

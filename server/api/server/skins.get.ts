@@ -1,5 +1,3 @@
-import type { IServerSkinsResponse } from '~~/shared/@types/response';
-
 import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 
 /**
@@ -10,7 +8,7 @@ import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
  *
  * @throws 403 если server-to-server токен отсутствует или неверен.
  */
-export default defineEventHandler(async (event): Promise<IServerSkinsResponse> => {
+export default defineEventHandler(async (event): Promise<string[]> => {
     const { uuid } = getQuery<{ uuid?: string }>(event);
     if (!uuid) {
         throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_UUID });
@@ -20,5 +18,5 @@ export default defineEventHandler(async (event): Promise<IServerSkinsResponse> =
         where: { character: { uuid } },
     });
 
-    return { hashes: skins.map(skin => skin.hash) };
+    return skins.map(skin => skin.hash);
 });
