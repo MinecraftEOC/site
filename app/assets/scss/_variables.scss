@@ -1,0 +1,214 @@
+// Брейкпоинты
+$breakpoints: (
+    mobile: 767px,
+    tablet: 1279px,
+    laptop: 1440px,
+    desktop: 1920px,
+);
+
+// ============================================================
+// Палитра
+// ============================================================
+
+// Нейтрали — пергамент
+$parchment-50: #fbf6ee;
+$parchment-100: #f7eee1;
+$parchment-200: #f2e6d6; // фон страницы
+$parchment-300: #ead9c4;
+$parchment-400: #dcc7ab;
+$parchment-500: #c9b08e;
+
+// Чернила и тёмные тона
+$taupe-400: #94856f;
+$taupe-600: #6b5f52;
+$ink: #2b2a29; // основной текст
+$black: #1a1a1a; // тёмные поверхности
+$cream: #f6e6d7; // текст на тёмном
+
+// Основной — кожа (brass)
+$brass-50: #f3ece3;
+$brass-100: #e6d5c3;
+$brass-300: #c4a488;
+$brass-400: #a5866a;
+$brass-500: #8e6c4f; // основная кнопка
+$brass-600: #71543c;
+$brass-700: #543e2c;
+
+// Гербовый красный — кирпич
+$brick-50: #f8e7e1;
+$brick-100: #efc7bb;
+$brick-400: #c05a44;
+$brick-500: #a63a2a; // деструктив
+$brick-600: #892c20;
+$brick-700: #6c2018;
+
+// Хвойный — вспомогательный
+$pine-50: #e9efe4;
+$pine-400: #6e8a5e;
+$pine-500: #4b6440;
+$pine-600: #38502f;
+
+// Семантика
+$success: #4b7a4e;
+$success-bg: #e9f0e6;
+$success-fg: #2e5233;
+$warning: #c0892a;
+$warning-bg: #f8ecd2;
+$warning-fg: #7a5410;
+$danger: #a63a2a;
+$danger-bg: #f8e7e1;
+$danger-fg: #6c2018; // danger = brick-500
+$info: #3e6b8a;
+$info-bg: #e4edf2;
+$info-fg: #234459;
+
+// Прозрачности и оверлеи (на базе $black и $cream)
+$transparent: rgba($black, 0); // #00000000 — сброс фона
+$overlay-50: rgba($black, 0.5); // #1a1a1a80 — лёгкое затемнение
+$overlay-55: rgba($black, 0.55); // #1a1a1a8c — под модалкой / дровером
+$overlay-85: rgba($black, 0.85); // #1a1a1ad9 — глубокое затемнение
+$overlay-95: rgba($black, 0.95); // #1a1a1af2 — почти сплошное
+$shadow-dark-80: rgba($black, 0.8); // #1a1a1acc — тёмная тень
+$text-inverse-subtle: rgba($cream, 0.72); // #f6e6d7b8 — приглушённый на тёмном
+$text-inverse-muted: rgba($cream, 0.8); // #f6e6d7cc — вторичный на тёмном
+$text-inverse-strong: rgba($cream, 0.9); // #f6e6d7e6 — основной на тёмном
+$border-inverse-faint: rgba($cream, 0.1); // #f6e6d71a — слабая граница на тёмном
+
+// ============================================================
+// Семантические роли
+// В компонентах используйте только эти переменные, а не сырые
+// $parchment-* / $brass-* и т.п.
+// ============================================================
+
+// Поверхности
+$surface-page: $parchment-200; // фон страницы
+$surface: $parchment-100; // карточки, панели
+$surface-raised: $parchment-50; // модалки, поповеры
+$surface-sunken: $parchment-300; // инсет, ховер-заливка
+$surface-dark: $black; // тёмные секции: шапка, сайдбар, футер
+$overlay: $overlay-55; // затемнение под модалкой
+$shadow-dark: $shadow-dark-80; // тёмная тень
+
+// Текст
+$text-primary: $ink;
+$text-secondary: $taupe-600;
+$text-muted: $taupe-400; // подписи, плейсхолдеры
+$text-inverse: $cream; // основной текст на тёмном (полная непрозрачность)
+// приглушённые градации на тёмном — $text-inverse-{strong,muted,subtle}
+$text-link: $brass-600;
+$text-link-hover: $brass-500;
+$text-danger: $brick-700; // инлайн-ошибка
+$text-success: $success-fg;
+
+// Границы
+$border-subtle: $parchment-400; // мягкая, разделители
+$border: $parchment-500; // по умолчанию
+$border-focus: $brass-500; // фокус-кольцо
+$border-inverse: $border-inverse-faint; // разделитель на тёмном (0.1)
+
+// Кнопка: основная (brass)
+$btn-primary-bg: $brass-500;
+$btn-primary-bg-hover: $brass-400;
+$btn-primary-bg-active: $brass-600;
+$btn-primary-text: $cream;
+$btn-primary-disabled-bg: rgba($brass-500, 0.28);
+$btn-primary-disabled-text: $taupe-400;
+
+// Кнопка: второстепенная (контурная)
+$btn-secondary-bg: transparent;
+$btn-secondary-bg-hover: $parchment-300;
+$btn-secondary-bg-active: $parchment-500;
+$btn-secondary-border: $parchment-500;
+$btn-secondary-text: $brass-600;
+$btn-secondary-disabled-bg: rgba($parchment-500, 0.28);
+$btn-secondary-disabled-text: $taupe-400;
+
+// Кнопка: акцентная (pine)
+$btn-accent-bg: $pine-500;
+$btn-accent-bg-hover: $pine-400;
+$btn-accent-bg-active: $pine-600;
+$btn-accent-text: $cream;
+$btn-accent-disabled-bg: rgba($pine-500, 0.28);
+$btn-accent-disabled-text: $taupe-400;
+
+// Кнопка: деструктивная (brick)
+$btn-danger-bg: $brick-500;
+$btn-danger-bg-hover: $brick-400;
+$btn-danger-bg-active: $brick-600;
+$btn-danger-text: $cream;
+$btn-danger-disabled-bg: rgba($brick-500, 0.28);
+$btn-danger-disabled-text: $taupe-400;
+
+// Поля ввода и контролы
+$input-bg: $parchment-50;
+$input-bg-disabled: $parchment-300;
+$input-border: $parchment-500;
+$input-text: $ink;
+$input-placeholder: $taupe-400;
+$control-active: $brass-500; // чекбокс / радио / тоггл во вкл.
+
+// Интерактивные состояния
+$focus-ring: $brass-500;
+$hover-surface: $parchment-300;
+
+// Бейджи / теги
+$badge-neutral-bg: $parchment-300;
+$badge-neutral-text: $taupe-600;
+$badge-online-bg: $pine-50;
+$badge-online-text: $pine-600;
+
+// Статусы берутся напрямую из палитры:
+// $success / $success-bg / $success-fg и аналогично warning / danger / info
+
+// ============================================================
+// Типографика
+// ============================================================
+
+// Семейства
+$font-serif: 'Alegreya', georgia, serif; // заголовки h1–h4
+$font-sans: 'Alegreya Sans', system-ui, sans-serif; // текст t / лейблы l
+$font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+// Начертания
+$fw-regular: 400;
+$fw-medium: 500;
+$fw-bold: 700;
+$fw-extrabold: 800;
+
+// Размеры (все кратны 2)
+$fs-h1: 52px;
+$fs-h2: 42px;
+$fs-h3: 28px;
+$fs-h4: 20px;
+$fs-t1: 18px;
+$fs-t2: 16px;
+$fs-t3: 14px;
+$fs-t4: 12px;
+$fs-l1: 16px;
+$fs-l2: 14px;
+$fs-l3: 12px;
+$fs-l4: 10px;
+$fs-mono: 14px;
+
+// ============================================================
+// Отступы и радиусы
+// Базовый шаг — 4px; для тонкой подгонки допустим 2px.
+// ============================================================
+
+// Отступы
+$space-2: 2px; // микрозазоры
+$space-4: 4px; // иконка ↔ текст
+$space-8: 8px; // внутри мелких элементов
+$space-12: 12px; // padding кнопок
+$space-16: 16px; // базовый отступ, padding карточек
+$space-24: 24px; // между блоками секции
+$space-32: 32px; // отступы секций
+$space-48: 48px; // крупные разделители
+$space-64: 64px; // вертикальные отступы страницы
+
+// Радиусы
+$radius-4: 4px; // поля ввода, теги
+$radius-8: 8px; // кнопки, карточки (по умолчанию)
+$radius-12: 12px; // панели, модалки
+$radius-16: 16px; // крупные контейнеры, hero-блоки
+$radius-full: 999px; // пилюли, круглые аватары
