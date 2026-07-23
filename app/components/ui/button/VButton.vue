@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { EColor, ESize } from '~/assets/ts/enums/common';
+import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
 
 interface IProps {
+    /** Тег кнопки. */
+    tag?: ETag;
     /** Размер кнопки. */
     size?: ESize;
     /** Цветовая схема кнопки. */
     color?: EColor;
     /** Иконка кнопки. */
     icon?: string;
+    /** Отключение кнопки. */
+    disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
+    tag: ETag.Button,
     size: ESize.Medium,
     color: EColor.Primary,
+    icon: '',
+    disabled: false,
 });
 
 const style = useCssModule();
@@ -20,6 +27,7 @@ const style = useCssModule();
 const classList = computed(() => [
     style[`--size-${props.size}`],
     style[`--color-${props.color}`],
+    props.disabled ? style['--disabled'] : '',
 ]);
 
 const iconSize = computed(() => {
@@ -32,11 +40,22 @@ const iconSize = computed(() => {
 </script>
 
 <template>
-    <button v-bind="$attrs" :class="[$style.VButton, classList]">
-        <VIcon v-if="icon" :name="icon" :size="iconSize" />
+    <component
+        :is="props.tag"
+        v-bind="$attrs"
+        :class="[$style.VButton, classList]"
+        class="v-button"
+    >
+        <VIcon
+            v-if="icon"
+            :name="icon"
+            :size="iconSize"
+        />
 
-        <slot />
-    </button>
+        <span class="v-button__label">
+            <slot />
+        </span>
+    </component>
 </template>
 
 <style module lang="scss">
@@ -44,23 +63,26 @@ const iconSize = computed(() => {
     @include l2;
 
     display: flex;
-    gap: 8px;
+    gap: $space-8;
+    justify-content: center;
     align-items: center;
-    border-radius: 8px;
+    border-radius: $radius-8;
+    cursor: pointer;
     user-select: none;
+    transition: all $default-transition;
 
-    &:disabled {
+    &:disabled, &.--disabled {
         pointer-events: none;
     }
 
     &.--size-small {
-        height: 32px;
-        padding: 8px 12px;
+        height: rem(32);
+        padding: $space-8 $space-12;
     }
 
     &.--size-medium {
-        height: 40px;
-        padding: 8px 16px;
+        height: rem(40);
+        padding: $space-8 $space-16;
     }
 
     &.--color-primary {
@@ -75,7 +97,8 @@ const iconSize = computed(() => {
             background-color: $btn-primary-bg-active;
         }
 
-        &:disabled {
+        &:disabled,
+        &.--disabled {
             background-color: $btn-primary-disabled-bg;
             color: $btn-primary-disabled-text;
         }
@@ -94,9 +117,26 @@ const iconSize = computed(() => {
             background-color: $btn-secondary-bg-active;
         }
 
-        &:disabled {
+        &:disabled,
+        &.--disabled {
             background-color: $btn-secondary-disabled-bg;
             color: $btn-secondary-disabled-text;
+        }
+    }
+
+    &.--color-secondary-dark {
+        border: 1px solid $btn-secondary-dark-border;
+        background-color: $btn-secondary-dark-bg;
+        color: $btn-secondary-dark-text;
+
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &:disabled,
+        &.--disabled {
+            background-color: $btn-secondary-dark-disabled-bg;
+            color: $btn-secondary-dark-disabled-text;
         }
     }
 
@@ -112,7 +152,8 @@ const iconSize = computed(() => {
             background-color: $btn-accent-bg-active;
         }
 
-        &:disabled {
+        &:disabled,
+        &.--disabled {
             background-color: $btn-accent-disabled-bg;
             color: $btn-accent-disabled-text;
         }
@@ -130,7 +171,8 @@ const iconSize = computed(() => {
             background-color: $btn-danger-bg-active;
         }
 
-        &:disabled {
+        &:disabled,
+        &.--disabled {
             background-color: $btn-danger-disabled-bg;
             color: $btn-danger-disabled-text;
         }

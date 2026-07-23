@@ -44,6 +44,10 @@
     font: #{$fw-bold} #{$fs-h4}/1.3 $font-serif;
 }
 
+@mixin h5 {
+    font: #{$fw-bold} #{$fs-h5}/1.3 $font-serif;
+}
+
 // Текст — Alegreya Sans
 @mixin t1 {
     font: #{$fw-regular} #{$fs-t1}/1.6 $font-sans;

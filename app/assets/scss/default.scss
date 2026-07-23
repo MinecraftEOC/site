@@ -3,6 +3,11 @@
 }
 
 html {
+    // Плавающий корневой размер: 1rem = 10px на 1440px и растёт вместе
+    // с шириной. clamp фиксирует нижнюю границу 10px (для экранов ≤1440
+    // работают штатные брейкпоинты) и потолок ~13.5px (на 2K/4K блоки
+    // не становятся гигантскими).
+    font-size: clamp(10px, calc(100vw / 144), 13.5px);
     text-size-adjust: 100%;
 }
 
@@ -11,7 +16,7 @@ body {
     padding: 0;
     background-color: $surface-page;
     color: $text-primary;
-    font-size: 16px;
+    font-size: rem(16);
     font-family: $font-sans;
 }
 
@@ -76,4 +81,18 @@ address {
 :focus-visible {
     outline: 2px solid $focus-ring;
     outline-offset: 2px;
+}
+
+
+.container {
+    max-width: rem(1320);
+    margin: 0 auto;
+
+    @include respond-to(laptop) {
+        padding: 0 $space-32;
+    }
+
+    @include respond-to(mobile) {
+        padding: 0 $space-16;
+    }
 }

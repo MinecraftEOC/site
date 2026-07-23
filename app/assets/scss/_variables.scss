@@ -1,4 +1,6 @@
-// Брейкпоинты
+@use './functions' as *;
+
+// Брейкпоинты (остаются в px — медиазапросы не должны зависеть от rem)
 $breakpoints: (
     mobile: 767px,
     tablet: 1279px,
@@ -123,6 +125,13 @@ $btn-secondary-text: $brass-600;
 $btn-secondary-disabled-bg: rgba($parchment-500, 0.28);
 $btn-secondary-disabled-text: $taupe-400;
 
+// Кнопка: второстепенная (контурная) на темном фоне
+$btn-secondary-dark-bg: transparent;
+$btn-secondary-dark-border: $border-inverse;
+$btn-secondary-dark-text: $text-inverse;
+$btn-secondary-dark-disabled-bg: rgba($surface-dark, 0.28);
+$btn-secondary-dark-disabled-text: $taupe-400;
+
 // Кнопка: акцентная (pine)
 $btn-accent-bg: $pine-500;
 $btn-accent-bg-hover: $pine-400;
@@ -175,20 +184,22 @@ $fw-medium: 500;
 $fw-bold: 700;
 $fw-extrabold: 800;
 
-// Размеры (все кратны 2)
-$fs-h1: 52px;
-$fs-h2: 42px;
-$fs-h3: 28px;
-$fs-h4: 20px;
-$fs-t1: 18px;
-$fs-t2: 16px;
-$fs-t3: 14px;
-$fs-t4: 12px;
-$fs-l1: 16px;
-$fs-l2: 14px;
-$fs-l3: 12px;
-$fs-l4: 10px;
-$fs-mono: 14px;
+// Размеры (все кратны 2; значения указаны в px, rem() переводит их
+// в масштабируемые rem из расчёта 1rem = 10px на 1440px)
+$fs-h1: rem(52);
+$fs-h2: rem(42);
+$fs-h3: rem(28);
+$fs-h4: rem(20);
+$fs-h5: rem(16);
+$fs-t1: rem(18);
+$fs-t2: rem(16);
+$fs-t3: rem(14);
+$fs-t4: rem(12);
+$fs-l1: rem(16);
+$fs-l2: rem(14);
+$fs-l3: rem(12);
+$fs-l4: rem(10);
+$fs-mono: rem(14);
 
 // ============================================================
 // Отступы и радиусы
@@ -196,19 +207,24 @@ $fs-mono: 14px;
 // ============================================================
 
 // Отступы
-$space-2: 2px; // микрозазоры
-$space-4: 4px; // иконка ↔ текст
-$space-8: 8px; // внутри мелких элементов
-$space-12: 12px; // padding кнопок
-$space-16: 16px; // базовый отступ, padding карточек
-$space-24: 24px; // между блоками секции
-$space-32: 32px; // отступы секций
-$space-48: 48px; // крупные разделители
-$space-64: 64px; // вертикальные отступы страницы
+$space-2: rem(2); // микрозазоры
+$space-4: rem(4); // иконка ↔ текст
+$space-8: rem(8); // внутри мелких элементов
+$space-12: rem(12); // padding кнопок
+$space-16: rem(16); // базовый отступ, padding карточек
+$space-24: rem(24); // между блоками секции
+$space-32: rem(32); // отступы секций
+$space-48: rem(48); // крупные разделители
+$space-64: rem(64); // вертикальные отступы страницы
 
 // Радиусы
-$radius-4: 4px; // поля ввода, теги
-$radius-8: 8px; // кнопки, карточки (по умолчанию)
-$radius-12: 12px; // панели, модалки
-$radius-16: 16px; // крупные контейнеры, hero-блоки
+$radius-4: rem(4); // поля ввода, теги
+$radius-8: rem(8); // кнопки, карточки (по умолчанию)
+$radius-12: rem(12); // панели, модалки
+$radius-16: rem(16); // крупные контейнеры, hero-блоки
 $radius-full: 999px; // пилюли, круглые аватары
+
+
+$header-h: rem(72);
+$header-mobile-h: rem(60);
+$default-transition: 0.3s ease-in-out;

@@ -18,6 +18,7 @@
       "devDependencies": {
         "@antfu/eslint-config": "^9.1.0",
         "@iconify-json/lucide": "^1.2.118",
+        "@iconify-json/simple-icons": "^1.2.91",
         "@nuxt/eslint": "1.16.0",
         "@nuxt/fonts": "^0.14.0",
         "@pinia/nuxt": "0.11.3",
@@ -246,6 +247,8 @@
     "@humanwhocodes/retry": ["@humanwhocodes/retry@0.4.3", "", {}, "sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ=="],
 
     "@iconify-json/lucide": ["@iconify-json/lucide@1.2.118", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-JBnK4YOq6K/lA0JP//27QxFxJ4120TjvfXAzGZZIGjCcXcRRRFxl1rcV7+IWdcVCe90KXdqVaAwLaLf6G3HELw=="],
+
+    "@iconify-json/simple-icons": ["@iconify-json/simple-icons@1.2.91", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-plQJHZxzpkIXaeYjJF0Sc9nkzYF32EDX9olx7j1hcKYFaiTrQXbcngZmvzuV0pG6uZPU3ZuA/GIsgxSHOm6jrQ=="],
 
     "@iconify/collections": ["@iconify/collections@1.0.713", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-IRuFajJYQ/DfU+Dj5ZJwOXmP41UEjao7H77Kn398v6geqqaYGo0DqvatwChssN90Si9V5O/B824r6QHN2MojVQ=="],
 
