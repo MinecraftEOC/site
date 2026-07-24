@@ -3,7 +3,7 @@ import type { ICharacterResponse } from '~~/shared/@types/response';
 import { randomUUID } from 'node:crypto';
 
 import { Prisma } from '~~/generated/prisma/client';
-import { CharacterStatus } from '~~/generated/prisma/enums';
+import { CharacterStatus, UserRole } from '~~/generated/prisma/enums';
 import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT, USERNAME_REGEX } from '~~/server/common/constants/character';
 import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
 import { USER_ERRORS } from '~~/server/common/constants/user';
@@ -27,7 +27,7 @@ import { USER_ERRORS } from '~~/server/common/constants/user';
  * @throws 409 если уже есть активный персонаж, имя занято или превышен лимит скинов.
  */
 export default defineEventHandler(async (event): Promise<ICharacterResponse> => {
-    const { id: userId } = requireUser(event);
+    const { id: userId, role } = requireUser(event);
     const parts = await readMultipartFormData(event);
 
     const username = getFormField(parts, 'username')?.trim();
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         select: { id: true },
     });
 
-    if (alive) {
+    if (alive && role !== UserRole.ADMIN) {
         throw createError({ statusCode: 409, statusMessage: CHARACTER_ERRORS.ALREADY_EXISTS });
     }
 
