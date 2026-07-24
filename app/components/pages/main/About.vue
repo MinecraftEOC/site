@@ -206,5 +206,9 @@ import { EColor, ETag } from '~/assets/ts/enums/common';
     @include t2;
 
     color: $text-secondary;
+
+    @include respond-to(mobile) {
+        @include t3;
+    }
 }
 </style>
