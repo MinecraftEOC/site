@@ -1,7 +1,8 @@
 {
     "extends": ["stylelint-config-hudochenkov/full"],
-    "plugins": ["stylelint-scss"],
+    "plugins": ["stylelint-scss", "@stylistic/stylelint-plugin"],
     "rules": {
+        "@stylistic/indentation": 4,
         "at-rule-no-unknown": null,
         "function-no-unknown": null,
         "selector-max-type": null,

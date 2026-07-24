@@ -6752,7 +6752,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "./images/generated-1784696265938.png",
+                        "url": "images/generated-1784696265938.png",
                         "mode": "fill"
                       },
                       "cornerRadius": 999,
@@ -7358,7 +7358,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1784695284831.png",
+                    "url": "images/generated-1784695284831.png",
                     "mode": "fill"
                   },
                   "cornerRadius": 12
@@ -7458,7 +7458,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1784695284697.png",
+                    "url": "images/generated-1784695284697.png",
                     "mode": "fill"
                   },
                   "cornerRadius": 12
@@ -7558,7 +7558,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1784695291106.png",
+                    "url": "images/generated-1784695291106.png",
                     "mode": "fill"
                   },
                   "cornerRadius": 12
