@@ -49,6 +49,21 @@ const BUTTONS = [
         icon: 'user',
     },
 ];
+
+function onNavItemClick(link: string) {
+    const block = document.getElementById(link.replace('#', ''));
+    if (!block) {
+        return;
+    }
+
+    const top = block.getBoundingClientRect().top + window.pageYOffset - 40;
+
+    window.scroll({
+        top,
+        left: 0,
+        behavior: 'smooth',
+    });
+}
 </script>
 
 <template>
@@ -72,14 +87,14 @@ const BUTTONS = [
             </NuxtLink>
 
             <nav v-if="props.hasMenu" :class="$style.nav">
-                <NuxtLink
+                <span
                     v-for="item in MAIN_NAV_LIST"
                     :key="item.title"
-                    :to="item.link"
                     :class="$style.navItem"
+                    @click="onNavItemClick(item.link)"
                 >
                     {{ item.title }}
-                </NuxtLink>
+                </span>
             </nav>
 
             <div :class="$style.buttons">
@@ -188,6 +203,8 @@ const BUTTONS = [
 
     padding: $space-8;
     color: $text-inverse-subtle;
+    cursor: pointer;
+    user-select: none;
     transition: color $default-transition;
 
     &:hover {

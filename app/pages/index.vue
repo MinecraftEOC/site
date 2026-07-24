@@ -9,10 +9,10 @@ import Rules from '~/components/pages/main/Rules.vue';
 <template>
     <div :class="$style.Page">
         <Hero />
-        <About />
+        <About id="about" />
         <Advantages />
-        <Rules />
-        <HowPlay />
+        <Rules id="rules" />
+        <HowPlay id="game" />
     </div>
 </template>
 

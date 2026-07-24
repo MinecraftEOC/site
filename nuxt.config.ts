@@ -12,6 +12,15 @@ export default defineNuxtConfig({
 
     app: {
         head: {
+            title: 'Эпоха Колонизации - Minecraft RP сервер',
+
+            meta: [
+                {
+                    name: 'description',
+                    content: 'Погрузись в ролевой мир средневекового фэнтези на сервере Minecraft. Каждый выбор пишет историю: политика, ремесло, интриги и жизнь города. Начни игру.',
+                },
+            ],
+
             link: [
                 { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
                 { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -24,11 +33,10 @@ export default defineNuxtConfig({
     },
 
     fonts: {
-        // Шрифты самохостятся; тянем только реально используемые веса
-        // и кириллицу с латиницей (см. дизайн-систему, раздел 2).
         defaults: {
             subsets: ['cyrillic', 'latin'],
         },
+
         families: [
             { name: 'Alegreya', weights: [700, 800] },
             { name: 'Alegreya Sans', weights: [400, 500] },
