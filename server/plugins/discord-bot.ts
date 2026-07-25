@@ -6,7 +6,6 @@ import {
     ButtonStyle,
     Client,
     ComponentType,
-    EmbedBuilder,
     Events,
     GatewayIntentBits,
     MessageFlags,
@@ -30,10 +29,12 @@ const verifyButton = new ButtonBuilder()
 /** Ряд с кнопкой панели (Discord требует оборачивать компоненты в ActionRow). */
 const panelRow = new ActionRowBuilder<ButtonBuilder>().addComponents(verifyButton);
 
-/** Embed-описание панели над кнопкой. */
-const panelEmbed = new EmbedBuilder()
-    .setTitle(VERIFY_PANEL.TITLE)
-    .setDescription(VERIFY_PANEL.DESCRIPTION);
+/**
+ * Текст сообщения-панели над кнопкой. Обычный текст (не embed) выбран намеренно:
+ * для отправки embed нужно право «Встраивать ссылки», а простому сообщению с
+ * кнопкой хватает «Отправлять сообщения».
+ */
+const panelContent = `**${VERIFY_PANEL.TITLE}**\n${VERIFY_PANEL.DESCRIPTION}`;
 
 /** Модальное окно ввода кода, открываемое по нажатию кнопки. */
 const verifyModal = new ModalBuilder()
@@ -74,7 +75,7 @@ async function ensureVerifyPanel(channel: SendableChannels, botId: string): Prom
         return;
     }
 
-    await channel.send({ embeds: [panelEmbed], components: [panelRow] });
+    await channel.send({ content: panelContent, components: [panelRow] });
 }
 
 export default defineNitroPlugin(async () => {
