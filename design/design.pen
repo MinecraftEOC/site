@@ -6381,10 +6381,10 @@
               "type": "frame",
               "id": "y3ibSs",
               "name": "Start / Main Content",
-              "context": "Spacing: две равные колонки 636px; gap 48px между ними.",
+              "context": "Spacing: колонка шагов 800px; квадратный визуал 496×496px; gap 24px.",
               "width": "fill_container",
               "height": 496,
-              "gap": "$space-48",
+              "gap": "$space-24",
               "alignItems": "center",
               "children": [
                 {
@@ -6392,8 +6392,8 @@
                   "id": "ImUfc",
                   "name": "Start / Steps",
                   "context": "Spacing: gap 16px между карточками шагов.",
-                  "width": 636,
-                  "height": 494,
+                  "width": 800,
+                  "height": 496,
                   "layout": "vertical",
                   "gap": "$space-16",
                   "children": [
@@ -6416,10 +6416,10 @@
                           "type": "frame",
                           "id": "TpWok",
                           "name": "Start Step Copy",
-                          "context": "Spacing: gap 16px между описанием и кнопкой.",
+                          "context": "Spacing: gap 8px между описанием и кнопкой; иконка соответствует карточкам правил.",
                           "width": "fill_container",
                           "layout": "vertical",
-                          "gap": "$space-16",
+                          "gap": "$space-8",
                           "children": [
                             {
                               "type": "frame",
@@ -6441,11 +6441,11 @@
                                     {
                                       "type": "frame",
                                       "id": "h58Tz",
-                                      "name": "Start Step Number",
-                                      "width": 24,
-                                      "height": 24,
+                                      "name": "Start Step Icon Container",
+                                      "width": 32,
+                                      "height": 32,
                                       "fill": "$surface-sunken",
-                                      "cornerRadius": 999,
+                                      "cornerRadius": "$radius-8",
                                       "justifyContent": "center",
                                       "alignItems": "center",
                                       "children": [
@@ -6453,8 +6453,8 @@
                                           "type": "icon",
                                           "id": "csiok",
                                           "name": "Start Step Icon / Rules",
-                                          "width": 14,
-                                          "height": 14,
+                                          "width": 16,
+                                          "height": 16,
                                           "icon": "scroll-text",
                                           "library": "lucide",
                                           "fill": "$text-link"
@@ -6526,10 +6526,10 @@
                           "type": "frame",
                           "id": "Kgv1I",
                           "name": "Start Step Copy",
-                          "context": "Spacing: gap 16px между описанием и кнопкой.",
+                          "context": "Spacing: gap 8px между описанием и кнопкой; иконка соответствует карточкам правил.",
                           "width": "fill_container",
                           "layout": "vertical",
-                          "gap": "$space-16",
+                          "gap": "$space-8",
                           "children": [
                             {
                               "type": "frame",
@@ -6551,11 +6551,11 @@
                                     {
                                       "type": "frame",
                                       "id": "Z88U2",
-                                      "name": "Start Step Number",
-                                      "width": 24,
-                                      "height": 24,
+                                      "name": "Start Step Icon Container",
+                                      "width": 32,
+                                      "height": 32,
                                       "fill": "$surface-sunken",
-                                      "cornerRadius": 999,
+                                      "cornerRadius": "$radius-8",
                                       "justifyContent": "center",
                                       "alignItems": "center",
                                       "children": [
@@ -6563,8 +6563,8 @@
                                           "type": "icon",
                                           "id": "c2Ff1y",
                                           "name": "Start Step Icon / Character",
-                                          "width": 14,
-                                          "height": 14,
+                                          "width": 16,
+                                          "height": 16,
                                           "icon": "user-plus",
                                           "library": "lucide",
                                           "fill": "$text-link"
@@ -6636,10 +6636,10 @@
                           "type": "frame",
                           "id": "R1RuB",
                           "name": "Start Step Copy",
-                          "context": "Spacing: gap 16px между описанием и кнопкой.",
+                          "context": "Spacing: gap 8px между описанием и кнопкой; иконка соответствует карточкам правил.",
                           "width": "fill_container",
                           "layout": "vertical",
-                          "gap": "$space-16",
+                          "gap": "$space-8",
                           "children": [
                             {
                               "type": "frame",
@@ -6661,11 +6661,11 @@
                                     {
                                       "type": "frame",
                                       "id": "wHEMe",
-                                      "name": "Start Step Number",
-                                      "width": 24,
-                                      "height": 24,
+                                      "name": "Start Step Icon Container",
+                                      "width": 32,
+                                      "height": 32,
                                       "fill": "$surface-sunken",
-                                      "cornerRadius": 999,
+                                      "cornerRadius": "$radius-8",
                                       "justifyContent": "center",
                                       "alignItems": "center",
                                       "children": [
@@ -6673,8 +6673,8 @@
                                           "type": "icon",
                                           "id": "SKflS",
                                           "name": "Start Step Icon / Launcher",
-                                          "width": 14,
-                                          "height": 14,
+                                          "width": 16,
+                                          "height": 16,
                                           "icon": "download",
                                           "library": "lucide",
                                           "fill": "$text-link"
@@ -6734,49 +6734,38 @@
                 {
                   "type": "frame",
                   "id": "GaT2T",
-                  "name": "Start / Logo Composition",
-                  "context": "Spacing: размер блока 636×494px; контент центрирован; gap 16px между логотипом и текстом.",
-                  "width": 636,
-                  "height": 494,
+                  "name": "Start / Story Visual",
+                  "context": "Квадратный сюжетный визуал 496×496px во всю высоту контентного контейнера.",
+                  "width": 496,
+                  "height": 496,
                   "layout": "none",
                   "children": [
                     {
                       "type": "frame",
                       "id": "wKrQw",
-                      "x": 79,
-                      "y": 8,
+                      "x": 0,
+                      "y": 0,
                       "name": "Start / Site Logo",
                       "clip": true,
-                      "width": 478,
-                      "height": 478,
+                      "width": 496,
+                      "height": 496,
                       "fill": {
                         "type": "image",
                         "enabled": true,
                         "url": "images/generated-1784696265938.png",
                         "mode": "fill"
                       },
-                      "cornerRadius": 999,
+                      "cornerRadius": "$radius-16",
                       "stroke": "$surface",
-                      "strokeWidth": 8
+                      "strokeWidth": 4
                     },
                     {
-                      "type": "ellipse",
-                      "id": "S6lzc",
-                      "x": 71,
+                      "type": "rectangle",
+                      "cornerRadius": "$radius-16",
+                      "id": "VBSEk",
+                      "x": 0,
                       "y": 0,
-                      "name": "Start Screenshot Outer Ring",
-                      "fill": "$transparent",
-                      "width": 494,
-                      "height": 494,
-                      "stroke": "$border",
-                      "strokeWidth": 1
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "VEvBQ",
-                      "x": 87,
-                      "y": 16,
-                      "name": "Start Screenshot Text Overlay",
+                      "name": "Start Story Visual Overlay",
                       "fill": {
                         "type": "gradient",
                         "gradientType": "linear",
@@ -6788,7 +6777,7 @@
                         "colors": [
                           {
                             "color": "$transparent",
-                            "position": 0.25
+                            "position": 0.3
                           },
                           {
                             "color": "$overlay-95",
@@ -6796,28 +6785,60 @@
                           }
                         ]
                       },
-                      "width": 462,
-                      "height": 462
+                      "width": 496,
+                      "height": 496
                     },
                     {
                       "type": "frame",
-                      "id": "vD9wQ",
-                      "layoutPosition": "absolute",
-                      "x": 168,
-                      "y": 336,
-                      "name": "Start / Logo Copy",
-                      "context": "Spacing: gap 8px между eyebrow и заголовком; текст центрирован внутри круга.",
-                      "width": 300,
-                      "height": 112,
+                      "id": "CYz5h",
+                      "x": 24,
+                      "y": 334,
+                      "name": "Start / Story Copy",
+                      "context": "Текст расположен в нижней части квадратного визуала с внутренним отступом 24px.",
+                      "width": 448,
+                      "height": 138,
                       "layout": "vertical",
                       "gap": "$space-8",
-                      "justifyContent": "center",
-                      "alignItems": "center",
+                      "justifyContent": "end",
                       "children": [
                         {
+                          "type": "frame",
+                          "id": "a8nelD",
+                          "name": "Whitelist Status",
+                          "fill": "$badge-online-bg",
+                          "cornerRadius": "$radius-full",
+                          "gap": "$space-8",
+                          "padding": [
+                            "$space-4",
+                            "$space-8"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "HCRvX",
+                              "name": "Whitelist Status Dot",
+                              "fill": "$success",
+                              "width": 8,
+                              "height": 8
+                            },
+                            {
+                              "type": "text",
+                              "id": "FjM2h",
+                              "name": "Whitelist Status Label",
+                              "fill": "$badge-online-text",
+                              "content": "WHITELIST ОТКРЫТ",
+                              "lineHeight": 1.35,
+                              "fontFamily": "$font-sans",
+                              "fontSize": "$fs-l3",
+                              "fontWeight": "$fw-medium"
+                            }
+                          ]
+                        },
+                        {
                           "type": "text",
-                          "id": "ga930",
-                          "name": "Start / Logo Eyebrow",
+                          "id": "aNwRy",
+                          "name": "Start Story Eyebrow",
                           "fill": "$text-inverse-subtle",
                           "effect": {
                             "type": "shadow",
@@ -6829,12 +6850,8 @@
                             },
                             "blur": 8
                           },
-                          "textGrowth": "fixed-width-height",
-                          "width": 220,
-                          "height": 14,
                           "content": "ВПЕРЁД К ПРИКЛЮЧЕНИЯМ",
                           "lineHeight": 1.4,
-                          "textAlign": "center",
                           "fontFamily": "$font-sans",
                           "fontSize": "$fs-l4",
                           "fontWeight": "$fw-medium",
@@ -6842,8 +6859,8 @@
                         },
                         {
                           "type": "text",
-                          "id": "Ke0Vo",
-                          "name": "Start / Logo Title",
+                          "id": "CUwcM",
+                          "name": "Start Story Title",
                           "fill": "$text-inverse",
                           "effect": {
                             "type": "shadow",
@@ -6856,12 +6873,11 @@
                             "blur": 8
                           },
                           "textGrowth": "fixed-width",
-                          "width": 300,
+                          "width": "fill_container",
                           "content": "История твоего персонажа начинается здесь",
-                          "lineHeight": 1.3,
-                          "textAlign": "center",
+                          "lineHeight": 1.2,
                           "fontFamily": "$font-serif",
-                          "fontSize": "$fs-h4",
+                          "fontSize": "$fs-h3",
                           "fontWeight": "$fw-bold"
                         }
                       ]
@@ -11289,6 +11305,1323 @@
                           ]
                         }
                       ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "IjL5y",
+      "x": 8736,
+      "y": 3752,
+      "name": "Авторизация — Desktop",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "$surface-page",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "W7U0KV",
+          "x": 0,
+          "y": 0,
+          "name": "Auth Visual Panel",
+          "width": 520,
+          "height": 900,
+          "fill": "$surface-dark",
+          "layout": "vertical",
+          "padding": "$space-64",
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "WxWeH",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 341.5,
+              "name": "Auth Visual Copy",
+              "width": 392,
+              "layout": "vertical",
+              "gap": "$space-16",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "H5UVnb",
+                  "name": "Auth Visual Eyebrow",
+                  "fill": "$text-inverse-subtle",
+                  "content": "ЛИЧНЫЙ КАБИНЕТ",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l4",
+                  "fontWeight": "$fw-medium",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "qhFye",
+                  "name": "Auth Visual Title",
+                  "fill": "$text-inverse",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Продолжите путь своего персонажа.",
+                  "lineHeight": 1.1,
+                  "fontFamily": "$font-serif",
+                  "fontSize": "$fs-h2",
+                  "fontWeight": "$fw-extrabold"
+                },
+                {
+                  "type": "text",
+                  "id": "jKmLk",
+                  "name": "Auth Visual Body",
+                  "fill": "$text-inverse-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Войди в личный кабинет, чтобы вернуться к приключениям.",
+                  "lineHeight": 1.55,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-t1",
+                  "fontWeight": "$fw-regular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "HnI4k",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 819,
+              "name": "Auth Visual Support",
+              "gap": "$space-4",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "MzMdi",
+                  "name": "Support Text",
+                  "fill": "$text-inverse-subtle",
+                  "content": "Нужна помощь? Напишите администрации в",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l3",
+                  "fontWeight": "$fw-regular"
+                },
+                {
+                  "type": "text",
+                  "id": "Ndw40",
+                  "name": "Discord Link",
+                  "fill": "$text-inverse",
+                  "content": "discord",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l3",
+                  "fontWeight": "$fw-medium"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "dhuzF",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 64,
+              "name": "Shared Brand / Header Exact",
+              "context": "Spacing: gap 16px между логотипом и названием.",
+              "gap": "$space-16",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Hcuew",
+                  "name": "Site Logo",
+                  "width": 72,
+                  "height": 72,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "../../../../C:/Users/axsel/Downloads/Logo_tyomny.png",
+                    "mode": "fit"
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "fDaos",
+                  "name": "Brand Text",
+                  "context": "Spacing: gap 2px между названием бренда и descriptor.",
+                  "layout": "vertical",
+                  "gap": "$space-2",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wAKAb",
+                      "name": "Brand Name",
+                      "fill": "$text-inverse",
+                      "content": "Эпоха Колонизации",
+                      "lineHeight": 1.3,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h3",
+                      "fontWeight": "$fw-bold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mKAkq",
+                      "name": "Brand Descriptor",
+                      "fill": "$text-inverse-subtle",
+                      "content": "ПРИВАТНЫЙ ROLEPLAY СЕРВЕР ",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l3",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "omsKB",
+          "x": 520,
+          "y": 0,
+          "name": "Login Form Area",
+          "width": 920,
+          "height": 900,
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "NvPKu",
+              "name": "Login Form",
+              "width": 400,
+              "layout": "vertical",
+              "gap": "$space-24",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gUN9N",
+                  "name": "Login Heading",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$space-8",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "QC6yR",
+                      "name": "Login Overline",
+                      "fill": "$text-muted",
+                      "content": "ЛИЧНЫЙ КАБИНЕТ",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l4",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "LWjaR",
+                      "name": "Login Title",
+                      "fill": "$text-primary",
+                      "content": "С возвращением",
+                      "lineHeight": 1.15,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h2",
+                      "fontWeight": "$fw-extrabold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Me55o",
+                      "name": "Login Description",
+                      "fill": "$text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Введите данные учётной записи, чтобы продолжить.",
+                      "lineHeight": 1.55,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t2",
+                      "fontWeight": "$fw-regular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ViiF0",
+                  "name": "Login Fields",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$space-16",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "r4vN5Z",
+                      "name": "Field / Email",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$space-8",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "gB09V",
+                          "name": "Field Label / Email",
+                          "fill": "$text-primary",
+                          "content": "Email",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-l2",
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "iKV7J",
+                          "name": "Input / Email",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "gap": "$space-8",
+                          "padding": [
+                            0,
+                            "$space-12"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "UbC5W",
+                              "name": "Input Icon / Email",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "mail",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "iMNJj",
+                              "name": "Input Value / Email",
+                              "fill": "$input-placeholder",
+                              "content": "name@example.com",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": "$fs-t3",
+                              "fontWeight": "$fw-regular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "o7Br9",
+                      "name": "Field / Пароль",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$space-8",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Mz6EB",
+                          "name": "Field Label / Пароль",
+                          "fill": "$text-primary",
+                          "content": "Пароль",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-l2",
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "iFp3C",
+                          "name": "Input / Пароль",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "gap": "$space-8",
+                          "padding": [
+                            0,
+                            "$space-12"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "rJWO8",
+                              "name": "Input Icon / Пароль",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "lock-keyhole",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "uW6Xm",
+                              "name": "Input Value / Пароль",
+                              "fill": "$input-placeholder",
+                              "content": "••••••••••••",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": "$fs-t3",
+                              "fontWeight": "$fw-regular"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gKpTJ",
+                  "name": "Login Support Row",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "QXRXu",
+                      "name": "Remember Me",
+                      "gap": "$space-8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Vi8WC",
+                          "name": "Remember Checkbox",
+                          "width": 20,
+                          "height": 20,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1
+                        },
+                        {
+                          "type": "text",
+                          "id": "OLhHM",
+                          "name": "Remember Label",
+                          "fill": "$text-secondary",
+                          "content": "Запомнить меня",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-t3",
+                          "fontWeight": "$fw-regular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "XpW9F",
+                      "name": "Recovery Link",
+                      "fill": "$text-link",
+                      "content": "Забыли пароль?",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-medium"
+                    }
+                  ]
+                },
+                {
+                  "id": "cFIbw",
+                  "type": "ref",
+                  "ref": "a5B8A",
+                  "name": "Button / Login",
+                  "width": "fill_container",
+                  "height": 40,
+                  "context": "UI Kit instance: Button / Default / Primary.",
+                  "descendants": {
+                    "HMhtM": {
+                      "content": "Войти"
+                    }
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "Qplye",
+                  "name": "Login Registration Prompt",
+                  "width": "fill_container",
+                  "gap": "$space-4",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "L2VR44",
+                      "name": "Login Registration Prompt Text",
+                      "fill": "$text-secondary",
+                      "content": "Впервые здесь?",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-regular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TurLY",
+                      "name": "Registration Link",
+                      "fill": "$text-link",
+                      "content": "Создать аккаунт",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-medium"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Si9AB",
+      "x": 10256,
+      "y": 3752,
+      "name": "Регистрация — Desktop",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "$surface-page",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Sa7Yn",
+          "x": 0,
+          "y": 0,
+          "name": "Atmospheric Left Panel",
+          "clip": true,
+          "width": 560,
+          "height": 900,
+          "fill": "$surface-dark",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "HgR3X",
+              "x": 64,
+              "y": 341.5,
+              "name": "Atmospheric Copy",
+              "width": 374,
+              "layout": "vertical",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "nBjCj",
+                  "name": "Atmospheric Eyebrow",
+                  "fill": "$text-inverse-subtle",
+                  "content": "ЛИЧНЫЙ КАБИНЕТ",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l4",
+                  "fontWeight": "$fw-medium",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "KUn5k",
+                  "name": "Atmospheric Heading",
+                  "fill": "$text-inverse",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Начните новую главу своей истории.",
+                  "lineHeight": 1.08,
+                  "fontFamily": "$font-serif",
+                  "fontSize": 42,
+                  "fontWeight": "$fw-extrabold"
+                },
+                {
+                  "type": "text",
+                  "id": "CsW3q",
+                  "name": "Atmospheric Description",
+                  "fill": "$text-inverse-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Создайте учётную запись, чтобы отправиться в приключение на остров Рейнстолл.",
+                  "lineHeight": 1.45,
+                  "fontFamily": "$font-sans",
+                  "fontSize": 18,
+                  "fontWeight": "$fw-regular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "W5AQg",
+              "x": 64,
+              "y": 819,
+              "name": "Left Panel Footer",
+              "width": 400,
+              "layout": "vertical",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "tDgi2",
+                  "name": "Registration Visual Support",
+                  "gap": "$space-4",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Z2inc4",
+                      "name": "Support Text",
+                      "fill": "$text-inverse-subtle",
+                      "content": "Нужна помощь? Напишите администрации в",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l3",
+                      "fontWeight": "$fw-regular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dKda4",
+                      "name": "Discord Link",
+                      "fill": "$text-inverse",
+                      "content": "discord",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l3",
+                      "fontWeight": "$fw-medium"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "q9lhF",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 64,
+              "name": "Shared Brand / Header Exact",
+              "context": "Spacing: gap 16px между логотипом и названием.",
+              "gap": "$space-16",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "I6DOA",
+                  "name": "Site Logo",
+                  "width": 72,
+                  "height": 72,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "../../../../C:/Users/axsel/Downloads/Logo_tyomny.png",
+                    "mode": "fit"
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "qSasH",
+                  "name": "Brand Text",
+                  "context": "Spacing: gap 2px между названием бренда и descriptor.",
+                  "layout": "vertical",
+                  "gap": "$space-2",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "s3TIp",
+                      "name": "Brand Name",
+                      "fill": "$text-inverse",
+                      "content": "Эпоха Колонизации",
+                      "lineHeight": 1.3,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h3",
+                      "fontWeight": "$fw-bold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "IgtqA",
+                      "name": "Brand Descriptor",
+                      "fill": "$text-inverse-subtle",
+                      "content": "ПРИВАТНЫЙ ROLEPLAY СЕРВЕР ",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l3",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VHDOx",
+          "x": 560,
+          "y": 0,
+          "name": "Registration Panel",
+          "width": 880,
+          "height": 900,
+          "fill": "$surface-page",
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "hXTGl",
+              "name": "Registration Form Shell",
+              "width": 420,
+              "layout": "vertical",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "lyXWx",
+                  "name": "Registration Header",
+                  "width": "fill_container",
+                  "height": 106,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "S5R45",
+                      "name": "Registration Overline",
+                      "fill": "$text-muted",
+                      "content": "СОЗДАНИЕ УЧЁТНОЙ ЗАПИСИ",
+                      "lineHeight": 1.3,
+                      "fontFamily": "$font-sans",
+                      "fontSize": 12,
+                      "fontWeight": "$fw-bold",
+                      "letterSpacing": 1.2
+                    },
+                    {
+                      "type": "text",
+                      "id": "zW15b",
+                      "name": "Registration Title",
+                      "fill": "$text-primary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Добро пожаловать",
+                      "lineHeight": 1.1,
+                      "fontFamily": "$font-serif",
+                      "fontSize": 42,
+                      "fontWeight": "$fw-extrabold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "G55NJp",
+                      "name": "Registration Lead",
+                      "fill": "$text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Заполните данные — это займёт всего минуту.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "$font-sans",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jESVl",
+                  "name": "Registration Fields",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "v3t9X",
+                      "name": "Email Field",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bj2GU",
+                          "name": "Email Label",
+                          "fill": "$text-primary",
+                          "content": "Email",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "xewri",
+                          "name": "Email Control",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "KQQvz",
+                              "name": "Email Placeholder",
+                              "fill": "$input-placeholder",
+                              "content": "name@example.com",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "THMU9",
+                      "name": "Пароль Field",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "dk4nc",
+                          "name": "Пароль Label",
+                          "fill": "$text-primary",
+                          "content": "Пароль",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "leQCO",
+                          "name": "Пароль Control",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "cQp9H",
+                              "name": "Пароль Placeholder",
+                              "fill": "$input-placeholder",
+                              "content": "Введите пароль",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZlbgB",
+                      "name": "Подтверждение пароля Field",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "q2kbcM",
+                          "name": "Подтверждение пароля Label",
+                          "fill": "$text-primary",
+                          "content": "Подтверждение пароля",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "UrdxF",
+                          "name": "Подтверждение пароля Control",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "V22wW",
+                              "name": "Подтверждение пароля Placeholder",
+                              "fill": "$input-placeholder",
+                              "content": "Повторите пароль",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "P8HoU",
+                  "type": "ref",
+                  "ref": "a5B8A",
+                  "name": "Button / Create Account",
+                  "width": "fill_container",
+                  "descendants": {
+                    "HMhtM": {
+                      "content": "Создать учётную запись"
+                    }
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "h2bCTi",
+                  "name": "Login Prompt",
+                  "width": "fill_container",
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "k3b0i",
+                      "name": "Login Prompt Text",
+                      "fill": "$text-secondary",
+                      "content": "Уже есть учётная запись?",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "nOrVj",
+                      "name": "Login Link",
+                      "fill": "$text-link",
+                      "content": "Войти",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "$fw-bold"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "SglkT",
+      "x": 11776,
+      "y": 3752,
+      "name": "Восстановление пароля — Desktop",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "$surface-page",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "F2pAV",
+          "x": 0,
+          "y": 0,
+          "name": "Recovery Visual Panel",
+          "width": 520,
+          "height": 900,
+          "fill": "$surface-dark",
+          "layout": "vertical",
+          "padding": "$space-64",
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "KhASH",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 341.5,
+              "name": "Recovery Visual Copy",
+              "width": 392,
+              "layout": "vertical",
+              "gap": "$space-16",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Ce9GK",
+                  "name": "Recovery Visual Eyebrow",
+                  "fill": "$text-inverse-subtle",
+                  "content": "ЛИЧНЫЙ КАБИНЕТ",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l4",
+                  "fontWeight": "$fw-medium",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "au4qz",
+                  "name": "Recovery Visual Title",
+                  "fill": "$text-inverse",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Каждая история заслуживает продолжения.",
+                  "lineHeight": 1.1,
+                  "fontFamily": "$font-serif",
+                  "fontSize": "$fs-h2",
+                  "fontWeight": "$fw-extrabold"
+                },
+                {
+                  "type": "text",
+                  "id": "iuP2u",
+                  "name": "Recovery Visual Body",
+                  "fill": "$text-inverse-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Восстановите доступ к аккаунту и вернитесь к приключениям.",
+                  "lineHeight": 1.55,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-t1",
+                  "fontWeight": "$fw-regular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Y2AgNs",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 819,
+              "name": "Recovery Visual Support",
+              "gap": "$space-4",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "A0wMy6",
+                  "name": "Support Text",
+                  "fill": "$text-inverse-subtle",
+                  "content": "Нужна помощь? Напишите администрации в",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l3",
+                  "fontWeight": "$fw-regular"
+                },
+                {
+                  "type": "text",
+                  "id": "ZZUyZ",
+                  "name": "Discord Link",
+                  "fill": "$text-inverse",
+                  "content": "discord",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l3",
+                  "fontWeight": "$fw-medium"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "t2f2YB",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 64,
+              "name": "Shared Brand / Header Exact",
+              "context": "Spacing: gap 16px между логотипом и названием.",
+              "gap": "$space-16",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fPjwF",
+                  "name": "Site Logo",
+                  "width": 72,
+                  "height": 72,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "../../../../C:/Users/axsel/Downloads/Logo_tyomny.png",
+                    "mode": "fit"
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "Bn1r3",
+                  "name": "Brand Text",
+                  "context": "Spacing: gap 2px между названием бренда и descriptor.",
+                  "layout": "vertical",
+                  "gap": "$space-2",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kRoHt",
+                      "name": "Brand Name",
+                      "fill": "$text-inverse",
+                      "content": "Эпоха Колонизации",
+                      "lineHeight": 1.3,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h3",
+                      "fontWeight": "$fw-bold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "i3usZ2",
+                      "name": "Brand Descriptor",
+                      "fill": "$text-inverse-subtle",
+                      "content": "ПРИВАТНЫЙ ROLEPLAY СЕРВЕР ",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l3",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "cxfdp",
+          "x": 520,
+          "y": 0,
+          "name": "Recovery Form Area",
+          "width": 920,
+          "height": 900,
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "g990Hp",
+              "name": "Recovery Form",
+              "width": 400,
+              "layout": "vertical",
+              "gap": "$space-24",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Y1goy",
+                  "name": "Recovery Heading",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$space-8",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ogAVw",
+                      "name": "Recovery Overline",
+                      "fill": "$text-muted",
+                      "content": "ВОССТАНОВЛЕНИЕ ДОСТУПА",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l4",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "ERtT4",
+                      "name": "Recovery Title",
+                      "fill": "$text-primary",
+                      "content": "Забыли пароль?",
+                      "lineHeight": 1.15,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h2",
+                      "fontWeight": "$fw-extrabold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Dqxcj",
+                      "name": "Recovery Description",
+                      "fill": "$text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Укажите email — мы отправим ссылку для сброса пароля.",
+                      "lineHeight": 1.55,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t2",
+                      "fontWeight": "$fw-regular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CpXDn",
+                  "name": "Recovery Email Field",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$space-8",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "nWjdT",
+                      "name": "Recovery Email Label",
+                      "fill": "$text-primary",
+                      "content": "Email",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l2",
+                      "fontWeight": "$fw-medium"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yWOXa",
+                      "name": "Recovery Email Input",
+                      "width": "fill_container",
+                      "height": 40,
+                      "fill": "$input-bg",
+                      "cornerRadius": "$radius-4",
+                      "stroke": "$input-border",
+                      "strokeWidth": 1,
+                      "gap": "$space-8",
+                      "padding": [
+                        0,
+                        "$space-12"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "jDnNB",
+                          "name": "Recovery Email Icon",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "mail",
+                          "library": "lucide",
+                          "fill": "$text-muted"
+                        },
+                        {
+                          "type": "text",
+                          "id": "F4I9ZS",
+                          "name": "Recovery Email Value",
+                          "fill": "$input-placeholder",
+                          "content": "name@example.com",
+                          "lineHeight": 1.55,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-t3",
+                          "fontWeight": "$fw-regular"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "FOnvs",
+                  "type": "ref",
+                  "ref": "a5B8A",
+                  "name": "Button / Send Recovery Link",
+                  "width": "fill_container",
+                  "height": 40,
+                  "context": "UI Kit instance: Button / Default / Primary.",
+                  "descendants": {
+                    "HMhtM": {
+                      "content": "Отправить ссылку"
+                    }
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "zdkef",
+                  "name": "Recovery Notice",
+                  "width": "fill_container",
+                  "fill": "$info-bg",
+                  "cornerRadius": "$radius-8",
+                  "gap": "$space-8",
+                  "padding": "$space-12",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "g0cBX",
+                      "name": "Recovery Notice Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "info",
+                      "library": "lucide",
+                      "fill": "$info-fg"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jCAaP",
+                      "name": "Recovery Notice Text",
+                      "fill": "$info-fg",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Письмо может прийти в течение нескольких минут. Проверьте папку «Спам».",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t4",
+                      "fontWeight": "$fw-regular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BsWBs",
+                  "name": "Recovery Back Prompt",
+                  "width": "fill_container",
+                  "gap": "$space-4",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "yzyEF",
+                      "name": "Recovery Back Text",
+                      "fill": "$text-secondary",
+                      "content": "Вспомнили пароль?",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-regular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "aY5N1",
+                      "name": "Recovery Back Link",
+                      "fill": "$text-link",
+                      "content": "Вернуться ко входу",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-medium"
                     }
                   ]
                 }
