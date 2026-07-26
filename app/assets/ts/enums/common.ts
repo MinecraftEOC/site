@@ -17,3 +17,10 @@ export enum ETag {
     Div = 'div',
     NuxtLink = 'nuxt-link',
 }
+
+export enum ENotificationType {
+    Success = 'success',
+    Warning = 'warning',
+    Error = 'error',
+    Info = 'info',
+}

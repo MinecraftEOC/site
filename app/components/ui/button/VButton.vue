@@ -2,15 +2,15 @@
 import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
 
 interface IProps {
-    /** Тег кнопки. */
+    /** Тег кнопки */
     tag?: ETag;
-    /** Размер кнопки. */
+    /** Размер кнопки */
     size?: ESize;
-    /** Цветовая схема кнопки. */
+    /** Цветовая схема кнопки */
     color?: EColor;
-    /** Иконка кнопки. */
+    /** Иконка кнопки */
     icon?: string;
-    /** Отключение кнопки. */
+    /** Отключение кнопки */
     disabled?: boolean;
 }
 
@@ -27,7 +27,7 @@ const style = useCssModule();
 const classList = computed(() => [
     style[`--size-${props.size}`],
     style[`--color-${props.color}`],
-    props.disabled ? style['--disabled'] : '',
+    props.disabled ? style._disabled : '',
 ]);
 
 const iconSize = computed(() => {
@@ -71,17 +71,17 @@ const iconSize = computed(() => {
     user-select: none;
     transition: all $default-transition;
 
-    &:disabled, &.--disabled {
+    &:disabled, &._disabled {
         pointer-events: none;
     }
 
     &.--size-small {
-        height: rem(32);
+        height: $space-32;
         padding: $space-8 $space-12;
     }
 
     &.--size-medium {
-        height: rem(40);
+        height: $space-40;
         padding: $space-8 $space-16;
     }
 

@@ -78,9 +78,8 @@ address {
     font-style: normal;
 }
 
-:focus-visible {
-    outline: 2px solid $focus-ring;
-    outline-offset: 2px;
+input {
+    outline: none;
 }
 
 .container {
