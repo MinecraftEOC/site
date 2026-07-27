@@ -78,10 +78,6 @@ const iconSize = computed(() => {
     display: flex;
     flex-direction: column;
 
-    &:disabled {
-        pointer-events: none;
-    }
-
     &._error {
         .native {
             border-color: $danger;
@@ -110,7 +106,7 @@ const iconSize = computed(() => {
 
         &._withIcon {
             .native {
-                padding-left: 2.8rem;
+                padding-left: $space-28;
             }
         }
     }
@@ -145,16 +141,25 @@ const iconSize = computed(() => {
     border: 1px solid $input-border;
     border-radius: $radius-4;
     background-color: $input-bg;
+    transition: all $default-transition;
 
     &::placeholder {
         color: $input-placeholder;
+    }
+
+    &:disabled {
+        pointer-events: none;
+    }
+
+    &:hover, &:active {
+        border-color: $focus-ring;
     }
 }
 
 .icon {
     position: absolute;
     top: calc(50% - 0.1rem);
-    left: $space-8;
+    left: $space-12;
     color: $text-muted;
     transform: translateY(-50%);
 }

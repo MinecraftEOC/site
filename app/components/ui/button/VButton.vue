@@ -12,6 +12,8 @@ interface IProps {
     icon?: string;
     /** Отключение кнопки */
     disabled?: boolean;
+    /** Состояние загрузки: вместо контента — анимация, кнопка неактивна */
+    loading?: boolean;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -20,14 +22,20 @@ const props = withDefaults(defineProps<IProps>(), {
     color: EColor.Primary,
     icon: '',
     disabled: false,
+    loading: false,
 });
 
 const style = useCssModule();
 
+const resolvedTag = computed(() => props.tag === ETag.NuxtLink ? resolveComponent('NuxtLink') : props.tag);
+
+// В загрузке кнопка тоже недоступна для нажатий.
+const isDisabled = computed(() => props.disabled || props.loading);
+
 const classList = computed(() => [
     style[`--size-${props.size}`],
     style[`--color-${props.color}`],
-    props.disabled ? style._disabled : '',
+    isDisabled.value ? style._disabled : '',
 ]);
 
 const iconSize = computed(() => {
@@ -41,20 +49,34 @@ const iconSize = computed(() => {
 
 <template>
     <component
-        :is="props.tag"
+        :is="resolvedTag"
         v-bind="$attrs"
+        :disabled="isDisabled || undefined"
         :class="[$style.VButton, classList]"
         class="v-button"
     >
-        <VIcon
-            v-if="icon"
-            :name="icon"
-            :size="iconSize"
-        />
-
-        <span class="v-button__label">
-            <slot />
+        <span
+            v-if="loading"
+            :class="$style.loader"
+            class="v-button__loader"
+            aria-label="Загрузка"
+        >
+            <span :class="$style.dot" />
+            <span :class="$style.dot" />
+            <span :class="$style.dot" />
         </span>
+
+        <template v-else>
+            <VIcon
+                v-if="icon"
+                :name="icon"
+                :size="iconSize"
+            />
+
+            <span class="v-button__label">
+                <slot />
+            </span>
+        </template>
     </component>
 </template>
 
@@ -176,6 +198,40 @@ const iconSize = computed(() => {
             background-color: $btn-danger-disabled-bg;
             color: $btn-danger-disabled-text;
         }
+    }
+}
+
+.loader {
+    display: flex;
+    gap: $space-4;
+    align-items: center;
+}
+
+.dot {
+    width: rem(6);
+    height: rem(6);
+    border-radius: 50%;
+    background-color: currentcolor;
+    animation: v-button-bounce 0.6s infinite ease-in-out both;
+
+    &:nth-child(1) {
+        animation-delay: -0.3s;
+    }
+
+    &:nth-child(2) {
+        animation-delay: -0.15s;
+    }
+}
+
+@keyframes v-button-bounce {
+    0%, 80%, 100% {
+        opacity: 0.5;
+        transform: translateY(0);
+    }
+
+    40% {
+        opacity: 1;
+        transform: translateY(rem(-4));
     }
 }
 </style>

@@ -34,10 +34,11 @@ const iconName = computed(() => {
 
 <template>
     <div :class="[$style.VNotification, classList]" class="v-notification">
-        <VIcon :name="iconName" :size="20" />
+        <VIcon :name="iconName" />
 
         <div :class="$style.wrapper">
             <div
+                v-if="props.title"
                 :class="$style.title"
                 class="v-notification__title"
                 v-html="props.title"
