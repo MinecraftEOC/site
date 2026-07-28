@@ -1,4 +1,8 @@
 import type { Character, DiscordAccount, Skin } from '~~/generated/prisma/client';
+import type { IUserResponse } from '~~/shared/@types/response';
+
+/** Интерфейс пользователя */
+export interface IUser extends IUserResponse {};
 
 /** Интерфейс персонажа */
 export interface ICharacter extends Omit<Character, 'uuid' | 'password' | 'accessToken' | 'serverId' | 'createdAt' | 'updatedAt' | 'userId'> {

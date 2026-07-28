@@ -3,7 +3,7 @@ import { FORM_HEADER, HELP_TEXT, SIDEBAR } from '~/assets/ts/constants/content/a
 import { EAuthPageType } from '~/assets/ts/enums/auth';
 import LogoBlock from '~/components/common/LogoBlock.vue';
 
-import AuthChangePasswordForm from '~/components/pages/auth/AuthChangePasswordForm.vue';
+import AuthForgotPasswordForm from '~/components/pages/auth/AuthForgotPasswordForm.vue';
 import AuthFormHeader from '~/components/pages/auth/AuthFormHeader.vue';
 import AuthLoginForm from '~/components/pages/auth/AuthLoginForm.vue';
 import AuthRegisterForm from '~/components/pages/auth/AuthRegisterForm.vue';
@@ -21,7 +21,7 @@ const formComponent = computed(() => {
     const components = {
         [EAuthPageType.Register]: AuthRegisterForm,
         [EAuthPageType.Login]: AuthLoginForm,
-        [EAuthPageType.ChangePassword]: AuthChangePasswordForm,
+        [EAuthPageType.ChangePassword]: AuthForgotPasswordForm,
         [EAuthPageType.ResetPassword]: AuthResetPasswordForm,
     };
 
@@ -29,6 +29,10 @@ const formComponent = computed(() => {
 });
 
 function getStartPageType() {
+    if (route.query.token) {
+        return EAuthPageType.ResetPassword;
+    }
+
     if (route.query.register) {
         return EAuthPageType.Register;
     }
@@ -46,25 +50,29 @@ function onChangePageType(type: EAuthPageType) {
         <div :class="$style.sidebar">
             <LogoBlock />
 
-            <div :class="$style.main">
-                <span :class="$style.pretitle" v-html="sidebar.pretitle" />
-                <h1 :class="$style.title" v-html="sidebar.title" />
-                <div :class="$style.description" v-html="sidebar.description" />
-            </div>
+            <Transition name="fade" mode="out-in">
+                <div :key="pageType" :class="$style.main">
+                    <span :class="$style.pretitle" v-html="sidebar.pretitle" />
+                    <h1 :class="$style.title" v-html="sidebar.title" />
+                    <div :class="$style.description" v-html="sidebar.description" />
+                </div>
+            </Transition>
 
             <div :class="$style.helpText" v-html="HELP_TEXT" />
         </div>
 
         <div :class="$style.formWrapper">
-            <div :class="$style.form">
-                <AuthFormHeader
-                    :title="header.title"
-                    :pretitle="header.pretitle"
-                    :description="header.description"
-                />
+            <Transition name="fade" mode="out-in">
+                <div :key="pageType" :class="$style.form">
+                    <AuthFormHeader
+                        :title="header.title"
+                        :pretitle="header.pretitle"
+                        :description="header.description"
+                    />
 
-                <component :is="formComponent" @change-type="onChangePageType" />
-            </div>
+                    <component :is="formComponent" @change-type="onChangePageType" />
+                </div>
+            </Transition>
         </div>
     </div>
 </template>

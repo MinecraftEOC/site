@@ -1,24 +1,6 @@
 import type { DiscordLinkStatus, UserRole } from '~~/generated/prisma/client';
 import type { ICharacter, IDiscordAccount, IServerCharacter } from '~~/shared/@types/user';
 
-/** Ответ `POST /api/auth/register` — созданный пользователь без чувствительных полей. */
-export interface IRegisterResponse {
-    /** Id нового пользователя. */
-    id: number;
-    /** Email пользователя. */
-    email: string;
-    /** Момент создания аккаунта в ISO-формате. */
-    createdAt: string;
-}
-
-/** Ответ `POST /api/auth/login` — базовые данные вошедшего пользователя. */
-export interface ILoginResponse {
-    /** Id пользователя. */
-    id: number;
-    /** Email пользователя. */
-    email: string;
-}
-
 /** Ответ `GET /api/user` — пользователь по id. */
 export interface IUserResponse {
     /** Id пользователя. */
@@ -32,6 +14,19 @@ export interface IUserResponse {
     /** Привязанный аккаунт Discord. */
     discordAccount: IDiscordAccount | null;
 }
+
+/** Ответ `POST /api/auth/register` — созданный пользователь без чувствительных полей. */
+export interface IRegisterResponse {
+    /** Id нового пользователя. */
+    id: number;
+    /** Email пользователя. */
+    email: string;
+    /** Момент создания аккаунта в ISO-формате. */
+    createdAt: string;
+}
+
+/** Ответ `POST /api/auth/login` — текущий авторизованный пользователь. */
+export interface ILoginResponse extends IUserResponse {}
 
 /** Ответ `GET /api/me` — текущий авторизованный пользователь. */
 export interface IMeResponse extends IUserResponse {}

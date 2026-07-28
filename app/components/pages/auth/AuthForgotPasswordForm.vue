@@ -2,7 +2,7 @@
 import { useForm } from 'vee-validate';
 
 import { EAuthPageType } from '~/assets/ts/enums/auth';
-import { resetPasswordSchema } from '~/assets/ts/schemas/auth';
+import { forgotPasswordSchema } from '~/assets/ts/schemas/auth';
 
 import { useAuthApi } from '~/composables/api/useAuthApi';
 
@@ -10,54 +10,38 @@ const emits = defineEmits<{
     changeType: [val: EAuthPageType];
 }>();
 
-const route = useRoute();
-const router = useRouter();
+const showNotification = ref(false);
 
-const { resetPassword } = useAuthApi();
+const { forgotPassword } = useAuthApi();
 
-const token = ref(String(route.query.token));
+const { handleSubmit, defineField, errors, isSubmitting, setFieldError } = useForm({ validationSchema: forgotPasswordSchema });
 
-const { handleSubmit, defineField, errors, isSubmitting, setFieldError } = useForm({ validationSchema: resetPasswordSchema });
-
-const [password] = defineField('password');
-const [confirm] = defineField('confirm');
+const [email] = defineField('email');
 
 const onSubmit = handleSubmit(async (values) => {
     try {
-        await resetPassword({ token: token.value, password: values.password });
+        await forgotPassword({ email: values.email });
+
+        showNotification.value = true;
     } catch (error) {
-        setFieldError('password', getApiErrorMessage(error));
+        setFieldError('email', getApiErrorMessage(error));
     }
 });
 
 function onClickLink() {
-    const { token: _token, ...query } = route.query;
-    router.replace({ query });
-
     emits('changeType', EAuthPageType.Login);
 }
 </script>
 
 <template>
-    <div :class="$style.AuthResetPasswordForm">
+    <div :class="$style.AuthForgotPasswordForm">
         <form :class="$style.form" @submit.prevent="onSubmit">
             <VInput
-                v-model="password"
-                type="password"
-                label="Новый пароль"
-                placeholder="Введите пароль"
-                icon="lock-keyhole"
-                :error="errors.password"
-                :class="$style.input"
-            />
-
-            <VInput
-                v-model="confirm"
-                type="password"
-                label="Подтверждение пароля"
-                placeholder="Повторите пароль"
-                icon="lock-keyhole"
-                :error="errors.confirm"
+                v-model="email"
+                label="Email"
+                placeholder="name@example.com"
+                icon="mail"
+                :error="errors.email"
                 :class="$style.input"
             />
 
@@ -66,8 +50,12 @@ function onClickLink() {
                 :loading="isSubmitting"
                 :class="$style.button"
             >
-                Сохранить пароль
+                Отправить ссылку
             </VButton>
+
+            <Transition name="fade">
+                <VNotification v-show="showNotification" text="Письмо отправлено и должно прийти в течение нескольких минут. Проверьте папку «Спам»." />
+            </Transition>
         </form>
 
         <div :class="$style.footer">
@@ -80,7 +68,7 @@ function onClickLink() {
 </template>
 
 <style module lang="scss">
-.AuthResetPasswordForm {
+.AuthForgotPasswordForm {
     //
 }
 

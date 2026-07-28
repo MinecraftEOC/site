@@ -1,44 +1,71 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate';
+
 import { EAuthPageType } from '~/assets/ts/enums/auth';
+import { loginSchema } from '~/assets/ts/schemas/auth';
 
 const emits = defineEmits<{
     changeType: [val: EAuthPageType];
 }>();
 
-function onChangePageType(type: EAuthPageType) {
+const userStore = useUserStore();
+
+const { handleSubmit, defineField, errors, isSubmitting, setFieldError } = useForm({ validationSchema: loginSchema });
+
+const [email] = defineField('email');
+const [password] = defineField('password');
+
+const onSubmit = handleSubmit(async (values) => {
+    try {
+        await userStore.login({ email: values.email, password: values.password });
+        await navigateTo('/account');
+    } catch (error) {
+        setFieldError('email', getApiErrorMessage(error));
+    }
+});
+
+function onClickLink(type: EAuthPageType) {
     emits('changeType', type);
 }
 </script>
 
 <template>
     <div :class="$style.AuthLoginForm">
-        <div :class="$style.form">
+        <form :class="$style.form" @submit.prevent="onSubmit">
             <VInput
+                v-model="email"
                 label="Email"
                 placeholder="name@example.com"
                 icon="mail"
+                :error="errors.email"
                 :class="$style.input"
             />
 
             <VInput
+                v-model="password"
                 type="password"
                 label="Пароль"
                 placeholder="12345678"
                 icon="lock-keyhole"
+                :error="errors.password"
                 :class="$style.input"
             />
 
-            <VButton :class="$style.button">
+            <VButton
+                type="submit"
+                :loading="isSubmitting"
+                :class="$style.button"
+            >
                 Войти
             </VButton>
-        </div>
+        </form>
 
         <div :class="$style.footer">
-            <span :class="$style.link" @click="onChangePageType(EAuthPageType.ChangePassword)">Забыли пароль?</span>
+            <span :class="$style.link" @click="onClickLink(EAuthPageType.ChangePassword)">Забыли пароль?</span>
 
             <div :class="$style.footerText">
                 Впервые здесь?
-                <span :class="$style.link" @click="onChangePageType(EAuthPageType.Register)">Создать аккаунт</span>
+                <span :class="$style.link" @click="onClickLink(EAuthPageType.Register)">Создать аккаунт</span>
             </div>
         </div>
     </div>

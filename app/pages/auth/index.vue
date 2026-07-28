@@ -3,6 +3,7 @@ import Auth from '~/components/pages/auth/Auth.vue';
 
 definePageMeta({
     layout: 'auth',
+    middleware: 'guest',
 });
 </script>
 
