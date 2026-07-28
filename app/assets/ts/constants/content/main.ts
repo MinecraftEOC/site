@@ -121,7 +121,7 @@ export const HOW_PLAY = {
             icon: 'user-plus',
             button: {
                 title: 'Создать персонажа',
-                to: '/account',
+                to: '/auth?register=1',
                 color: EColor.Primary,
             },
         },

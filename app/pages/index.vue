@@ -7,7 +7,7 @@ import Rules from '~/components/pages/main/Rules.vue';
 </script>
 
 <template>
-    <div :class="$style.Page">
+    <div class="MainPage">
         <Hero />
         <About id="about" />
         <Advantages />
@@ -17,7 +17,4 @@ import Rules from '~/components/pages/main/Rules.vue';
 </template>
 
 <style module lang="scss">
-.Page {
-    //
-}
 </style>

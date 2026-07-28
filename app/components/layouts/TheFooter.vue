@@ -17,7 +17,7 @@
 
 <style module lang="scss">
 .TheFooter {
-    height: rem(72);
+    height: 7.2rem;
     background-color: $surface-dark;
 }
 

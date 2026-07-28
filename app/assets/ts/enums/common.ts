@@ -14,8 +14,8 @@ export enum EColor {
 export enum ETag {
     Button = 'button',
     Link = 'a',
+    NuxtLink = 'NuxtLink',
     Div = 'div',
-    NuxtLink = 'nuxt-link',
 }
 
 export enum ENotificationType {

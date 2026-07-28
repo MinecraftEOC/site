@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { DISCORD_LINK, VK_LINK } from '~/assets/ts/constants/common';
 import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
+
+import LogoBlock from '~/components/common/LogoBlock.vue';
 
 interface IProps {
     hasMenu?: boolean;
@@ -29,7 +32,7 @@ const BUTTONS = [
         tag: ETag.Link,
         color: EColor.SecondaryDark,
         title: 'ВКонтакте',
-        href: 'https://vk.ru/colonial_era',
+        href: VK_LINK,
         target: '_blank',
         icon: 'simple-icons:vk',
     },
@@ -37,7 +40,7 @@ const BUTTONS = [
         tag: ETag.Link,
         color: EColor.SecondaryDark,
         title: 'Discord',
-        href: 'https://discord.com/invite/cwACTVDgbm',
+        href: DISCORD_LINK,
         target: '_blank',
         icon: 'simple-icons:discord',
     },
@@ -45,7 +48,7 @@ const BUTTONS = [
         tag: ETag.NuxtLink,
         color: EColor.Primary,
         title: 'Личный кабинет',
-        to: '/account',
+        to: '/auth',
         icon: 'user',
     },
 ];
@@ -69,22 +72,7 @@ function onNavItemClick(link: string) {
 <template>
     <div :class="$style.TheHeader">
         <div :class="$style.container" class="container">
-            <NuxtLink to="/" :class="$style.logoWrapper">
-                <img
-                    src="~/assets/images/logo.svg"
-                    alt="Logo"
-                    :class="$style.logo"
-                >
-
-                <div :class="$style.logoTextWrapper">
-                    <div :class="$style.logoText">
-                        Эпоха Колонизации
-                    </div>
-                    <div :class="$style.logoTextSub">
-                        Приватный roleplay сервер
-                    </div>
-                </div>
-            </NuxtLink>
+            <LogoBlock :size="ESize.Small" mobile-small />
 
             <nav v-if="props.hasMenu" :class="$style.nav">
                 <span
@@ -135,53 +123,6 @@ function onNavItemClick(link: string) {
     justify-content: space-between;
     align-items: center;
     height: 100%;
-}
-
-.logoWrapper {
-    display: flex;
-    gap: $space-16;
-    align-items: center;
-
-    @include respond-to(mobile) {
-        gap: $space-8;
-    }
-}
-
-.logo {
-    width: rem(48);
-    height: rem(48);
-
-    @include respond-to(mobile) {
-        width: rem(32);
-        height: rem(32);
-    }
-}
-
-.logoTextWrapper {
-    display: flex;
-    flex-direction: column;
-    gap: $space-2;
-}
-
-.logoText {
-    @include h4;
-
-    color: $text-inverse;
-
-    @include respond-to(mobile) {
-        @include h5;
-    }
-}
-
-.logoTextSub {
-    @include l4;
-
-    color: $text-inverse-subtle;
-    text-transform: uppercase;
-
-    @include respond-to(mobile) {
-        display: none;
-    }
 }
 
 .nav {
