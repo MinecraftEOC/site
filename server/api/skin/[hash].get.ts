@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
     const hash = getRouterParam(event, 'hash') ?? '';
 
     if (!SKIN_HASH_REGEX.test(hash)) {
-        throw createError({ statusCode: 400, statusMessage: SKIN_ERRORS.SKIN_NOT_FOUND });
+        throw createError({ statusCode: 400, message: SKIN_ERRORS.SKIN_NOT_FOUND });
     }
 
     const file = await readSkinFile(hash);
     if (!file) {
-        throw createError({ statusCode: 404, statusMessage: SKIN_ERRORS.SKIN_NOT_FOUND });
+        throw createError({ statusCode: 404, message: SKIN_ERRORS.SKIN_NOT_FOUND });
     }
 
     setHeader(event, 'Content-Type', 'image/png');

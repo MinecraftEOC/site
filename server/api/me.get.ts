@@ -20,7 +20,7 @@ export default defineEventHandler(async (event): Promise<IMeResponse> => {
     });
 
     if (!user) {
-        throw createError({ statusCode: 404, statusMessage: USER_ERRORS.USER_NOT_FOUND });
+        throw createError({ statusCode: 404, message: USER_ERRORS.USER_NOT_FOUND });
     }
 
     return user;

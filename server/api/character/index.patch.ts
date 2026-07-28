@@ -34,7 +34,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     if (username !== undefined) {
         const trimmed = username.trim();
         if (!USERNAME_REGEX.test(trimmed)) {
-            throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.INVALID_USERNAME });
+            throw createError({ statusCode: 400, message: CHARACTER_ERRORS.INVALID_USERNAME });
         }
         data.username = trimmed;
     }
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     if (biography !== undefined) {
         const trimmed = biography.trim();
         if (!trimmed) {
-            throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
+            throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
         }
         data.biography = trimmed;
     }
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const skinBuffers = collectSkinFiles(parts);
     if (Object.keys(data).length === 0 && skinBuffers.length === 0) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.NOTHING_TO_UPDATE });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.NOTHING_TO_UPDATE });
     }
 
     const character = await prisma.character.findFirst({
@@ -69,11 +69,11 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     });
 
     if (!character) {
-        throw createError({ statusCode: 404, statusMessage: CHARACTER_ERRORS.NOT_EDITABLE });
+        throw createError({ statusCode: 404, message: CHARACTER_ERRORS.NOT_EDITABLE });
     }
 
     if (character._count.skins + skinBuffers.length > SKIN_MAX_COUNT) {
-        throw createError({ statusCode: 409, statusMessage: SKIN_ERRORS.LIMIT_REACHED });
+        throw createError({ statusCode: 409, message: SKIN_ERRORS.LIMIT_REACHED });
     }
 
     data.status = CharacterStatus.UNVERIFIED;
@@ -94,7 +94,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         await deleteSkinFiles(hashes);
 
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-            throw createError({ statusCode: 409, statusMessage: CHARACTER_ERRORS.USERNAME_TAKEN });
+            throw createError({ statusCode: 409, message: CHARACTER_ERRORS.USERNAME_TAKEN });
         }
 
         throw error;
@@ -113,6 +113,6 @@ function parseJson(raw: string, invalidMessage: string): Prisma.InputJsonValue {
     try {
         return JSON.parse(raw);
     } catch {
-        throw createError({ statusCode: 400, statusMessage: invalidMessage });
+        throw createError({ statusCode: 400, message: invalidMessage });
     }
 }

@@ -1,10 +1,5 @@
 /** Тексты ошибок авторизации, возвращаемые эндпоинтами через `createError`. */
 export const AUTH_ERRORS = {
-    INVALID_EMAIL: 'Некорректный email',
-    INVALID_PASSWORD: 'Пароль должен быть не короче 8 символов',
-    EMPTY_EMAIL: 'Email не задан',
-    EMPTY_PASSWORD: 'Пароль не задан',
-    EMPTY_RESET_TOKEN: 'Токен не задан',
     INVALID_DATA: 'Неверный email или пароль',
     INVALID_RESET_TOKEN: 'Неверный токен',
     UNAUTHORIZED: 'Требуется авторизация',

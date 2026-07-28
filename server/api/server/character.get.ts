@@ -14,7 +14,7 @@ import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 export default defineEventHandler(async (event): Promise<IServerCharacterResponse> => {
     const { uuid } = getQuery<{ uuid?: string }>(event);
     if (!uuid) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_UUID });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_UUID });
     }
 
     const character = await prisma.character.findUnique({
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event): Promise<IServerCharacterRespons
     });
 
     if (!character) {
-        throw createError({ statusCode: 404, statusMessage: CHARACTER_ERRORS.NOT_FOUND });
+        throw createError({ statusCode: 404, message: CHARACTER_ERRORS.NOT_FOUND });
     }
 
     return character;

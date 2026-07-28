@@ -11,7 +11,7 @@ import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 export default defineEventHandler(async (event): Promise<string[]> => {
     const { uuid } = getQuery<{ uuid?: string }>(event);
     if (!uuid) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_UUID });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_UUID });
     }
 
     const skins = await prisma.skin.findMany({

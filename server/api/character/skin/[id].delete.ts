@@ -21,7 +21,7 @@ export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const skinId = Number(getRouterParam(event, 'id'));
 
     if (!Number.isInteger(skinId)) {
-        throw createError({ statusCode: 404, statusMessage: SKIN_ERRORS.SKIN_NOT_FOUND });
+        throw createError({ statusCode: 404, message: SKIN_ERRORS.SKIN_NOT_FOUND });
     }
 
     const skin = await prisma.skin.findUnique({
@@ -33,11 +33,11 @@ export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     });
 
     if (!skin || (!isAdmin && skin.character.userId !== userId)) {
-        throw createError({ statusCode: 404, statusMessage: SKIN_ERRORS.SKIN_NOT_FOUND });
+        throw createError({ statusCode: 404, message: SKIN_ERRORS.SKIN_NOT_FOUND });
     }
 
     if (!isAdmin && !SKIN_MANAGEABLE_STATUSES.includes(skin.character.status)) {
-        throw createError({ statusCode: 409, statusMessage: SKIN_ERRORS.NOT_MANAGEABLE });
+        throw createError({ statusCode: 409, message: SKIN_ERRORS.NOT_MANAGEABLE });
     }
 
     await prisma.skin.delete({ where: { id: skinId } });

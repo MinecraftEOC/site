@@ -80,11 +80,11 @@ export function collectSkinFiles(parts: MultiPartData[] | undefined) {
 
     for (const file of files) {
         if (file.data.length > SKIN_MAX_SIZE) {
-            throw createError({ statusCode: 400, statusMessage: SKIN_ERRORS.TOO_LARGE });
+            throw createError({ statusCode: 400, message: SKIN_ERRORS.TOO_LARGE });
         }
 
         if (!isPng(file.data)) {
-            throw createError({ statusCode: 400, statusMessage: SKIN_ERRORS.NOT_PNG });
+            throw createError({ statusCode: 400, message: SKIN_ERRORS.NOT_PNG });
         }
     }
 

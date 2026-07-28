@@ -36,6 +36,26 @@ httpOnly-cookie с id сессии. На каждый запрос middleware п
 | `forgot-password.post.ts` | `POST /api/auth/forgot-password` | генерация reset-токена (`randomBytes` из `node:crypto`) + срок; отправка письма — TODO (SMTP не настроен)    |
 | `reset-password.post.ts`  | `POST /api/auth/reset-password`  | смена пароля по токену: проверка срока, хэш, гашение токена, удаление всех сессий юзера |
 
+Все ручки валидируют тело Zod-схемой через `readValidatedBodyOr400` — см. раздел
+«Валидация тел запросов».
+
+## Валидация тел запросов (Zod, `shared/schemas/`)
+
+Тела запросов валидируются **Zod-схемами** из `shared/schemas/auth.ts` — общими
+для клиента и сервера. Правила и тексты ошибок заданы один раз в схеме.
+
+- Схемы: `sharedRegisterSchema`, `sharedLoginSchema`, `sharedForgotPasswordSchema`,
+  `sharedResetPasswordSchema` (+ выведенные типы `TRegisterBody`, `TLoginBody`,
+  `TForgotPasswordBody`, `TResetPasswordBody`).
+- **На бэке** каждая ручка валидирует тело хелпером
+  **`readValidatedBodyOr400(event, schema)`** (`server/utils/validation.ts`,
+  автоимпортируется): `safeParse` → при ошибке `400` с текстом из схемы, при
+  успехе типизированное тело с применёнными трансформами (`trim`, `toLowerCase`).
+  Ручных `readBody<...>` и `if`-проверок полей в auth-хендлерах больше нет.
+- **На фронте** те же схемы идут во `vee-validate` (`toTypedSchema`); клиентские
+  обёртки (например, с полем `confirm`) — в `app/assets/ts/schemas/`.
+- **Тексты ошибок формата/длины/обязательности — в схеме**, не в `AUTH_ERRORS`.
+
 ## Middleware (`server/middleware/auth.ts`)
 
 Выполняется Nitro **на каждый запрос**. Логика:
@@ -53,11 +73,16 @@ Middleware только **опознаёт** юзера. **Требование*
 
 - `server/utils/auth.ts` → **`requireUser(event)`** — возвращает юзера из
   контекста или кидает `401 UNAUTHORIZED`. Использовать в защищённых эндпоинтах.
-- `server/constants/auth.ts` → `AUTH_ERRORS` (тексты ошибок),
-  `SESSION_COOKIE` (`'sessionid'`), `SESSION_MAX_AGE` (7 дней, сек),
-  `RESET_TOKEN_MAX_AGE` (1 час, сек).
-- `server/types/auth.ts` → `IAuthBody`, `IResetPasswordBody`, `ISafeUser`,
-  `ISessionContext`, и **аугментация `H3EventContext`** (`user?`, `session?`).
+- `server/utils/validation.ts` → **`readValidatedBodyOr400(event, schema)`** —
+  валидация тела Zod-схемой (`safeParse` → `400` с текстом из схемы).
+- `server/common/constants/auth.ts` → `AUTH_ERRORS` (только ошибки, не связанные
+  с формой данных: `INVALID_DATA`, `INVALID_RESET_TOKEN`, `UNAUTHORIZED`,
+  `FORBIDDEN`, `SERVER_TOKEN_NOT_CONFIGURED`), `SESSION_COOKIE` (`'sessionid'`),
+  `SESSION_MAX_AGE` (7 дней, сек), `RESET_TOKEN_MAX_AGE` (1 час, сек).
+- `server/common/@types/auth.ts` → `ISafeUser`, `ISessionContext`, и
+  **аугментация `H3EventContext`** (`user?`, `session?`).
+- `shared/schemas/auth.ts` → Zod-схемы тел запросов auth (см. раздел «Валидация
+  тел запросов»).
 
 ## Параметры cookie сессии (login)
 

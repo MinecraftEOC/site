@@ -24,11 +24,11 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     const body = await readBody<IUpdateCharacterStatusBody>(event);
 
     if (!Number.isInteger(body.characterId)) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_ID });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_ID });
     }
 
     if (!body.status || !Object.values(CharacterStatus).includes(body.status)) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.INVALID_STATUS });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.INVALID_STATUS });
     }
 
     const character = await prisma.character.findUnique({
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     });
     
     if (!character) {
-        throw createError({ statusCode: 404, statusMessage: CHARACTER_ERRORS.NOT_FOUND });
+        throw createError({ statusCode: 404, message: CHARACTER_ERRORS.NOT_FOUND });
     }
 
     const data: Prisma.CharacterUpdateInput = { status: body.status };

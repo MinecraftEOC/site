@@ -27,7 +27,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     const parts = await readMultipartFormData(event);
     const skinBuffers = collectSkinFiles(parts);
     if (skinBuffers.length === 0) {
-        throw createError({ statusCode: 400, statusMessage: SKIN_ERRORS.NO_FILE });
+        throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_FILE });
     }
 
     const character = await prisma.character.findFirst({
@@ -40,15 +40,15 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     });
 
     if (!character) {
-        throw createError({ statusCode: 404, statusMessage: SKIN_ERRORS.NO_CHARACTER });
+        throw createError({ statusCode: 404, message: SKIN_ERRORS.NO_CHARACTER });
     }
 
     if (!SKIN_MANAGEABLE_STATUSES.includes(character.status)) {
-        throw createError({ statusCode: 409, statusMessage: SKIN_ERRORS.NOT_MANAGEABLE });
+        throw createError({ statusCode: 409, message: SKIN_ERRORS.NOT_MANAGEABLE });
     }
 
     if (character._count.skins + skinBuffers.length > SKIN_MAX_COUNT) {
-        throw createError({ statusCode: 409, statusMessage: SKIN_ERRORS.LIMIT_REACHED });
+        throw createError({ statusCode: 409, message: SKIN_ERRORS.LIMIT_REACHED });
     }
 
     const hashes = await saveSkinFiles(skinBuffers);

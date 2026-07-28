@@ -21,7 +21,7 @@ export default defineEventHandler(async (event): Promise<IDiscordLinkResponse> =
     });
 
     if (discordAccount?.status === DiscordLinkStatus.LINKED) {
-        throw createError({ statusCode: 409, statusMessage: DISCORD_ERRORS.ALREADY_LINKED });
+        throw createError({ statusCode: 409, message: DISCORD_ERRORS.ALREADY_LINKED });
     }
 
     const verifyCode = generateVerifyCode();

@@ -32,12 +32,12 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const username = getFormField(parts, 'username')?.trim();
     if (!username || !USERNAME_REGEX.test(username)) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.INVALID_USERNAME });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.INVALID_USERNAME });
     }
 
     const biography = getFormField(parts, 'biography')?.trim();
     if (!biography) {
-        throw createError({ statusCode: 400, statusMessage: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
     }
 
     const states = parseJsonField(parts, 'states', CHARACTER_ERRORS.EMPTY_STATES, CHARACTER_ERRORS.INVALID_STATES);
@@ -45,9 +45,9 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const skinBuffers = collectSkinFiles(parts);
     if (skinBuffers.length > SKIN_MAX_COUNT) {
-        throw createError({ statusCode: 409, statusMessage: SKIN_ERRORS.LIMIT_REACHED });
+        throw createError({ statusCode: 409, message: SKIN_ERRORS.LIMIT_REACHED });
     } else if (skinBuffers.length === 0) {
-        throw createError({ statusCode: 400, statusMessage: SKIN_ERRORS.NO_SKINS });
+        throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_SKINS });
     }
 
     const alive = await prisma.character.findFirst({
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     });
 
     if (alive && role !== UserRole.ADMIN) {
-        throw createError({ statusCode: 409, statusMessage: CHARACTER_ERRORS.ALREADY_EXISTS });
+        throw createError({ statusCode: 409, message: CHARACTER_ERRORS.ALREADY_EXISTS });
     }
 
     const user = await prisma.user.findUnique({
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     });
 
     if (!user) {
-        throw createError({ statusCode: 404, statusMessage: USER_ERRORS.USER_NOT_FOUND });
+        throw createError({ statusCode: 404, message: USER_ERRORS.USER_NOT_FOUND });
     }
 
     const hashes = await saveSkinFiles(skinBuffers);
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         await deleteSkinFiles(hashes);
 
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-            throw createError({ statusCode: 409, statusMessage: CHARACTER_ERRORS.USERNAME_TAKEN });
+            throw createError({ statusCode: 409, message: CHARACTER_ERRORS.USERNAME_TAKEN });
         }
         throw error;
     }
@@ -112,12 +112,12 @@ function parseJsonField(
 ): Prisma.InputJsonValue {
     const raw = getFormField(parts, name);
     if (raw === undefined) {
-        throw createError({ statusCode: 400, statusMessage: emptyMessage });
+        throw createError({ statusCode: 400, message: emptyMessage });
     }
 
     try {
         return JSON.parse(raw);
     } catch {
-        throw createError({ statusCode: 400, statusMessage: invalidMessage });
+        throw createError({ statusCode: 400, message: invalidMessage });
     }
 }

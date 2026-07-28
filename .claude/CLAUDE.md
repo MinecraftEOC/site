@@ -21,6 +21,8 @@
   Схема — `server/database/schema.prisma`, миграции — `server/database/migrations/`.
 - **Клиент:** Vue 3.5 + Pinia (`@pinia/nuxt`).
 - **Хэширование паролей:** `bcryptjs`.
+- **Валидация тел запросов:** Zod (общие схемы в `shared/schemas/`, см. ниже) —
+  на бэке через `readValidatedBodyOr400`, на фронте через `vee-validate`.
 - **Язык:** TypeScript (strict). Линт — ESLint (`@antfu/eslint-config`) +
   Stylelint для `scss`/`vue`. Отступ — 4 пробела.
 
@@ -43,8 +45,11 @@
   `server/common/constants/`, enum-ы в `server/common/enums/`, типы в
   `server/common/@types/`; утилиты — в `server/utils/` (автоимпортируется Nitro,
   поэтому остаётся на верхнем уровне).
-- **Ошибки API** бросаются через `createError({ statusCode, statusMessage })`,
+- **Ошибки API** бросаются через `createError({ statusCode, message })`,
   тексты сообщений — из констант (`AUTH_ERRORS` в `server/common/constants/auth.ts`).
+  Использовать `message`, **а не `statusMessage`**: `statusMessage` — это HTTP
+  reason-phrase, h3 его санитизирует (кириллица вырежется). Фронт читает текст из
+  `error.data.message` (см. `getApiErrorMessage` в `app/utils/common.ts`).
 - Файлы эндпоинтов именуются по методу: `*.post.ts`, `*.get.ts`.
 
 ### Внутренние ручки под server-to-server токеном (`/api/server`)
@@ -81,12 +86,36 @@
   ISO-строку, поэтому в хендлере даты приводятся через `.toISOString()`, а не
   отдаются объектом `Date`.
 
+Рядом, в `shared/schemas/`, лежат **Zod-схемы тел запросов** — тоже общие для
+клиента и сервера (см. следующий раздел).
+
+### Валидация тел запросов (Zod, `shared/schemas/`)
+
+Тела запросов валидируются **Zod-схемами** из `shared/schemas/` — один источник
+правил и текстов ошибок для обоих концов.
+
+- **На бэке** тело валидируется хелпером **`readValidatedBodyOr400(event, schema)`**
+  (`server/utils/validation.ts`, автоимпортируется): внутри `safeParse`, при
+  ошибке — `400` с текстом первой ошибки из схемы, при успехе — типизированное
+  тело с применёнными трансформами (`trim`, `toLowerCase`). Ручные
+  `readBody<...>` + `if`-проверки полей и дублирующий регэксп/длину код **не
+  писать** — это делает схема.
+- **На фронте** те же схемы подключаются во `vee-validate` через `toTypedSchema`;
+  клиентские обёртки (например, с полем `confirm`) — в `app/assets/ts/schemas/`.
+- **Тексты ошибок валидации** (некорректный email, короткий пароль,
+  «Обязательное поле») живут **в схеме**, а не в `AUTH_ERRORS`. В `AUTH_ERRORS`
+  остаются только ошибки, не относящиеся к форме данных (`INVALID_DATA`,
+  `INVALID_RESET_TOKEN`, `UNAUTHORIZED`, `FORBIDDEN` и т.п.).
+- Схемы auth: `sharedRegisterSchema`, `sharedLoginSchema`,
+  `sharedForgotPasswordSchema`, `sharedResetPasswordSchema` в
+  `shared/schemas/auth.ts` (+ выведенные типы `TRegisterBody`, `TLoginBody` и т.п.).
+
 ### Именование интерфейсов, типов, enum-ов
 
 Применяется ко **всему коду проекта** (кроме сгенерированного Prisma-клиента
 в `generated/`, который не трогаем):
 
-- **Интерфейсы** — префикс `I` (`IAuthBody`, `IDiscordInfo`).
+- **Интерфейсы** — префикс `I` (`ILoginResponse`, `ISafeUser`).
 - **Type-алиасы** — префикс `T` (`TLinkResult`).
 - **Enum-ы** — префикс `E` (`ELinkReasons`).
 

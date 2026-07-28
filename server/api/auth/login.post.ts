@@ -1,36 +1,32 @@
-import type { IAuthBody } from '~~/server/common/@types/auth';
 import type { ILoginResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
 import { AUTH_ERRORS, SESSION_COOKIE, SESSION_MAX_AGE } from '~~/server/common/constants/auth';
+import { USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
+import { sharedLoginSchema } from '~~/shared/schemas/auth';
 
 /**
  * `POST /api/auth/login` — вход по email и паролю.
  *
- * При успехе создаёт сессию и кладёт её id в httpOnly-cookie.
+ * Валидирует тело схемой `sharedLoginSchema`, при успехе создаёт сессию и кладёт
+ * её id в httpOnly-cookie.
  *
- * @throws 400 если email или пароль не переданы.
+ * @throws 400 если тело не прошло валидацию.
  * @throws 401 если пользователь не найден или пароль неверный.
  */
 export default defineEventHandler(async (event): Promise<ILoginResponse> => {
-    const body = await readBody<IAuthBody>(event);
-    const email = body.email?.trim().toLowerCase();
-    const password = body.password;
+    const { email, password } = await readValidatedBodyOr400(event, sharedLoginSchema);
 
-    if (!email) {
-        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.EMPTY_EMAIL });
-    }
+    const user = await prisma.user.findUnique({
+        where: { email },
+        select: { ...USER_PUBLIC_SELECT, password: true },
+    });
 
-    if (!password) {
-        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.EMPTY_PASSWORD });
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } });
     const isPasswordCorrect = user ? await bcrypt.compare(password, user.password) : false;
 
     if (!user || !isPasswordCorrect) {
-        throw createError({ statusCode: 401, statusMessage: AUTH_ERRORS.INVALID_DATA });
+        throw createError({ statusCode: 401, message: AUTH_ERRORS.INVALID_DATA });
     }
 
     const session = await prisma.session.create({
@@ -48,5 +44,7 @@ export default defineEventHandler(async (event): Promise<ILoginResponse> => {
         maxAge: SESSION_MAX_AGE,
     });
 
-    return { id: user.id, email: user.email };
+    const { password: _password, ...userWithoutPassport } = user;
+
+    return userWithoutPassport;
 });

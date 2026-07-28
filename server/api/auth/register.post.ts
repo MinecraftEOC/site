@@ -1,38 +1,25 @@
-import type { IAuthBody } from '~~/server/common/@types/auth';
 import type { IRegisterResponse } from '~~/shared/@types/response';
 
 import bcrypt from 'bcryptjs';
 
-import { AUTH_ERRORS } from '~~/server/common/constants/auth';
 import { USER_ERRORS } from '~~/server/common/constants/user';
-
-const EMAIL_REGEX = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+import { sharedRegisterSchema } from '~~/shared/schemas/auth';
 
 /**
  * `POST /api/auth/register` — регистрация нового пользователя.
  *
- * Валидирует email и длину пароля, хэширует пароль (`bcrypt`) и создаёт
- * пользователя. Сессию не создаёт — вход выполняется отдельно.
+ * Валидирует тело схемой `sharedRegisterSchema`, хэширует пароль (`bcrypt`) и
+ * создаёт пользователя. Сессию не создаёт — вход выполняется отдельно.
  *
- * @throws 400 если email некорректен или пароль короче 8 символов.
+ * @throws 400 если тело не прошло валидацию (email/пароль).
  * @throws 409 если пользователь с таким email уже существует.
  */
 export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
-    const body = await readBody<IAuthBody>(event);
-    const email = body.email?.trim().toLowerCase();
-    const password = body.password;
-
-    if (!email || !EMAIL_REGEX.test(email)) {
-        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.INVALID_EMAIL });
-    }
-
-    if (!password || password.length < 8) {
-        throw createError({ statusCode: 400, statusMessage: AUTH_ERRORS.INVALID_PASSWORD });
-    }
+    const { email, password } = await readValidatedBodyOr400(event, sharedRegisterSchema);
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (user) {
-        throw createError({ statusCode: 409, statusMessage: USER_ERRORS.USER_EXISTS });
+        throw createError({ statusCode: 409, message: USER_ERRORS.USER_EXISTS });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
