@@ -1865,6 +1865,202 @@
                             },
                             {
                               "type": "frame",
+                              "id": "RwqvU",
+                              "name": "Email / Error State",
+                              "context": "Input error state: красная рамка и текст ошибки под полем.",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": "$space-8",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "jbmcx",
+                                  "name": "Email Error Label",
+                                  "fill": "$text-primary",
+                                  "content": "Email",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": "$fs-l2",
+                                  "fontWeight": "$fw-medium"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "WgsAE",
+                                  "name": "Email Error Control",
+                                  "width": "fill_container",
+                                  "height": 40,
+                                  "fill": "$input-bg",
+                                  "cornerRadius": "$radius-4",
+                                  "stroke": "$danger",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    0,
+                                    "$space-12"
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "f7CnM",
+                                      "name": "Email Error Value",
+                                      "fill": "$input-text",
+                                      "content": "name@",
+                                      "lineHeight": 1.55,
+                                      "fontFamily": "$font-sans",
+                                      "fontSize": "$fs-t3",
+                                      "fontWeight": "$fw-regular"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "LEtNv",
+                                  "name": "Email Error Message",
+                                  "width": "fill_container",
+                                  "gap": "$space-4",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "cdHim",
+                                      "name": "Email Error Icon",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "circle-alert",
+                                      "library": "lucide",
+                                      "fill": "$danger"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "lNxeR",
+                                      "name": "Email Error Text",
+                                      "fill": "$text-danger",
+                                      "content": "Введите корректный адрес email",
+                                      "lineHeight": 1.4,
+                                      "fontFamily": "$font-sans",
+                                      "fontSize": "$fs-t4",
+                                      "fontWeight": "$fw-regular"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "dMLV6",
+                              "name": "Email / With Icon",
+                              "context": "Input with leading icon; паттерн используется на экранах авторизации.",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": "$space-8",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "h1F4j",
+                                  "name": "Email Icon Label",
+                                  "fill": "$text-primary",
+                                  "content": "Email с иконкой",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": "$fs-l2",
+                                  "fontWeight": "$fw-medium"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "flQgt",
+                                  "name": "Email Icon Control",
+                                  "width": "fill_container",
+                                  "height": 40,
+                                  "fill": "$input-bg",
+                                  "cornerRadius": "$radius-4",
+                                  "stroke": "$input-border",
+                                  "strokeWidth": 1,
+                                  "gap": "$space-8",
+                                  "padding": [
+                                    0,
+                                    "$space-12"
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "mdlpi",
+                                      "name": "Email Leading Icon",
+                                      "width": 16,
+                                      "height": 16,
+                                      "icon": "mail",
+                                      "library": "lucide",
+                                      "fill": "$text-muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "A4Ywt",
+                                      "name": "Email Icon Value",
+                                      "fill": "$input-placeholder",
+                                      "content": "name@example.com",
+                                      "lineHeight": 1.55,
+                                      "fontFamily": "$font-sans",
+                                      "fontSize": "$fs-t3",
+                                      "fontWeight": "$fw-regular"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "bMQXQ",
+                              "name": "Email / Disabled",
+                              "context": "Disabled input: недоступное поле без фокуса и редактирования.",
+                              "opacity": 0.72,
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": "$space-8",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "hsA7o",
+                                  "name": "Email Disabled Label",
+                                  "fill": "$text-muted",
+                                  "content": "Email (недоступно)",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": "$fs-l2",
+                                  "fontWeight": "$fw-medium"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "k171q",
+                                  "name": "Email Disabled Control",
+                                  "width": "fill_container",
+                                  "height": 40,
+                                  "fill": "$input-bg-disabled",
+                                  "cornerRadius": "$radius-4",
+                                  "stroke": "$input-border",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    0,
+                                    "$space-12"
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "nnMz6",
+                                      "name": "Email Disabled Value",
+                                      "fill": "$input-placeholder",
+                                      "content": "name@example.com",
+                                      "lineHeight": 1.55,
+                                      "fontFamily": "$font-sans",
+                                      "fontSize": "$fs-t3",
+                                      "fontWeight": "$fw-regular"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
                               "id": "AEGBX",
                               "name": "Путь клиента",
                               "width": "fill_container",
@@ -2738,7 +2934,7 @@
                               "fill": "$info-bg",
                               "cornerRadius": 8,
                               "gap": "$space-12",
-                              "padding": "$space-12",
+                              "padding": 12,
                               "children": [
                                 {
                                   "type": "icon",
@@ -11320,6 +11516,7 @@
       "x": 8736,
       "y": 3752,
       "name": "Авторизация — Desktop",
+      "context": "Desktop auth screen: 1440×900px; left visual panel 520px, form area 920px.",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -11332,6 +11529,7 @@
           "x": 0,
           "y": 0,
           "name": "Auth Visual Panel",
+          "context": "Left visual panel: 520×900px; padding 64px; brand x64/y64, copy x64/y341.5, support x64/y819.",
           "width": 520,
           "height": 900,
           "fill": "$surface-dark",
@@ -11346,6 +11544,7 @@
               "x": 64,
               "y": 341.5,
               "name": "Auth Visual Copy",
+              "context": "Visual copy: width 392px; vertical gap 16px; absolute x64/y341.5.",
               "width": 392,
               "layout": "vertical",
               "gap": "$space-16",
@@ -11369,7 +11568,7 @@
                   "fill": "$text-inverse",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Продолжите путь своего персонажа.",
+                  "content": "Продолжи путь своего персонажа.",
                   "lineHeight": 1.1,
                   "fontFamily": "$font-serif",
                   "fontSize": "$fs-h2",
@@ -11397,6 +11596,7 @@
               "x": 64,
               "y": 819,
               "name": "Auth Visual Support",
+              "context": "Support row: horizontal gap 4px; absolute x64/y819.",
               "gap": "$space-4",
               "alignItems": "center",
               "children": [
@@ -11431,7 +11631,7 @@
               "x": 64,
               "y": 64,
               "name": "Shared Brand / Header Exact",
-              "context": "Spacing: gap 16px между логотипом и названием.",
+              "context": "Brand lockup: logo 72×72px; horizontal gap 16px; absolute x64/y64.",
               "gap": "$space-16",
               "alignItems": "center",
               "children": [
@@ -11452,7 +11652,7 @@
                   "type": "frame",
                   "id": "fDaos",
                   "name": "Brand Text",
-                  "context": "Spacing: gap 2px между названием бренда и descriptor.",
+                  "context": "Brand text: vertical gap 2px between name and descriptor.",
                   "layout": "vertical",
                   "gap": "$space-2",
                   "children": [
@@ -11491,6 +11691,7 @@
           "x": 520,
           "y": 0,
           "name": "Login Form Area",
+          "context": "Form area: 920×900px; content centered horizontally and vertically.",
           "width": 920,
           "height": 900,
           "layout": "vertical",
@@ -11501,6 +11702,7 @@
               "type": "frame",
               "id": "NvPKu",
               "name": "Login Form",
+              "context": "Login form: width 400px; vertical gap 24px between groups.",
               "width": 400,
               "layout": "vertical",
               "gap": "$space-24",
@@ -11509,7 +11711,9 @@
                   "type": "frame",
                   "id": "gUN9N",
                   "name": "Login Heading",
+                  "context": "Form heading: vertical gap 8px between overline, title and description.",
                   "width": "fill_container",
+                  "height": 102,
                   "layout": "vertical",
                   "gap": "$space-8",
                   "children": [
@@ -11530,7 +11734,7 @@
                       "id": "LWjaR",
                       "name": "Login Title",
                       "fill": "$text-primary",
-                      "content": "С возвращением",
+                      "content": "С возвращением!",
                       "lineHeight": 1.15,
                       "fontFamily": "$font-serif",
                       "fontSize": "$fs-h2",
@@ -11555,6 +11759,7 @@
                   "type": "frame",
                   "id": "ViiF0",
                   "name": "Login Fields",
+                  "context": "Login fields: vertical gap 16px between email and password fields.",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": "$space-16",
@@ -11563,6 +11768,7 @@
                       "type": "frame",
                       "id": "r4vN5Z",
                       "name": "Field / Email",
+                      "context": "Email field: vertical gap 8px between label and 40px control.",
                       "width": "fill_container",
                       "layout": "vertical",
                       "gap": "$space-8",
@@ -11624,6 +11830,7 @@
                       "type": "frame",
                       "id": "o7Br9",
                       "name": "Field / Пароль",
+                      "context": "Password field: vertical gap 8px between label and 40px control.",
                       "width": "fill_container",
                       "layout": "vertical",
                       "gap": "$space-8",
@@ -11684,58 +11891,6 @@
                   ]
                 },
                 {
-                  "type": "frame",
-                  "id": "gKpTJ",
-                  "name": "Login Support Row",
-                  "width": "fill_container",
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "QXRXu",
-                      "name": "Remember Me",
-                      "gap": "$space-8",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "Vi8WC",
-                          "name": "Remember Checkbox",
-                          "width": 20,
-                          "height": 20,
-                          "fill": "$input-bg",
-                          "cornerRadius": "$radius-4",
-                          "stroke": "$input-border",
-                          "strokeWidth": 1
-                        },
-                        {
-                          "type": "text",
-                          "id": "OLhHM",
-                          "name": "Remember Label",
-                          "fill": "$text-secondary",
-                          "content": "Запомнить меня",
-                          "lineHeight": 1.4,
-                          "fontFamily": "$font-sans",
-                          "fontSize": "$fs-t3",
-                          "fontWeight": "$fw-regular"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "text",
-                      "id": "XpW9F",
-                      "name": "Recovery Link",
-                      "fill": "$text-link",
-                      "content": "Забыли пароль?",
-                      "lineHeight": 1.4,
-                      "fontFamily": "$font-sans",
-                      "fontSize": "$fs-t3",
-                      "fontWeight": "$fw-medium"
-                    }
-                  ]
-                },
-                {
                   "id": "cFIbw",
                   "type": "ref",
                   "ref": "a5B8A",
@@ -11751,33 +11906,66 @@
                 },
                 {
                   "type": "frame",
-                  "id": "Qplye",
-                  "name": "Login Registration Prompt",
+                  "id": "SvWEb",
+                  "name": "Login Secondary Actions",
+                  "context": "Secondary actions: vertical gap 8px; centered directly below the 40px login button.",
                   "width": "fill_container",
-                  "gap": "$space-4",
-                  "justifyContent": "center",
+                  "layout": "vertical",
+                  "gap": "$space-8",
+                  "alignItems": "center",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "L2VR44",
-                      "name": "Login Registration Prompt Text",
-                      "fill": "$text-secondary",
-                      "content": "Впервые здесь?",
-                      "lineHeight": 1.4,
-                      "fontFamily": "$font-sans",
-                      "fontSize": "$fs-t3",
-                      "fontWeight": "$fw-regular"
+                      "type": "frame",
+                      "id": "gKpTJ",
+                      "name": "Login Support Row",
+                      "context": "Password recovery action: centered under the primary button.",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "XpW9F",
+                          "name": "Recovery Link",
+                          "fill": "$text-link",
+                          "content": "Забыли пароль?",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-t3",
+                          "fontWeight": "$fw-medium"
+                        }
+                      ]
                     },
                     {
-                      "type": "text",
-                      "id": "TurLY",
-                      "name": "Registration Link",
-                      "fill": "$text-link",
-                      "content": "Создать аккаунт",
-                      "lineHeight": 1.4,
-                      "fontFamily": "$font-sans",
-                      "fontSize": "$fs-t3",
-                      "fontWeight": "$fw-medium"
+                      "type": "frame",
+                      "id": "Qplye",
+                      "name": "Login Registration Prompt",
+                      "context": "Registration prompt: horizontal gap 4px between text and link.",
+                      "gap": "$space-4",
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "L2VR44",
+                          "name": "Login Registration Prompt Text",
+                          "fill": "$text-secondary",
+                          "content": "Впервые здесь?",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-t3",
+                          "fontWeight": "$fw-regular"
+                        },
+                        {
+                          "type": "text",
+                          "id": "TurLY",
+                          "name": "Registration Link",
+                          "fill": "$text-link",
+                          "content": "Создать аккаунт",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-t3",
+                          "fontWeight": "$fw-medium"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -11793,6 +11981,7 @@
       "x": 10256,
       "y": 3752,
       "name": "Регистрация — Desktop",
+      "context": "Desktop registration screen: 1440×900px; left visual panel 560px, form area 880px.",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -11805,6 +11994,7 @@
           "x": 0,
           "y": 0,
           "name": "Atmospheric Left Panel",
+          "context": "Left visual panel: 560×900px; brand x64/y64, copy x64/y341.5, support x64/y819.",
           "clip": true,
           "width": 560,
           "height": 900,
@@ -11817,9 +12007,10 @@
               "x": 64,
               "y": 341.5,
               "name": "Atmospheric Copy",
+              "context": "Visual copy: width 374px; vertical gap 16px; absolute x64/y341.5.",
               "width": 374,
               "layout": "vertical",
-              "gap": 16,
+              "gap": "$space-16",
               "children": [
                 {
                   "type": "text",
@@ -11840,7 +12031,7 @@
                   "fill": "$text-inverse",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Начните новую главу своей истории.",
+                  "content": "Начни новую главу своей истории.",
                   "lineHeight": 1.08,
                   "fontFamily": "$font-serif",
                   "fontSize": 42,
@@ -11853,7 +12044,7 @@
                   "fill": "$text-inverse-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Создайте учётную запись, чтобы отправиться в приключение на остров Рейнстолл.",
+                  "content": "Создай учётную запись, чтобы отправиться в приключение на остров Рейнстолл.",
                   "lineHeight": 1.45,
                   "fontFamily": "$font-sans",
                   "fontSize": 18,
@@ -11867,14 +12058,16 @@
               "x": 64,
               "y": 819,
               "name": "Left Panel Footer",
+              "context": "Support wrapper: width 400px; vertical gap 4px; absolute x64/y819.",
               "width": 400,
               "layout": "vertical",
-              "gap": 4,
+              "gap": "$space-4",
               "children": [
                 {
                   "type": "frame",
                   "id": "tDgi2",
                   "name": "Registration Visual Support",
+                  "context": "Support row: horizontal gap 4px between copy and Discord link.",
                   "gap": "$space-4",
                   "alignItems": "center",
                   "children": [
@@ -11911,7 +12104,7 @@
               "x": 64,
               "y": 64,
               "name": "Shared Brand / Header Exact",
-              "context": "Spacing: gap 16px между логотипом и названием.",
+              "context": "Brand lockup: logo 72×72px; horizontal gap 16px; absolute x64/y64.",
               "gap": "$space-16",
               "alignItems": "center",
               "children": [
@@ -11932,7 +12125,7 @@
                   "type": "frame",
                   "id": "qSasH",
                   "name": "Brand Text",
-                  "context": "Spacing: gap 2px между названием бренда и descriptor.",
+                  "context": "Brand text: vertical gap 2px between name and descriptor.",
                   "layout": "vertical",
                   "gap": "$space-2",
                   "children": [
@@ -11971,6 +12164,7 @@
           "x": 560,
           "y": 0,
           "name": "Registration Panel",
+          "context": "Form area: 880×900px; registration form centered on both axes.",
           "width": 880,
           "height": 900,
           "fill": "$surface-page",
@@ -11982,18 +12176,20 @@
               "type": "frame",
               "id": "hXTGl",
               "name": "Registration Form Shell",
+              "context": "Registration form: width 420px; vertical gap 32px between content groups.",
               "width": 420,
               "layout": "vertical",
-              "gap": 32,
+              "gap": "$space-32",
               "children": [
                 {
                   "type": "frame",
                   "id": "lyXWx",
                   "name": "Registration Header",
+                  "context": "Form heading: vertical gap 8px between overline, title and description.",
                   "width": "fill_container",
                   "height": 106,
                   "layout": "vertical",
-                  "gap": 10,
+                  "gap": "$space-8",
                   "children": [
                     {
                       "type": "text",
@@ -12039,17 +12235,19 @@
                   "type": "frame",
                   "id": "jESVl",
                   "name": "Registration Fields",
+                  "context": "Registration fields: vertical gap 16px between fields.",
                   "width": "fill_container",
                   "layout": "vertical",
-                  "gap": 16,
+                  "gap": "$space-16",
                   "children": [
                     {
                       "type": "frame",
                       "id": "v3t9X",
                       "name": "Email Field",
+                      "context": "Email field: vertical gap 8px between label and 40px control.",
                       "width": "fill_container",
                       "layout": "vertical",
-                      "gap": 8,
+                      "gap": "$space-8",
                       "children": [
                         {
                           "type": "text",
@@ -12097,9 +12295,10 @@
                       "type": "frame",
                       "id": "THMU9",
                       "name": "Пароль Field",
+                      "context": "Password field: vertical gap 8px between label and 40px control.",
                       "width": "fill_container",
                       "layout": "vertical",
-                      "gap": 8,
+                      "gap": "$space-8",
                       "children": [
                         {
                           "type": "text",
@@ -12147,9 +12346,10 @@
                       "type": "frame",
                       "id": "ZlbgB",
                       "name": "Подтверждение пароля Field",
+                      "context": "Confirm password: vertical gap 8px between label and 40px control.",
                       "width": "fill_container",
                       "layout": "vertical",
-                      "gap": 8,
+                      "gap": "$space-8",
                       "children": [
                         {
                           "type": "text",
@@ -12211,8 +12411,9 @@
                   "type": "frame",
                   "id": "h2bCTi",
                   "name": "Login Prompt",
+                  "context": "Login prompt: horizontal gap 4px between copy and link; centered.",
                   "width": "fill_container",
-                  "gap": 6,
+                  "gap": "$space-4",
                   "justifyContent": "center",
                   "alignItems": "center",
                   "children": [
@@ -12252,6 +12453,7 @@
       "x": 11776,
       "y": 3752,
       "name": "Восстановление пароля — Desktop",
+      "context": "Desktop password recovery screen: 1440×900px; left visual panel 520px, form area 920px.",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -12264,6 +12466,7 @@
           "x": 0,
           "y": 0,
           "name": "Recovery Visual Panel",
+          "context": "Left visual panel: 520×900px; padding 64px; brand x64/y64, copy x64/y341.5, support x64/y819.",
           "width": 520,
           "height": 900,
           "fill": "$surface-dark",
@@ -12278,6 +12481,7 @@
               "x": 64,
               "y": 341.5,
               "name": "Recovery Visual Copy",
+              "context": "Visual copy: width 392px; vertical gap 16px; absolute x64/y341.5.",
               "width": 392,
               "layout": "vertical",
               "gap": "$space-16",
@@ -12314,7 +12518,7 @@
                   "fill": "$text-inverse-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Восстановите доступ к аккаунту и вернитесь к приключениям.",
+                  "content": "Восстанови доступ к аккаунту и вернись к приключениям.",
                   "lineHeight": 1.55,
                   "fontFamily": "$font-sans",
                   "fontSize": "$fs-t1",
@@ -12329,6 +12533,7 @@
               "x": 64,
               "y": 819,
               "name": "Recovery Visual Support",
+              "context": "Support row: horizontal gap 4px; absolute x64/y819.",
               "gap": "$space-4",
               "alignItems": "center",
               "children": [
@@ -12363,7 +12568,7 @@
               "x": 64,
               "y": 64,
               "name": "Shared Brand / Header Exact",
-              "context": "Spacing: gap 16px между логотипом и названием.",
+              "context": "Brand lockup: logo 72×72px; horizontal gap 16px; absolute x64/y64.",
               "gap": "$space-16",
               "alignItems": "center",
               "children": [
@@ -12384,7 +12589,7 @@
                   "type": "frame",
                   "id": "Bn1r3",
                   "name": "Brand Text",
-                  "context": "Spacing: gap 2px между названием бренда и descriptor.",
+                  "context": "Brand text: vertical gap 2px between name and descriptor.",
                   "layout": "vertical",
                   "gap": "$space-2",
                   "children": [
@@ -12423,6 +12628,7 @@
           "x": 520,
           "y": 0,
           "name": "Recovery Form Area",
+          "context": "Form area: 920×900px; content centered horizontally and vertically.",
           "width": 920,
           "height": 900,
           "layout": "vertical",
@@ -12433,6 +12639,7 @@
               "type": "frame",
               "id": "g990Hp",
               "name": "Recovery Form",
+              "context": "Recovery form: width 400px; vertical gap 24px between groups.",
               "width": 400,
               "layout": "vertical",
               "gap": "$space-24",
@@ -12441,6 +12648,7 @@
                   "type": "frame",
                   "id": "Y1goy",
                   "name": "Recovery Heading",
+                  "context": "Form heading: vertical gap 8px between overline, title and description.",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": "$space-8",
@@ -12487,6 +12695,7 @@
                   "type": "frame",
                   "id": "CpXDn",
                   "name": "Recovery Email Field",
+                  "context": "Email field: vertical gap 8px between label and 40px control.",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": "$space-8",
@@ -12562,6 +12771,7 @@
                   "type": "frame",
                   "id": "zdkef",
                   "name": "Recovery Notice",
+                  "context": "Info notice: padding 12px; horizontal gap 8px between icon and copy.",
                   "width": "fill_container",
                   "fill": "$info-bg",
                   "cornerRadius": "$radius-8",
@@ -12597,6 +12807,7 @@
                   "type": "frame",
                   "id": "BsWBs",
                   "name": "Recovery Back Prompt",
+                  "context": "Back action: horizontal gap 4px between copy and link; centered.",
                   "width": "fill_container",
                   "gap": "$space-4",
                   "justifyContent": "center",
@@ -12616,6 +12827,438 @@
                       "type": "text",
                       "id": "aY5N1",
                       "name": "Recovery Back Link",
+                      "fill": "$text-link",
+                      "content": "Вернуться ко входу",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-medium"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ITkNO",
+      "x": 13296,
+      "y": 3752,
+      "name": "Новый пароль — Desktop",
+      "context": "Desktop password reset screen: 1440×900px; sidebar mirrors password recovery screen; form area 920px.",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "$surface-page",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "g7CfC5",
+          "x": 0,
+          "y": 0,
+          "name": "Recovery Visual Panel",
+          "context": "Left visual panel: 520×900px; padding 64px; brand x64/y64, copy x64/y341.5, support x64/y819.",
+          "width": 520,
+          "height": 900,
+          "fill": "$surface-dark",
+          "layout": "vertical",
+          "padding": "$space-64",
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "WniaY",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 341.5,
+              "name": "Recovery Visual Copy",
+              "context": "Visual copy: width 392px; vertical gap 16px; absolute x64/y341.5.",
+              "width": 392,
+              "layout": "vertical",
+              "gap": "$space-16",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "EPBb7",
+                  "name": "Recovery Visual Eyebrow",
+                  "fill": "$text-inverse-subtle",
+                  "content": "ЛИЧНЫЙ КАБИНЕТ",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l4",
+                  "fontWeight": "$fw-medium",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "WKCFK",
+                  "name": "Recovery Visual Title",
+                  "fill": "$text-inverse",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Каждая история заслуживает продолжения.",
+                  "lineHeight": 1.1,
+                  "fontFamily": "$font-serif",
+                  "fontSize": "$fs-h2",
+                  "fontWeight": "$fw-extrabold"
+                },
+                {
+                  "type": "text",
+                  "id": "k0vOjw",
+                  "name": "Recovery Visual Body",
+                  "fill": "$text-inverse-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Восстанови доступ к аккаунту и вернись к приключениям.",
+                  "lineHeight": 1.55,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-t1",
+                  "fontWeight": "$fw-regular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nRgqz",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 819,
+              "name": "Recovery Visual Support",
+              "context": "Support row: horizontal gap 4px; absolute x64/y819.",
+              "gap": "$space-4",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "SFeOj",
+                  "name": "Support Text",
+                  "fill": "$text-inverse-subtle",
+                  "content": "Нужна помощь? Напишите администрации в",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l3",
+                  "fontWeight": "$fw-regular"
+                },
+                {
+                  "type": "text",
+                  "id": "BBrsc",
+                  "name": "Discord Link",
+                  "fill": "$text-inverse",
+                  "content": "discord",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-sans",
+                  "fontSize": "$fs-l3",
+                  "fontWeight": "$fw-medium"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Z6Wbrf",
+              "layoutPosition": "absolute",
+              "x": 64,
+              "y": 64,
+              "name": "Shared Brand / Header Exact",
+              "context": "Brand lockup: logo 72×72px; horizontal gap 16px; absolute x64/y64.",
+              "gap": "$space-16",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "TSRUF",
+                  "name": "Site Logo",
+                  "width": 72,
+                  "height": 72,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "../../../../C:/Users/axsel/Downloads/Logo_tyomny.png",
+                    "mode": "fit"
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "Jxitl",
+                  "name": "Brand Text",
+                  "context": "Brand text: vertical gap 2px between name and descriptor.",
+                  "layout": "vertical",
+                  "gap": "$space-2",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SbtyP",
+                      "name": "Brand Name",
+                      "fill": "$text-inverse",
+                      "content": "Эпоха Колонизации",
+                      "lineHeight": 1.3,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h3",
+                      "fontWeight": "$fw-bold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "utty2",
+                      "name": "Brand Descriptor",
+                      "fill": "$text-inverse-subtle",
+                      "content": "ПРИВАТНЫЙ ROLEPLAY СЕРВЕР ",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l3",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ivK7i",
+          "x": 520,
+          "y": 0,
+          "name": "Recovery Form Area",
+          "context": "Form area: 920×900px; content centered horizontally and vertically.",
+          "width": 920,
+          "height": 900,
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "w6Q63",
+              "name": "New Password Form",
+              "context": "New password form: width 400px; vertical gap 24px between heading, fields, action and back link.",
+              "width": 400,
+              "layout": "vertical",
+              "gap": "$space-24",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zXYdC",
+                  "name": "New Password Heading",
+                  "context": "Form heading: vertical gap 8px between overline, title and description.",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$space-8",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "yGd5Y",
+                      "name": "New Password Overline",
+                      "fill": "$text-muted",
+                      "content": "НОВЫЙ ПАРОЛЬ",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-l4",
+                      "fontWeight": "$fw-medium",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "W4bVb",
+                      "name": "New Password Title",
+                      "fill": "$text-primary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Задайте пароль",
+                      "lineHeight": 1.15,
+                      "fontFamily": "$font-serif",
+                      "fontSize": "$fs-h2",
+                      "fontWeight": "$fw-extrabold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "p0cw8K",
+                      "name": "New Password Description",
+                      "fill": "$text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Придумайте надёжный пароль для входа в личный кабинет.",
+                      "lineHeight": 1.55,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t2",
+                      "fontWeight": "$fw-regular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Gcr16",
+                  "name": "New Password Fields",
+                  "context": "Password fields: vertical gap 16px; each control is 40px with 8px gap below its label.",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$space-16",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jLrPq",
+                      "name": "New Password Field",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$space-8",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ndJjD",
+                          "name": "New Password Label",
+                          "fill": "$text-primary",
+                          "content": "Новый пароль",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-l2",
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "kQzi5",
+                          "name": "New Password Input",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "gap": "$space-8",
+                          "padding": [
+                            0,
+                            "$space-12"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "XA2gL",
+                              "name": "New Password Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "lock-keyhole",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Px9Tc",
+                              "name": "New Password Value",
+                              "fill": "$input-placeholder",
+                              "content": "••••••••••••",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": "$fs-t3",
+                              "fontWeight": "$fw-regular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "D7vPw",
+                      "name": "Confirm New Password Field",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$space-8",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Z0ENio",
+                          "name": "Confirm New Password Label",
+                          "fill": "$text-primary",
+                          "content": "Повторите пароль",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-sans",
+                          "fontSize": "$fs-l2",
+                          "fontWeight": "$fw-medium"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "VqEVF",
+                          "name": "Confirm New Password Input",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$input-bg",
+                          "cornerRadius": "$radius-4",
+                          "stroke": "$input-border",
+                          "strokeWidth": 1,
+                          "gap": "$space-8",
+                          "padding": [
+                            0,
+                            "$space-12"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "tWur6",
+                              "name": "Confirm Password Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "lock-keyhole",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "jwRsS",
+                              "name": "Confirm Password Value",
+                              "fill": "$input-placeholder",
+                              "content": "••••••••••••",
+                              "lineHeight": 1.55,
+                              "fontFamily": "$font-sans",
+                              "fontSize": "$fs-t3",
+                              "fontWeight": "$fw-regular"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "emcYs",
+                  "type": "ref",
+                  "ref": "a5B8A",
+                  "name": "Button / Save New Password",
+                  "width": "fill_container",
+                  "height": 40,
+                  "context": "UI Kit instance: Button / Default / Primary.",
+                  "descendants": {
+                    "HMhtM": {
+                      "content": "Сохранить пароль"
+                    }
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "N8mZ4y",
+                  "name": "New Password Back Prompt",
+                  "context": "Back action: horizontal gap 4px between copy and link; centered.",
+                  "width": "fill_container",
+                  "gap": "$space-4",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "xBzJh",
+                      "name": "New Password Back Text",
+                      "fill": "$text-secondary",
+                      "content": "Вспомнили пароль?",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-sans",
+                      "fontSize": "$fs-t3",
+                      "fontWeight": "$fw-regular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WrAUY",
+                      "name": "New Password Back Link",
                       "fill": "$text-link",
                       "content": "Вернуться ко входу",
                       "lineHeight": 1.4,
