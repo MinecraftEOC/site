@@ -54,9 +54,9 @@ const classList = computed(() => [
             <span :class="$style.text" class="v-checkbox__text"><slot /></span>
         </label>
 
-        <transition name="fade">
+        <Transition name="fade">
             <span v-show="props.error" :class="$style.error">{{ props.error }}</span>
-        </transition>
+        </Transition>
     </div>
 </template>
 

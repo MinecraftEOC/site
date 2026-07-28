@@ -66,9 +66,9 @@ const iconSize = computed(() => {
             />
         </div>
 
-        <transition name="fade">
+        <Transition name="fade">
             <span v-show="props.error" :class="$style.error">{{ props.error }}</span>
-        </transition>
+        </Transition>
     </div>
 </template>
 
@@ -168,6 +168,6 @@ const iconSize = computed(() => {
     @include t4;
 
     margin-top: $space-4;
-    color: $text-danger;
+    color: $danger;
 }
 </style>

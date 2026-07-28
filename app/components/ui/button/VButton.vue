@@ -208,8 +208,8 @@ const iconSize = computed(() => {
 }
 
 .dot {
-    width: rem(6);
-    height: rem(6);
+    width: 0.6rem;
+    height: 0.6rem;
     border-radius: 50%;
     background-color: currentcolor;
     animation: v-button-bounce 0.6s infinite ease-in-out both;
@@ -231,7 +231,7 @@ const iconSize = computed(() => {
 
     40% {
         opacity: 1;
-        transform: translateY(rem(-4));
+        transform: translateY(-0.4rem);
     }
 }
 </style>

@@ -90,7 +90,7 @@ import { ETag } from '~/assets/ts/enums/common';
 }
 
 .button {
-    width: rem(180);
+    width: 18rem;
 
     @include respond-to(mobile) {
         width: 100%;
