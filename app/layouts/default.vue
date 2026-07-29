@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NotificationsList from '~/components/common/NotificationsList.vue';
 import TheFooter from '~/components/layouts/TheFooter.vue';
 import TheHeader from '~/components/layouts/TheHeader.vue';
 </script>
@@ -8,6 +9,8 @@ import TheHeader from '~/components/layouts/TheHeader.vue';
 
     <div :class="$style.main">
         <slot />
+
+        <NotificationsList />
     </div>
 
     <TheFooter />
@@ -15,6 +18,7 @@ import TheHeader from '~/components/layouts/TheHeader.vue';
 
 <style module lang="scss">
 .main {
+    position: relative;
     min-height: 100dvh;
     padding-top: $header-h;
 

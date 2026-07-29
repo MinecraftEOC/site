@@ -20,6 +20,7 @@ export const forgotPasswordSchema = toTypedSchema(sharedForgotPasswordSchema);
 
 export const resetPasswordSchema = toTypedSchema(
     sharedResetPasswordSchema
+        .pick({ password: true })
         .extend({
             confirm: z.string({ required_error: REQUIRED_FIELD_MESSAGE }).min(1, REQUIRED_FIELD_MESSAGE),
         })

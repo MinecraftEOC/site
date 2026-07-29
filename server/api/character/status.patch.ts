@@ -35,7 +35,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         where: { id: body.characterId },
         select: { id: true },
     });
-    
+
     if (!character) {
         throw createError({ statusCode: 404, message: CHARACTER_ERRORS.NOT_FOUND });
     }

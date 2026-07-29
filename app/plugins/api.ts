@@ -1,3 +1,5 @@
+import { ENotificationType } from '~/assets/ts/enums/common';
+
 export default defineNuxtPlugin(() => {
     const headers = import.meta.server ? useRequestHeaders(['cookie']) : undefined;
 
@@ -17,12 +19,12 @@ export default defineNuxtPlugin(() => {
                 userStore.reset();
 
                 await navigateTo('/auth');
+
                 return;
             }
 
             if (response.status >= 500) {
-                console.error('Ошибка сервера, попробуйте позже');
-                // useNotificationStore().error('Ошибка сервера, попробуйте позже');
+                useNotificationStore().add('Ошибка сервера, попробуйте позже', '', ENotificationType.Error);
             }
         },
     });

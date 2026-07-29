@@ -11,6 +11,7 @@ const emits = defineEmits<{
 }>();
 
 const userStore = useUserStore();
+const notificationStore = useNotificationStore();
 
 const { register } = useAuthApi();
 
@@ -25,6 +26,8 @@ const onSubmit = handleSubmit(async (values) => {
         await register({ email: values.email, password: values.password });
         await userStore.login({ email: values.email, password: values.password });
         await navigateTo('/account');
+
+        notificationStore.add('Учетная запись успешно создана');
     } catch (error) {
         setFieldError('email', getApiErrorMessage(error));
     }

@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate';
 
 import { EAuthPageType } from '~/assets/ts/enums/auth';
+import { ENotificationType } from '~/assets/ts/enums/common';
 import { resetPasswordSchema } from '~/assets/ts/schemas/auth';
 
 import { useAuthApi } from '~/composables/api/useAuthApi';
@@ -13,11 +14,13 @@ const emits = defineEmits<{
 const route = useRoute();
 const router = useRouter();
 
+const notificationStore = useNotificationStore();
+
 const { resetPassword } = useAuthApi();
 
 const token = ref(String(route.query.token));
 
-const { handleSubmit, defineField, errors, isSubmitting, setFieldError } = useForm({ validationSchema: resetPasswordSchema });
+const { handleSubmit, defineField, errors, isSubmitting } = useForm({ validationSchema: resetPasswordSchema });
 
 const [password] = defineField('password');
 const [confirm] = defineField('confirm');
@@ -25,8 +28,9 @@ const [confirm] = defineField('confirm');
 const onSubmit = handleSubmit(async (values) => {
     try {
         await resetPassword({ token: token.value, password: values.password });
+        notificationStore.add('Пароль успешно изменен');
     } catch (error) {
-        setFieldError('password', getApiErrorMessage(error));
+        notificationStore.add('Ошибка', getApiErrorMessage(error), ENotificationType.Error);
     }
 });
 
