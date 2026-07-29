@@ -8,9 +8,6 @@
     opacity: 0;
 }
 
-// Toast-уведомления: выезжают снизу экрана и уезжают обратно вниз.
-// Уходящее уведомление вынимается из потока (position: absolute), чтобы
-// соседние уведомления плавно съезжали на его место через .notification-move.
 .notification-enter-active {
     transition: transform .35s cubic-bezier(.22, 1, .36, 1), opacity .35s ease-out;
 }

@@ -35,10 +35,12 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw createError({ statusCode: 400, message: CHARACTER_ERRORS.INVALID_USERNAME });
     }
 
-    const biography = getFormField(parts, 'biography')?.trim();
-    if (!biography) {
+    const rawBiography = getFormField(parts, 'biography')?.trim();
+    if (!rawBiography) {
         throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
     }
+
+    const biography = prepareBiography(rawBiography);
 
     const states = parseJsonField(parts, 'states', CHARACTER_ERRORS.EMPTY_STATES, CHARACTER_ERRORS.INVALID_STATES);
     const startingItems = parseJsonField(parts, 'startingItems', CHARACTER_ERRORS.EMPTY_STARTING_ITEMS, CHARACTER_ERRORS.INVALID_STARTING_ITEMS);

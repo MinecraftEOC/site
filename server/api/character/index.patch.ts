@@ -45,7 +45,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         if (!trimmed) {
             throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
         }
-        data.biography = trimmed;
+        data.biography = prepareBiography(trimmed);
     }
 
     const states = getFormField(parts, 'states');

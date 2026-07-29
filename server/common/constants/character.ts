@@ -2,6 +2,15 @@ import type { Prisma } from '~~/generated/prisma/client';
 
 import { CharacterStatus } from '~~/generated/prisma/enums';
 
+/** Максимальная длина квенты по видимому тексту, без учёта разметки. */
+export const BIOGRAPHY_MAX_LENGTH = 10000;
+
+/**
+ * Жёсткий предел на размер присланной разметки квенты. Проверяется до очистки:
+ * защищает от мегабайтных «бомб» из вложенных тегов, в которых почти нет текста.
+ */
+export const BIOGRAPHY_MAX_HTML_LENGTH = 100000;
+
 /** Тексты ошибок ручек персонажа, возвращаемые через `createError`. */
 export const CHARACTER_ERRORS = {
     ALREADY_EXISTS: 'У вас уже есть активный персонаж',
@@ -10,6 +19,7 @@ export const CHARACTER_ERRORS = {
     USERNAME_TAKEN: 'Имя персонажа уже занято',
     INVALID_USERNAME: 'Некорректное имя персонажа',
     EMPTY_BIOGRAPHY: 'Квента не задана',
+    BIOGRAPHY_TOO_LONG: `Квента не должна быть длиннее ${BIOGRAPHY_MAX_LENGTH} символов`,
     EMPTY_STATES: 'Поле states не задано',
     EMPTY_STARTING_ITEMS: 'Поле startingItems не задано',
     INVALID_STATES: 'Поле states имеет некорректный формат',
