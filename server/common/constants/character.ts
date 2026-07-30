@@ -31,9 +31,11 @@ export const CHARACTER_ERRORS = {
 };
 
 /**
- * Публичный `select` персонажа — поля профиля со скинами, без служебных
- * (`uuid`, `password`, `accessToken`, `serverId`, даты). Совпадает с формой
- * {@link ICharacter}. `satisfies` сохраняет литеральный тип для вывода Prisma.
+ * Публичный `select` персонажа — поля профиля со скинами и данными о статусе,
+ * без служебных (`uuid`, `password`, `accessToken`, `serverId`, `createdAt`,
+ * `updatedAt`). Совпадает с формой {@link ICharacter} с точностью до
+ * сериализации дат (см. `toCharacterResponse`). `satisfies` сохраняет
+ * литеральный тип для вывода Prisma.
  */
 export const CHARACTER_PUBLIC_SELECT = {
     id: true,
@@ -42,14 +44,22 @@ export const CHARACTER_PUBLIC_SELECT = {
     states: true,
     startingItems: true,
     status: true,
+    statusChangedAt: true,
+    statusComment: true,
+    reviewComment: true,
     skins: {
         select: {
             id: true,
             hash: true,
         },
     },
-    comment: true,
 } satisfies Prisma.CharacterSelect;
+
+/**
+ * Статусы, в которых персонаж выведен из игры: он больше не считается «живым»,
+ * не мешает создать нового и не участвует в поиске текущего персонажа.
+ */
+export const CHARACTER_RETIRED_STATUSES: CharacterStatus[] = [CharacterStatus.DEAD, CharacterStatus.UNAVAILABLE];
 
 /** Статусы, в которых пользователь может редактировать своего персонажа. */
 export const CHARACTER_EDITABLE_STATUSES: CharacterStatus[] = [CharacterStatus.UNVERIFIED, CharacterStatus.RETURNED];

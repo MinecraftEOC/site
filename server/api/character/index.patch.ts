@@ -17,8 +17,9 @@ import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
  * `biography`, `states`, `startingItems` — JSON-строки) и новые файлы скинов в
  * поле `skin`. Редактировать можно только собственного персонажа в статусе
  * `UNVERIFIED`/`RETURNED`. Новые скины добавляются к существующим (удаление —
- * отдельной ручкой). После сохранения статус сбрасывается в `UNVERIFIED`, а
- * комментарий администратора очищается — персонаж снова уходит на модерацию.
+ * отдельной ручкой). После сохранения статус сбрасывается в `UNVERIFIED` вместе
+ * с датой смены статуса, а комментарии администратора (`statusComment`,
+ * `reviewComment`) очищаются — персонаж снова уходит на модерацию.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 если не передано ни одного изменения или поля некорректны.
@@ -77,12 +78,14 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     data.status = CharacterStatus.UNVERIFIED;
-    data.comment = null;
+    data.statusChangedAt = new Date();
+    data.statusComment = null;
+    data.reviewComment = null;
 
     const hashes = await saveSkinFiles(skinBuffers);
 
     try {
-        return await prisma.character.update({
+        const updated = await prisma.character.update({
             where: { id: character.id },
             data: {
                 ...data,
@@ -90,6 +93,8 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
             },
             select: CHARACTER_PUBLIC_SELECT,
         });
+
+        return toCharacterResponse(updated);
     } catch (error) {
         await deleteSkinFiles(hashes);
 

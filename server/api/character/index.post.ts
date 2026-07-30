@@ -3,8 +3,13 @@ import type { ICharacterResponse } from '~~/shared/@types/response';
 import { randomUUID } from 'node:crypto';
 
 import { Prisma } from '~~/generated/prisma/client';
-import { CharacterStatus, UserRole } from '~~/generated/prisma/enums';
-import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT, USERNAME_REGEX } from '~~/server/common/constants/character';
+import { UserRole } from '~~/generated/prisma/enums';
+import {
+    CHARACTER_ERRORS,
+    CHARACTER_PUBLIC_SELECT,
+    CHARACTER_RETIRED_STATUSES,
+    USERNAME_REGEX,
+} from '~~/server/common/constants/character';
 import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
 import { USER_ERRORS } from '~~/server/common/constants/user';
 
@@ -17,9 +22,10 @@ import { USER_ERRORS } from '~~/server/common/constants/user';
  * транзакция + откат файлов при ошибке).
  *
  * У пользователя может быть только один «живой» персонаж: создать нового можно,
- * только если персонажей нет вовсе или текущий в статусе `DEAD`. Новый персонаж
- * получает статус `UNVERIFIED`. `uuid` генерируется на сайте, `password`
- * копируется из аккаунта пользователя.
+ * только если персонажей нет вовсе или текущий выведен из игры — в статусе
+ * `DEAD` или `UNAVAILABLE` (см. {@link CHARACTER_RETIRED_STATUSES}). Новый
+ * персонаж получает статус `UNVERIFIED`. `uuid` генерируется на сайте,
+ * `password` копируется из аккаунта пользователя.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 при некорректных полях или невалидных файлах скинов.
@@ -53,7 +59,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     const alive = await prisma.character.findFirst({
-        where: { userId, status: { not: CharacterStatus.DEAD } },
+        where: { userId, status: { notIn: CHARACTER_RETIRED_STATUSES } },
         select: { id: true },
     });
 
@@ -73,7 +79,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     const hashes = await saveSkinFiles(skinBuffers);
 
     try {
-        return await prisma.character.create({
+        const created = await prisma.character.create({
             data: {
                 uuid: randomUUID(),
                 username,
@@ -86,6 +92,8 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
             },
             select: CHARACTER_PUBLIC_SELECT,
         });
+
+        return toCharacterResponse(created);
     } catch (error) {
         await deleteSkinFiles(hashes);
 

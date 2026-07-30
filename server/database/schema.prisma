@@ -58,12 +58,14 @@ model Character {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    biography     String
-    states        Json
-    startingItems Json
-    status        CharacterStatus @default(UNVERIFIED)
-    skins         Skin[]
-    comment       String?
+    biography       String
+    states          Json
+    startingItems   Json
+    status          CharacterStatus @default(UNVERIFIED)
+    statusChangedAt DateTime        @default(now())
+    statusComment   String?
+    reviewComment   String?
+    skins           Skin[]
 
     userId Int
     user   User @relation(fields: [userId], references: [id])
@@ -89,6 +91,7 @@ enum CharacterStatus {
     ACTIVE
     BANNED
     DEAD
+    UNAVAILABLE
 }
 
 enum DiscordLinkStatus {

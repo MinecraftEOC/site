@@ -1,7 +1,6 @@
 import type { ICharacterResponse } from '~~/shared/@types/response';
 
-import { CharacterStatus } from '~~/generated/prisma/enums';
-import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { CHARACTER_PUBLIC_SELECT, CHARACTER_RETIRED_STATUSES } from '~~/server/common/constants/character';
 import {
     SKIN_ERRORS,
     SKIN_MANAGEABLE_STATUSES,
@@ -31,7 +30,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     const character = await prisma.character.findFirst({
-        where: { userId, status: { not: CharacterStatus.DEAD } },
+        where: { userId, status: { notIn: CHARACTER_RETIRED_STATUSES } },
         select: {
             id: true,
             status: true,
@@ -62,8 +61,10 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw error;
     }
 
-    return prisma.character.findUniqueOrThrow({
+    const updated = await prisma.character.findUniqueOrThrow({
         where: { id: character.id },
         select: CHARACTER_PUBLIC_SELECT,
     });
+
+    return toCharacterResponse(updated);
 });

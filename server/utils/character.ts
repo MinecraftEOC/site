@@ -1,4 +1,21 @@
+import type { TCharacterRow } from '~~/server/common/@types/character';
+import type { ICharacter } from '~~/shared/@types/user';
+
 import { BIOGRAPHY_MAX_HTML_LENGTH, BIOGRAPHY_MAX_LENGTH, CHARACTER_ERRORS } from '~~/server/common/constants/character';
+
+/**
+ * Приводит персонажа из Prisma к форме ответа API: даты сериализуются в
+ * ISO-строки. Использовать на каждой ручке, которая отдаёт персонажа наружу.
+ *
+ * @param character Персонаж в форме `CHARACTER_PUBLIC_SELECT`.
+ * @returns Персонаж с датами-строками.
+ */
+export function toCharacterResponse(character: TCharacterRow): ICharacter {
+    return {
+        ...character,
+        statusChangedAt: character.statusChangedAt.toISOString(),
+    };
+}
 
 /**
  * Готовит квенту к записи в БД: чистит присланный HTML по белому списку и

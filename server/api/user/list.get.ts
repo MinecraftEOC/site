@@ -18,5 +18,5 @@ export default defineEventHandler(async (event): Promise<IUserResponse[]> => {
         select: USER_PUBLIC_SELECT,
     });
 
-    return users;
+    return users.map(toUserResponse);
 });

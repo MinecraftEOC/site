@@ -24,5 +24,5 @@ export default defineEventHandler(async (event): Promise<IUserResponse> => {
         throw createError({ statusCode: 404, message: USER_ERRORS.USER_NOT_FOUND });
     }
 
-    return user;
+    return toUserResponse(user);
 });

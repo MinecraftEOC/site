@@ -10,8 +10,13 @@ import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/cons
  *
  * Доступно только админу (`requireAdmin`). Позволяет выставить **любой** статус
  * из `CharacterStatus` (одобрить → `ACTIVE`, вернуть на доработку → `RETURNED`,
- * забанить → `BANNED` и т.п.). Опционально задаёт/очищает комментарий: поле не
- * передано — комментарий без изменений, пустая строка — очищается.
+ * забанить → `BANNED`, снять с игры → `UNAVAILABLE` и т.п.). Вместе со статусом
+ * можно задать/очистить комментарий к статусу (`statusComment`) и комментарий
+ * модерации (`reviewComment`): поле не передано — без изменений, пустая
+ * строка — очищается.
+ *
+ * `statusChangedAt` обновляется, только если статус реально сменился: правка
+ * одних комментариев дату не двигает.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 403 если пользователь не администратор.
@@ -33,7 +38,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const character = await prisma.character.findUnique({
         where: { id: body.characterId },
-        select: { id: true },
+        select: { id: true, status: true },
     });
 
     if (!character) {
@@ -42,14 +47,35 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const data: Prisma.CharacterUpdateInput = { status: body.status };
 
-    if (body.comment !== undefined) {
-        const trimmed = body.comment.trim();
-        data.comment = trimmed.length > 0 ? trimmed : null;
+    if (character.status !== body.status) {
+        data.statusChangedAt = new Date();
     }
 
-    return prisma.character.update({
+    if (body.statusComment !== undefined) {
+        data.statusComment = normalizeComment(body.statusComment);
+    }
+
+    if (body.reviewComment !== undefined) {
+        data.reviewComment = normalizeComment(body.reviewComment);
+    }
+
+    const updated = await prisma.character.update({
         where: { id: character.id },
         data,
         select: CHARACTER_PUBLIC_SELECT,
     });
+
+    return toCharacterResponse(updated);
 });
+
+/**
+ * Готовит присланный комментарий к записи: обрезает пробелы, пустую строку
+ * трактует как очистку поля.
+ *
+ * @param raw Значение комментария из тела запроса.
+ * @returns Текст комментария или `null`, если он пустой.
+ */
+function normalizeComment(raw: string): string | null {
+    const trimmed = raw.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}

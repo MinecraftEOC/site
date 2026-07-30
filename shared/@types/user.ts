@@ -5,7 +5,8 @@ import type { IUserResponse } from '~~/shared/@types/response';
 export interface IUser extends IUserResponse {};
 
 /** Интерфейс персонажа */
-export interface ICharacter extends Omit<Character, 'uuid' | 'password' | 'accessToken' | 'serverId' | 'createdAt' | 'updatedAt' | 'userId'> {
+export interface ICharacter extends Omit<Character, 'uuid' | 'password' | 'accessToken' | 'serverId' | 'createdAt' | 'updatedAt' | 'userId' | 'statusChangedAt'> {
+    statusChangedAt: string;
     skins: Omit<Skin, 'characterId'>[];
 }
 

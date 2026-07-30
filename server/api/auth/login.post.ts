@@ -46,5 +46,5 @@ export default defineEventHandler(async (event): Promise<ILoginResponse> => {
 
     const { password: _password, ...userWithoutPassport } = user;
 
-    return userWithoutPassport;
+    return toUserResponse(userWithoutPassport);
 });
