@@ -56,3 +56,17 @@ export interface IDiscordStatusResponse {
 
 /** Ответ `GET /api/server/character` — персонаж по uuid. Запрос для сервера */
 export interface IServerCharacterResponse extends IServerCharacter {}
+
+/** Ответ `GET /api/status` — состояние игрового сервера по Server List Ping. */
+export interface IStatusResponse {
+    /** Сервер ответил на пинг. */
+    online: boolean;
+    /** Игроков в сети. */
+    players: number;
+    /** Всего слотов. */
+    maxPlayers: number;
+    /** Ники игроков онлайн — сервер отдаёт не более 12. */
+    sample: string[];
+    /** Версия ядра из ответа сервера. */
+    version: string | null;
+}

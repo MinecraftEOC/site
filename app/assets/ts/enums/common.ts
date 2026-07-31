@@ -11,6 +11,12 @@ export enum EColor {
     Danger = 'danger',
 }
 
+export enum EStatusColor {
+    Success = 'success',
+    Warning = 'warning',
+    Danger = 'danger',
+}
+
 export enum ETag {
     Button = 'button',
     Link = 'a',

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { DiscordLinkStatus, UserRole } from '~~/generated/prisma/enums';
+import { UserRole } from '~~/generated/prisma/enums';
 import { DISCORD_LINK, VK_LINK } from '~/assets/ts/constants/common';
 
 import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
 
 import LogoBlock from '~/components/common/LogoBlock.vue';
+import ServerStatus from '~/components/common/ServerStatus.vue';
 
 const ADMIN_MENU = {
     title: 'Администрирование',
@@ -84,15 +85,6 @@ const menu = computed(() => {
     return [MENU];
 });
 
-const discordStatus = computed(() => {
-    const isLinked = userStore.user?.discordAccount?.status === DiscordLinkStatus.LINKED;
-
-    return {
-        class: isLinked ? style._linked : '',
-        label: isLinked ? 'Discord привязан' : 'Discord не привязан',
-    };
-});
-
 const panelClassList = computed(() => [
     isMenuOpen.value ? style._open : '',
 ]);
@@ -166,7 +158,20 @@ watch(() => route.path, closeMenu);
             </div>
 
             <div :class="$style.bottom">
-                <div :class="$style.links">
+                <div :class="$style.statuses">
+                    <ServerStatus :size="ESize.Small" icon="users-round" />
+                </div>
+
+                <div :class="$style.actions">
+                    <VButton
+                        icon="log-out"
+                        :color="EColor.SecondaryDark"
+                        :class="$style.button"
+                        @click="userStore.logout"
+                    >
+                        Выйти
+                    </VButton>
+
                     <VButton
                         v-for="item in LINKS"
                         :key="item.title"
@@ -174,25 +179,12 @@ watch(() => route.path, closeMenu);
                         :icon="item.icon"
                         :tag="ETag.Link"
                         :color="EColor.SecondaryDark"
-                        :size="ESize.Small"
+                        :class="$style.iconButton"
+                        :aria-label="item.title"
+                        :title="item.title"
                         target="_blank"
-                    >
-                        {{ item.title }}
-                    </VButton>
+                    />
                 </div>
-
-                <div :class="[$style.discordStatus, discordStatus.class]">
-                    {{ discordStatus.label }}
-                </div>
-
-                <VButton
-                    icon="log-out"
-                    :color="EColor.SecondaryDark"
-                    :class="$style.button"
-                    @click="userStore.logout"
-                >
-                    Выйти из аккаунта
-                </VButton>
             </div>
         </aside>
     </div>
@@ -348,7 +340,7 @@ watch(() => route.path, closeMenu);
 }
 
 .button {
-    width: 100%;
+    flex: 1;
 }
 
 .bottom {
@@ -357,42 +349,31 @@ watch(() => route.path, closeMenu);
     gap: $space-16;
 }
 
-.links {
+.actions {
     display: flex;
     gap: $space-8;
 
-    a {
-        flex: 1;
+    .iconButton {
+        padding: 0;
     }
 }
 
-.discordStatus {
-    @include l3;
+.iconButton {
+    flex: none;
+    width: $space-40;
 
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: $space-32;
-    padding: $space-12;
-    border: 1px solid $warning;
-    border-radius: $radius-8;
-    color: $text-inverse;
-
-    &::before {
-        content: '';
-        width: 0.8rem;
-        height: 0.8rem;
-        margin-right: $space-8;
-        border-radius: 50%;
-        background-color: $warning;
+    & :global(.v-button__label) {
+        display: none;
     }
+}
 
-    &._linked {
-        border-color: $success;
+.statuses {
+    display: flex;
+    gap: $space-8;
 
-        &::before {
-            background-color: $success;
-        }
+    > * {
+        flex: 1;
+        min-width: 0;
     }
 }
 </style>

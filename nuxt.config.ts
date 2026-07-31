@@ -70,5 +70,7 @@ export default defineNuxtConfig({
         discordGuildId: '',
         discordChannelId: '',
         serverApiToken: '',
+        minecraftHost: '127.0.0.1',
+        minecraftPort: 25565,
     },
 });

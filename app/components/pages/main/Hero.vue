@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { HERO } from '~/assets/ts/constants/content/main';
+
 import { ETag } from '~/assets/ts/enums/common';
+import ServerStatus from '~/components/common/ServerStatus.vue';
 </script>
 
 <template>
@@ -11,6 +13,8 @@ import { ETag } from '~/assets/ts/enums/common';
             <div :class="$style.container">
                 <h1 :class="$style.title" v-html="HERO.title" />
                 <div :class="$style.description" v-html="HERO.description" />
+
+                <ServerStatus :class="$style.status" />
 
                 <VButton
                     href="#game"
@@ -87,6 +91,11 @@ import { ETag } from '~/assets/ts/enums/common';
 
         max-width: 100%;
     }
+}
+
+.status {
+    align-self: flex-start;
+    margin-bottom: $space-24;
 }
 
 .button {
