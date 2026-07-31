@@ -2,16 +2,13 @@ import type { EventHandlerRequest, H3Event } from 'h3';
 import type { ZodSchema } from 'zod';
 
 /**
- * Читает тело запроса и валидирует его Zod-схемой.
- *
- * Использует `safeParse` чтобы вернуть управляемую `400`-ошибку
- * с человекочитаемым текстом из схемы, а не необработанный `500`. Трансформы
- * схемы (`trim`, `toLowerCase` и т.п.) применяются к результату.
+ * Читает тело запроса и валидирует Zod-схемой; трансформы схемы (`trim`,
+ * `toLowerCase`) применяются к результату.
  *
  * @param event Текущее событие H3.
  * @param schema Zod-схема тела запроса.
  * @returns Провалидированное и типизированное тело запроса.
- * @throws `400` с текстом первой ошибки, если тело не прошло валидацию.
+ * @throws `400` с текстом первой ошибки схемы.
  */
 export async function readValidatedBodyOr400<T>(event: H3Event<EventHandlerRequest>, schema: ZodSchema<T>): Promise<T> {
     const result = await readValidatedBody(event, schema.safeParse);

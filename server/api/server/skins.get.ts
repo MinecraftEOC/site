@@ -2,9 +2,7 @@ import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 
 /**
  * `GET /api/server/skins` — скины персонажа по uuid для игрового сервера.
- *
- * Ручка внутренняя: доступ закрыт server-to-server токеном на уровне middleware
- * (`server/middleware/server.ts`), сессия/роль не проверяются.
+ * Внутренняя ручка, закрыта токеном в `server/middleware/server.ts`.
  *
  * @throws 403 если server-to-server токен отсутствует или неверен.
  */

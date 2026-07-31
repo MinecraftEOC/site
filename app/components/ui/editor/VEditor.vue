@@ -95,7 +95,6 @@ function onUpdate(value: unknown) {
         padding: $space-12;
     }
 
-    // Плейсхолдер Quill рисует псевдоэлементом, курсивом и с левым отступом 15px
     .ql-editor.ql-blank::before {
         right: $space-12;
         left: $space-12;
@@ -103,7 +102,6 @@ function onUpdate(value: unknown) {
         font-style: normal;
     }
 
-    // Иконки тулбара — inline-svg, красятся через stroke/fill
     .ql-snow .ql-stroke {
         stroke: $text-secondary;
     }
@@ -116,8 +114,6 @@ function onUpdate(value: unknown) {
         color: $text-secondary;
     }
 
-    // Наведение и активное состояние Quill красит синим, причём его селекторы
-    // содержат тип (button.ql-active) — перебиваем количеством классов
     .ql-toolbar.ql-snow button:hover .ql-stroke,
     .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke,
     .ql-toolbar.ql-snow .ql-active .ql-stroke,
@@ -151,7 +147,6 @@ function onUpdate(value: unknown) {
         background-color: $surface-raised;
     }
 
-    // Выпадающие списки тулбара (заголовки) — тоже часть виджета
     .ql-snow .ql-picker-options {
         border-radius: $radius-4;
         background-color: $surface-raised;
@@ -166,7 +161,6 @@ function onUpdate(value: unknown) {
         color: $text-link;
     }
 
-    // Диалог вставки ссылки
     .ql-snow .ql-tooltip {
         border: 1px solid $border;
         border-radius: $radius-4;

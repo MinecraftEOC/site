@@ -7,13 +7,10 @@ import { USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
 import { sharedLoginSchema } from '~~/shared/schemas/auth';
 
 /**
- * `POST /api/auth/login` — вход по email и паролю.
- *
- * Валидирует тело схемой `sharedLoginSchema`, при успехе создаёт сессию и кладёт
- * её id в httpOnly-cookie.
+ * `POST /api/auth/login` — вход по email и паролю: создаёт сессию и ставит cookie.
  *
  * @throws 400 если тело не прошло валидацию.
- * @throws 401 если пользователь не найден или пароль неверный.
+ * @throws 401 если email не найден или пароль неверный.
  */
 export default defineEventHandler(async (event): Promise<ILoginResponse> => {
     const { email, password } = await readValidatedBodyOr400(event, sharedLoginSchema);

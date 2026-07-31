@@ -6,17 +6,8 @@ import { CharacterStatus } from '~~/generated/prisma/enums';
 import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
 
 /**
- * `PATCH /api/character/status` — установка статуса персонажа администратором.
- *
- * Доступно только админу (`requireAdmin`). Позволяет выставить **любой** статус
- * из `CharacterStatus` (одобрить → `ACTIVE`, вернуть на доработку → `RETURNED`,
- * забанить → `BANNED`, снять с игры → `UNAVAILABLE` и т.п.). Вместе со статусом
- * можно задать/очистить комментарий к статусу (`statusComment`) и комментарий
- * модерации (`reviewComment`): поле не передано — без изменений, пустая
- * строка — очищается.
- *
- * `statusChangedAt` обновляется, только если статус реально сменился: правка
- * одних комментариев дату не двигает.
+ * `PATCH /api/character/status` — установка статуса персонажа админом вместе
+ * с комментариями (не передан — без изменений, пустая строка — очистка).
  *
  * @throws 401 если запрос не авторизован.
  * @throws 403 если пользователь не администратор.

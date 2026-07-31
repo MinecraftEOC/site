@@ -318,8 +318,6 @@ watch(viewerOptions, applyOptions);
     overflow: hidden;
 }
 
-// Канвас позиционирован абсолютно, чтобы его размер не влиял на размер
-// родителя: иначе ResizeObserver зациклится на собственных изменениях.
 .canvas {
     position: absolute;
     top: 0;

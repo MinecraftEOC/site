@@ -3,9 +3,9 @@ import type { IUserResponse } from '~~/shared/@types/response';
 import { USER_ERRORS, USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
 
 /**
- * `GET /api/user` — поиск пользователя по id
- * Доступно только администратору.
- * @throws 404 если пользователь под заданные условия не найден.
+ * `GET /api/user` — пользователь по id. Только для администратора.
+ *
+ * @throws 404 если пользователь не найден.
  */
 export default defineEventHandler(async (event): Promise<IUserResponse> => {
     requireAdmin(event);

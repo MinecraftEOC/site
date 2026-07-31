@@ -4,11 +4,8 @@ import { DiscordLinkStatus } from '~~/generated/prisma/enums';
 import { DISCORD_ERRORS, VERIFY_CODE_TTL } from '~~/server/common/constants/discord';
 
 /**
- * `POST /api/discord/link` — запуск привязки аккаунта к Discord.
- *
- * Генерирует одноразовый код с ограниченным сроком жизни и сохраняет его
- * (создавая или обновляя `DiscordAccount`). Код вводится в Discord-боте
- * командой `/verify`.
+ * `POST /api/discord/link` — выдача одноразового кода привязки к Discord.
+ * Код вводится боту командой `/verify`.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 409 если Discord-аккаунт уже привязан.

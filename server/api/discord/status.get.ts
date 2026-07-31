@@ -3,9 +3,8 @@ import type { IDiscordStatusResponse } from '~~/shared/@types/response';
 import { DiscordLinkStatus } from '~~/generated/prisma/enums';
 
 /**
- * `GET /api/discord/status` — статус привязки Discord у текущего пользователя.
- *
- * Если аккаунт ещё не создан, возвращает статус `PENDING` по умолчанию.
+ * `GET /api/discord/status` — статус привязки Discord у текущего пользователя,
+ * для непривязанного — `PENDING`.
  *
  * @throws 401 если запрос не авторизован.
  */

@@ -7,14 +7,11 @@ import { UserRole } from '~~/generated/prisma/enums';
 import { AUTH_ERRORS, SERVER_TOKEN_SCHEME } from '~~/server/common/constants/auth';
 
 /**
- * Требует авторизованного пользователя для защищённого эндпоинта.
- *
- * Берёт пользователя из `event.context` (кладётся middleware) и кидает
- * `401 UNAUTHORIZED`, если его нет.
+ * Возвращает пользователя, положенного в контекст сессионным middleware.
  *
  * @param event Текущее событие H3.
  * @returns Авторизованный пользователь ({@link ISafeUser}).
- * @throws `401` если пользователь не авторизован.
+ * @throws `401` если запрос не авторизован.
  */
 export function requireUser(event: H3Event) {
     const user = event.context.user;
@@ -26,10 +23,11 @@ export function requireUser(event: H3Event) {
 }
 
 /**
- * Требует роли администратора для защищенного ресурса.
+ * Возвращает пользователя из контекста, если он администратор.
  *
  * @param event Текущее событие H3.
  * @returns Администратор ({@link ISafeUser}).
+ * @throws `401` если запрос не авторизован.
  * @throws `403` если пользователь не администратор.
  */
 export function requireAdmin(event: H3Event) {
@@ -42,13 +40,8 @@ export function requireAdmin(event: H3Event) {
 }
 
 /**
- * Требует валидный server-to-server токен для внутренних ручек
- * (например, запросов с игрового сервера).
- *
- * Токен передаётся в заголовке `Authorization: Bearer <token>` и сверяется
- * с приватным `serverApiToken` из `runtimeConfig` (env `NUXT_SERVER_API_TOKEN`).
- * Сравнение — за постоянное время. Cookie/сессия не используются, поэтому
- * из браузера ручку не дёрнуть.
+ * Сверяет токен из `Authorization: Bearer` с `runtimeConfig.serverApiToken`.
+ * Сессия и роль не участвуют — из браузера такую ручку не дёрнуть.
  *
  * @param event Текущее событие H3.
  * @throws `500` если токен не настроен на сервере.
@@ -71,7 +64,7 @@ export function requireServerToken(event: H3Event) {
 }
 
 /**
- * Сравнивает две строки за постоянное время (защита от timing-атак).
+ * Сравнивает строки за постоянное время — защита от timing-атак.
  *
  * @param a Первая строка.
  * @param b Вторая строка.

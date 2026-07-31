@@ -6,13 +6,11 @@ import { USER_ERRORS } from '~~/server/common/constants/user';
 import { sharedRegisterSchema } from '~~/shared/schemas/auth';
 
 /**
- * `POST /api/auth/register` — регистрация нового пользователя.
+ * `POST /api/auth/register` — регистрация пользователя. Сессию не создаёт,
+ * вход выполняется отдельно.
  *
- * Валидирует тело схемой `sharedRegisterSchema`, хэширует пароль (`bcrypt`) и
- * создаёт пользователя. Сессию не создаёт — вход выполняется отдельно.
- *
- * @throws 400 если тело не прошло валидацию (email/пароль).
- * @throws 409 если пользователь с таким email уже существует.
+ * @throws 400 если тело не прошло валидацию.
+ * @throws 409 если email уже занят.
  */
 export default defineEventHandler(async (event): Promise<IRegisterResponse> => {
     const { email, password } = await readValidatedBodyOr400(event, sharedRegisterSchema);

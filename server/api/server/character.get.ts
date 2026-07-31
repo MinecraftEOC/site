@@ -3,10 +3,8 @@ import type { IServerCharacterResponse } from '~~/shared/@types/response';
 import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 
 /**
- * `GET /api/server/character` — данные персонажа по uuid для игрового сервера.
- *
- * Ручка внутренняя: доступ закрыт server-to-server токеном на уровне middleware
- * (`server/middleware/server.ts`), сессия/роль не проверяются.
+ * `GET /api/server/character` — персонаж по uuid для игрового сервера.
+ * Внутренняя ручка, закрыта токеном в `server/middleware/server.ts`.
  *
  * @throws 403 если server-to-server токен отсутствует или неверен.
  * @throws 404 если персонаж с таким uuid не найден.

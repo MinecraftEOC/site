@@ -3,10 +3,7 @@ import type { IMeResponse } from '~~/shared/@types/response';
 import { USER_ERRORS, USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
 
 /**
- * `GET /api/me` — данные текущего авторизованного пользователя.
- *
- * Пользователь определяется по сессии (`requireUser`); возвращаются его
- * персонажи и привязанный Discord-аккаунт.
+ * `GET /api/me` — текущий пользователь с персонажами и Discord-аккаунтом.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 404 если пользователь из сессии не найден в БД.

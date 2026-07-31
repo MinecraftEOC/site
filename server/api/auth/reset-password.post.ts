@@ -6,13 +6,10 @@ import { AUTH_ERRORS } from '~~/server/common/constants/auth';
 import { sharedResetPasswordSchema } from '~~/shared/schemas/auth';
 
 /**
- * `POST /api/auth/reset-password` — установка нового пароля по reset-токену.
+ * `POST /api/auth/reset-password` — смена пароля по reset-токену. Гасит токен
+ * и удаляет все сессии пользователя.
  *
- * Валидирует тело схемой `sharedResetPasswordSchema`, проверяет валидность и срок
- * жизни токена, хэширует новый пароль и в одной транзакции обновляет пользователя
- * (сбрасывая токен) и удаляет все его сессии.
- *
- * @throws 400 если тело не прошло валидацию или токен недействителен/просрочен.
+ * @throws 400 если тело не прошло валидацию или токен недействителен либо просрочен.
  */
 export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     const { token, password } = await readValidatedBodyOr400(event, sharedResetPasswordSchema);
