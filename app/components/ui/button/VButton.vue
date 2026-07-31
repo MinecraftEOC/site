@@ -29,7 +29,6 @@ const style = useCssModule();
 
 const resolvedTag = computed(() => props.tag === ETag.NuxtLink ? resolveComponent('NuxtLink') : props.tag);
 
-// В загрузке кнопка тоже недоступна для нажатий.
 const isDisabled = computed(() => props.disabled || props.loading);
 
 const classList = computed(() => [

@@ -36,6 +36,7 @@ function onBeforeLeave(el: Element) {
     position: fixed;
     right: $space-24;
     bottom: $space-24;
+    z-index: 5;
     display: flex;
     flex-direction: column;
     gap: $space-16;

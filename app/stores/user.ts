@@ -27,6 +27,7 @@ export const useUserStore = defineStore('user', () => {
     async function logout() {
         await api.logout();
         reset();
+        await navigateTo('/');
     }
 
     function reset() {
