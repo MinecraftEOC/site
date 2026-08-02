@@ -24,6 +24,16 @@ export enum ETag {
     Div = 'div',
 }
 
+/** Расположение модального окна на экране */
+export enum EModalVariant {
+    /** По центру на десктопе, bottom sheet на мобилке */
+    Adaptive = 'adaptive',
+    /** По центру на любой ширине */
+    Center = 'center',
+    /** Bottom sheet на любой ширине */
+    BottomSheet = 'bottom-sheet',
+}
+
 export enum ENotificationType {
     Success = 'success',
     Warning = 'warning',
