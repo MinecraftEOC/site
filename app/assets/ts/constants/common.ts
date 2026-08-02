@@ -1,4 +1,5 @@
 export const DISCORD_LINK = 'https://discord.com/invite/cwACTVDgbm';
+export const DISCORD_VERIFY_CHANNEL = 'https://discord.com/channels/739826388143570975/1524635028498157598';
 export const VK_LINK = 'https://vk.ru/colonial_era';
 
 /** Как часто на клиенте перезапрашивается онлайн сервера, мс. */

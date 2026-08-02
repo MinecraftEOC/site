@@ -76,6 +76,11 @@
     text-transform: uppercase;
 }
 
+@mixin mono-lg {
+    font: #{$fw-bold} #{$fs-mono-lg}/1.25 $font-mono;
+    letter-spacing: 0.04em;
+}
+
 @mixin mono {
     font: #{$fw-regular} #{$fs-mono}/1.5 $font-mono;
 }

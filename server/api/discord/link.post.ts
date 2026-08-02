@@ -5,7 +5,6 @@ import { DISCORD_ERRORS, VERIFY_CODE_TTL } from '~~/server/common/constants/disc
 
 /**
  * `POST /api/discord/link` — выдача одноразового кода привязки к Discord.
- * Код вводится боту командой `/verify`.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 409 если Discord-аккаунт уже привязан.

@@ -54,7 +54,7 @@ const hasHandle = computed(() => props.variant !== EModalVariant.Center);
                         :class="$style.close"
                         class="v-modal__close"
                     >
-                        <VIcon name="x" size="1em" />
+                        <VIcon name="x" />
                     </DialogClose>
                 </div>
 
@@ -127,7 +127,7 @@ const hasHandle = computed(() => props.variant !== EModalVariant.Center);
     width: auto;
     max-height: 90dvh;
     margin: 0;
-    padding: $space-12 $space-24 $space-24;
+    padding: $space-12 $space-16 $space-16;
     border: 1px solid $border;
     border-radius: $radius-12 $radius-12 0 0;
     box-shadow: 0 (-$space-12) $space-28 $shadow-sheet;
@@ -232,6 +232,7 @@ const hasHandle = computed(() => props.variant !== EModalVariant.Center);
     @include t2;
 
     flex: none;
+    margin: 0;
     color: $text-secondary;
 }
 

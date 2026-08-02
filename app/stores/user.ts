@@ -1,6 +1,7 @@
 import type { IUser } from '~~/shared/@types/user';
 import type { TLoginBody } from '~~/shared/schemas/auth';
 
+import { DiscordLinkStatus } from '~~/generated/prisma/enums';
 import { useAuthApi } from '~/composables/api/useAuthApi';
 
 export const useUserStore = defineStore('user', () => {
@@ -8,6 +9,7 @@ export const useUserStore = defineStore('user', () => {
 
     const user = ref<IUser | null>(null);
     const isAuthenticated = computed(() => !!user.value);
+    const isDiscordLinked = computed(() => user.value?.discordAccount?.status === DiscordLinkStatus.LINKED);
 
     async function fetchMe() {
         try {
@@ -37,6 +39,7 @@ export const useUserStore = defineStore('user', () => {
     return {
         user,
         isAuthenticated,
+        isDiscordLinked,
 
         fetchMe,
         reset,
