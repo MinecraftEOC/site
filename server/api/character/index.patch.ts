@@ -3,12 +3,12 @@ import type { ICharacterResponse } from '~~/shared/@types/response';
 import { Prisma } from '~~/generated/prisma/client';
 import { CharacterStatus } from '~~/generated/prisma/enums';
 import {
-    CHARACTER_EDITABLE_STATUSES,
     CHARACTER_ERRORS,
     CHARACTER_PUBLIC_SELECT,
     USERNAME_REGEX,
 } from '~~/server/common/constants/character';
 import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
+import { CHARACTER_EDITABLE_STATUSES } from '~~/shared/constants/character';
 
 /**
  * `PATCH /api/character` — доработка своего персонажа (`multipart/form-data`,

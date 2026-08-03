@@ -13,6 +13,29 @@ export function rem(px: number): string {
 }
 
 /**
+ * Форматирует дату в `ДД.ММ.ГГГГ` по UTC.
+ *
+ * Собирается вручную из `getUTC*`, а не через `toLocaleDateString`: результат не
+ * зависит ни от локали, ни от таймзоны рантайма, поэтому SSR и клиент дают
+ * одинаковую строку и гидрация не расходится.
+ *
+ * @param value Дата или её ISO-представление.
+ * @returns Строка вида `12.04.1642`, либо пустая строка для невалидной даты.
+ */
+export function formatDate(value: string | Date): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    const day = `${date.getUTCDate()}`.padStart(2, '0');
+    const month = `${date.getUTCMonth() + 1}`.padStart(2, '0');
+
+    return `${day}.${month}.${date.getUTCFullYear()}`;
+}
+
+/**
  * Достаёт человекочитаемый текст из ошибки `$fetch`.
  *
  * @param error Ошибка запроса.

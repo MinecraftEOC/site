@@ -1,7 +1,8 @@
 import type { IUser } from '~~/shared/@types/user';
 import type { TLoginBody } from '~~/shared/schemas/auth';
 
-import { DiscordLinkStatus } from '~~/generated/prisma/enums';
+import { CharacterStatus, DiscordLinkStatus } from '~~/generated/prisma/enums';
+import { CHARACTER_EDITABLE_STATUSES, isCharacterLive } from '~~/shared/constants/character';
 import { useAuthApi } from '~/composables/api/useAuthApi';
 
 export const useUserStore = defineStore('user', () => {
@@ -10,6 +11,10 @@ export const useUserStore = defineStore('user', () => {
     const user = ref<IUser | null>(null);
     const isAuthenticated = computed(() => !!user.value);
     const isDiscordLinked = computed(() => user.value?.discordAccount?.status === DiscordLinkStatus.LINKED);
+    const characters = computed(() => user.value?.characters ?? []);
+    const hasLiveCharacter = computed(() => characters.value.some(character => isCharacterLive(character.status)));
+    const activeCharacter = computed(() => characters.value.find(character => character.status === CharacterStatus.ACTIVE) ?? null);
+    const editableCharacter = computed(() => characters.value.find(character => CHARACTER_EDITABLE_STATUSES.includes(character.status)) ?? null);
 
     async function fetchMe() {
         try {
@@ -40,6 +45,10 @@ export const useUserStore = defineStore('user', () => {
         user,
         isAuthenticated,
         isDiscordLinked,
+        characters,
+        hasLiveCharacter,
+        activeCharacter,
+        editableCharacter,
 
         fetchMe,
         reset,

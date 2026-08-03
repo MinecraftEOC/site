@@ -1,11 +1,12 @@
 import type { ICharacterResponse } from '~~/shared/@types/response';
 
-import { CHARACTER_PUBLIC_SELECT, CHARACTER_RETIRED_STATUSES } from '~~/server/common/constants/character';
+import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
 import {
     SKIN_ERRORS,
     SKIN_MANAGEABLE_STATUSES,
     SKIN_MAX_COUNT,
 } from '~~/server/common/constants/skin';
+import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
 
 /**
  * `POST /api/character/skin` — добавление PNG-скинов существующему персонажу

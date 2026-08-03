@@ -3,22 +3,24 @@ import type { ICharacterResponse } from '~~/shared/@types/response';
 import { randomUUID } from 'node:crypto';
 
 import { Prisma } from '~~/generated/prisma/client';
-import { UserRole } from '~~/generated/prisma/enums';
+import { DiscordLinkStatus, UserRole } from '~~/generated/prisma/enums';
 import {
     CHARACTER_ERRORS,
     CHARACTER_PUBLIC_SELECT,
-    CHARACTER_RETIRED_STATUSES,
     USERNAME_REGEX,
 } from '~~/server/common/constants/character';
 import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
 import { USER_ERRORS } from '~~/server/common/constants/user';
+import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
 
 /**
  * `POST /api/character` — создание персонажа (`multipart/form-data` с полями
- * и файлами скинов). Живой персонаж у пользователя может быть только один.
+ * и файлами скинов). Живой персонаж у пользователя может быть только один,
+ * а сам аккаунт должен быть привязан к Discord.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 при некорректных полях или невалидных файлах скинов.
+ * @throws 403 если Discord не привязан.
  * @throws 404 если аккаунт пользователя не найден.
  * @throws 409 если уже есть активный персонаж, имя занято или превышен лимит скинов.
  */
@@ -59,11 +61,18 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { password: true },
+        select: {
+            password: true,
+            discordAccount: { select: { status: true } },
+        },
     });
 
     if (!user) {
         throw createError({ statusCode: 404, message: USER_ERRORS.USER_NOT_FOUND });
+    }
+
+    if (user.discordAccount?.status !== DiscordLinkStatus.LINKED) {
+        throw createError({ statusCode: 403, message: CHARACTER_ERRORS.DISCORD_NOT_LINKED });
     }
 
     const hashes = await saveSkinFiles(skinBuffers);

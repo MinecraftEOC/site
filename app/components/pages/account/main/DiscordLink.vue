@@ -3,6 +3,7 @@ import { DISCORD_VERIFY_CHANNEL } from '~/assets/ts/constants/common';
 import { DEFAULT_TITLE, DISCORD_LINK, DISCORD_PAGE_DESCRIPTION } from '~/assets/ts/constants/content/account';
 import { EColor, ENotificationType, ETag } from '~/assets/ts/enums/common';
 
+import AccountEmptyState from '~/components/pages/account/AccountEmptyState.vue';
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
 import { useDiscordApi } from '~/composables/api/useDiscordApi';
 
@@ -41,18 +42,15 @@ watch(showModal, (value) => {
         :description="DISCORD_PAGE_DESCRIPTION"
         :class="$style.DiscordLink"
     >
-        <div :class="$style.main">
-            <div :class="$style.iconWrapper">
-                <VIcon name="link-2" size="28" />
-            </div>
-
-            <div :class="$style.title" v-html="DISCORD_LINK.title" />
-            <div :class="$style.description" v-html="DISCORD_LINK.description" />
-
+        <AccountEmptyState
+            icon="link-2"
+            :title="DISCORD_LINK.title"
+            :description="DISCORD_LINK.description"
+        >
             <VButton :class="$style.mainButton" @click="showModal = !showModal">
                 {{ DISCORD_LINK.button }}
             </VButton>
-        </div>
+        </AccountEmptyState>
 
         <VModal
             v-model="showModal"
@@ -90,56 +88,6 @@ watch(showModal, (value) => {
 <style module lang="scss">
 .DiscordLink {
     //
-}
-
-.main {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.iconWrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 6.4rem;
-    height: 6.4rem;
-    margin-bottom: $space-16;
-    border-radius: 50%;
-    background-color: $surface-sunken;
-    color: $text-link;
-
-    @include respond-to(mobile) {
-        width: rem(56);
-        height: rem(56);
-        margin-bottom: $space-12;
-    }
-}
-
-.title {
-    @include h3;
-
-    margin-bottom: $space-8;
-    text-align: center;
-
-    @include respond-to(mobile) {
-        @include h4;
-    }
-}
-
-.description {
-    @include t2;
-
-    margin-bottom: $space-16;
-    color: $text-secondary;
-    text-align: center;
-
-    @include respond-to(mobile) {
-        @include t3;
-    }
 }
 
 .mainButton {

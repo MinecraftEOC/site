@@ -313,9 +313,9 @@ watch(viewerOptions, applyOptions);
 <style module lang="scss">
 .VSkin {
     position: relative;
+    overflow: hidden;
     width: 100%;
     height: 100%;
-    overflow: hidden;
 }
 
 .canvas {

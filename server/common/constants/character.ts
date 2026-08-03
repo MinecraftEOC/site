@@ -1,7 +1,5 @@
 import type { Prisma } from '~~/generated/prisma/client';
 
-import { CharacterStatus } from '~~/generated/prisma/enums';
-
 /** Максимальная длина квенты по видимому тексту, без учёта разметки. */
 export const BIOGRAPHY_MAX_LENGTH = 10000;
 
@@ -14,6 +12,7 @@ export const BIOGRAPHY_MAX_HTML_LENGTH = 100000;
 /** Тексты ошибок ручек персонажа, возвращаемые через `createError`. */
 export const CHARACTER_ERRORS = {
     ALREADY_EXISTS: 'У вас уже есть активный персонаж',
+    DISCORD_NOT_LINKED: 'Для создания персонажа нужно привязать Discord',
     NOT_EDITABLE: 'Нет персонажа, доступного для редактирования',
     NOTHING_TO_UPDATE: 'Не передано ни одного поля для обновления',
     USERNAME_TAKEN: 'Имя персонажа уже занято',
@@ -54,15 +53,6 @@ export const CHARACTER_PUBLIC_SELECT = {
         },
     },
 } satisfies Prisma.CharacterSelect;
-
-/**
- * Статусы, в которых персонаж выведен из игры: он больше не считается «живым»,
- * не мешает создать нового и не участвует в поиске текущего персонажа.
- */
-export const CHARACTER_RETIRED_STATUSES: CharacterStatus[] = [CharacterStatus.DEAD, CharacterStatus.UNAVAILABLE];
-
-/** Статусы, в которых пользователь может редактировать своего персонажа. */
-export const CHARACTER_EDITABLE_STATUSES: CharacterStatus[] = [CharacterStatus.UNVERIFIED, CharacterStatus.RETURNED];
 
 /** Регулярка имени персонажа: 3–16 символов, кириллица, латиница и `_`, пробелы (не по краям). */
 export const USERNAME_REGEX = /^[а-яёА-ЯЁa-zA-Z_][а-яёА-ЯЁa-zA-Z_ ]{1,14}[а-яёА-ЯЁa-zA-Z_]$/;

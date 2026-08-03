@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import CharactersList from '~/components/pages/account/main/CharactersList.vue';
 import DiscordLink from '~/components/pages/account/main/DiscordLink.vue';
+import EmptyCharacters from '~/components/pages/account/main/EmptyCharacters.vue';
 
 definePageMeta({
     layout: 'account',
@@ -12,7 +14,11 @@ const pageComponent = computed(() => {
         return DiscordLink;
     }
 
-    return DiscordLink;
+    if (!userStore.characters.length) {
+        return EmptyCharacters;
+    }
+
+    return CharactersList;
 });
 </script>
 

@@ -17,6 +17,14 @@ export enum EStatusColor {
     Danger = 'danger',
 }
 
+export enum EBadgeColor {
+    Neutral = 'neutral',
+    Success = 'success',
+    Warning = 'warning',
+    Danger = 'danger',
+    Info = 'info',
+}
+
 export enum ETag {
     Button = 'button',
     Link = 'a',
@@ -24,13 +32,9 @@ export enum ETag {
     Div = 'div',
 }
 
-/** Расположение модального окна на экране */
 export enum EModalVariant {
-    /** По центру на десктопе, bottom sheet на мобилке */
     Adaptive = 'adaptive',
-    /** По центру на любой ширине */
     Center = 'center',
-    /** Bottom sheet на любой ширине */
     BottomSheet = 'bottom-sheet',
 }
 
