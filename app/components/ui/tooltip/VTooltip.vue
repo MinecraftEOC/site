@@ -7,6 +7,8 @@ interface IProps {
     text?: string;
     /** Предпочитаемая сторона появления — при нехватке места меняется автоматически */
     placement?: Placement;
+    /** Максимальная ширина подсказки: числом — в px по макету 1440px, строкой — готовое CSS-значение */
+    maxWidth?: string | number;
     /** Задержка перед показом, мс */
     delay?: number;
     /** Отключает показ: триггер работает как обычно, тултип не появляется */
@@ -18,6 +20,7 @@ interface IProps {
 const props = withDefaults(defineProps<IProps>(), {
     text: '',
     placement: 'top',
+    maxWidth: 320,
     delay: 150,
     disabled: false,
     interactive: false,
@@ -28,6 +31,8 @@ const VIEWPORT_PADDING = 8;
 const CLOSE_DELAY = 120;
 
 const slots = useSlots();
+
+const style = useCssModule();
 
 const reference = useTemplateRef<HTMLElement>('reference');
 const floating = useTemplateRef<HTMLElement>('floating');
@@ -52,6 +57,14 @@ const { floatingStyles, placement: currentPlacement, middlewareData } = useFloat
 });
 
 const hasContent = computed(() => Boolean(props.text) || Boolean(slots.content));
+
+const tooltipClassList = computed(() => [props.interactive ? style._interactive : '']);
+
+const tooltipStyles = computed(() => ({
+    ...floatingStyles.value,
+    maxWidth: typeof props.maxWidth === 'number' ? rem(props.maxWidth) : props.maxWidth,
+}));
+
 const arrowStyles = computed(() => {
     const { x, y } = middlewareData.value.arrow ?? {};
 
@@ -127,8 +140,8 @@ onBeforeUnmount(stopTimers);
                     :id="id"
                     ref="floating"
                     role="tooltip"
-                    :class="[$style.tooltip, props.interactive ? $style._interactive : '']"
-                    :style="floatingStyles"
+                    :class="[$style.tooltip, tooltipClassList]"
+                    :style="tooltipStyles"
                     :data-placement="currentPlacement"
                     @mouseenter="onFloatingEnter"
                     @mouseleave="onFloatingLeave"
@@ -158,7 +171,6 @@ onBeforeUnmount(stopTimers);
 
     z-index: 10;
     width: max-content;
-    max-width: 24rem;
     padding: $space-8 $space-12;
     border-radius: $radius-8;
     background-color: $surface-dark;

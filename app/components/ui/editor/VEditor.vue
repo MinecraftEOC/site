@@ -6,12 +6,22 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 interface IProps {
     /** Содержимое редактора, HTML */
     modelValue?: string;
+    /** Лейбл */
+    label?: string;
+    /** Текст подсказки — рядом с лейблом появляется иконка с тултипом */
+    hint?: string;
     /** Подсказка в пустом поле */
     placeholder?: string;
     /** Только чтение: тулбар скрыт, текст не редактируется */
     readonly?: boolean;
     /** Состав тулбара; по умолчанию — минимальный набор */
     toolbar?: string | unknown[] | false;
+    /**
+     * Максимальная высота поля ввода. Числом — в px по макету 1440px
+     * (240 → 24rem), строкой — готовое CSS-значение. Без неё поле тянется на
+     * всю доступную высоту родителя.
+     */
+    maxHeight?: string | number;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -27,6 +37,22 @@ const emits = defineEmits<{
 
 const QuillEditor = defineAsyncComponent(async () => (await import('@vueup/vue-quill')).QuillEditor);
 
+const READONLY_CLASS = 'v-editor--readonly';
+
+const classList = computed(() => [props.readonly ? READONLY_CLASS : '']);
+
+/**
+ * Ограничение уезжает в CSS-переменную: сам `.ql-container` рисует Quill, снаружи
+ * до него не дотянуться инлайновым стилем.
+ */
+const maxHeightStyle = computed(() => {
+    if (props.maxHeight === undefined) {
+        return undefined;
+    }
+
+    return { '--v-editor-max-height': typeof props.maxHeight === 'number' ? rem(props.maxHeight) : props.maxHeight };
+});
+
 function onUpdate(value: unknown) {
     const html = typeof value === 'string' ? value : '';
 
@@ -36,9 +62,25 @@ function onUpdate(value: unknown) {
 
 <template>
     <div
-        :class="[$style.VEditor, { 'v-editor--readonly': props.readonly }]"
+        :class="[$style.VEditor, classList]"
+        :style="maxHeightStyle"
         class="v-editor"
     >
+        <span
+            v-if="props.label"
+            :class="$style.label"
+            class="v-editor__label"
+        >
+            {{ props.label }}
+
+            <VTooltip
+                v-if="props.hint"
+                :text="props.hint"
+            >
+                <VIcon name="info" :size="12" />
+            </VTooltip>
+        </span>
+
         <ClientOnly>
             <QuillEditor
                 theme="snow"
@@ -59,11 +101,28 @@ function onUpdate(value: unknown) {
 
 <style module lang="scss">
 .VEditor {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.label {
+    @include l2;
+
+    display: inline-flex;
+    gap: $space-4;
+    align-items: center;
+    align-self: flex-start;
+    margin-bottom: $space-8;
 }
 
 .fallback {
-    min-height: 24rem;
+    flex: 1;
+    min-height: min(#{$editor-min-height}, var(--v-editor-max-height, #{$editor-min-height}));
+    max-height: var(--v-editor-max-height, none);
     border: 1px solid $input-border;
     border-radius: $radius-8;
     background-color: $input-bg;
@@ -73,29 +132,34 @@ function onUpdate(value: unknown) {
 <style lang="scss">
 .v-editor {
     .ql-toolbar.ql-snow {
+        flex-shrink: 0;
         padding: $space-8;
         border: 1px solid $input-border;
-        border-radius: $radius-8 $radius-8 0 0;
+        border-radius: $radius-4 $radius-4 0 0;
         background-color: $surface-sunken;
         font-family: $font-sans;
     }
 
     .ql-container.ql-snow {
-        @include t2;
+        @include t3;
 
+        flex: 1;
+        min-height: min(#{$editor-min-height}, var(--v-editor-max-height, #{$editor-min-height}));
+        max-height: var(--v-editor-max-height, none);
         border: 1px solid $input-border;
         border-top: 0;
-        border-radius: 0 0 $radius-8 $radius-8;
+        border-radius: 0 0 $radius-4 $radius-4;
         background-color: $input-bg;
         color: $input-text;
     }
 
     .ql-editor {
-        min-height: 20rem;
         padding: $space-12;
     }
 
     .ql-editor.ql-blank::before {
+        @include t3;
+
         right: $space-12;
         left: $space-12;
         color: $input-placeholder;

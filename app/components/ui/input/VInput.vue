@@ -6,6 +6,8 @@ interface IProps {
     size?: ESize;
     /** Лейбл */
     label?: string;
+    /** Текст подсказки — рядом с лейблом появляется иконка с тултипом */
+    hint?: string;
     /** Текст ошибки */
     error?: string;
     /** Иконка инпута */
@@ -46,6 +48,18 @@ const iconSize = computed(() => {
             class="v-input__label"
         >
             {{ props.label }}
+
+            <VTooltip
+                v-if="props.hint"
+                :text="props.hint"
+            >
+                <VIcon
+                    name="info"
+                    :size="12"
+                    :class="$style.hintIcon"
+                    class="v-input__hint-icon"
+                />
+            </VTooltip>
         </span>
 
         <div :class="$style.wrapper">
@@ -128,7 +142,15 @@ const iconSize = computed(() => {
 .label {
     @include l2;
 
+    display: inline-flex;
+    gap: $space-4;
+    align-items: center;
+    align-self: flex-start;
     margin-bottom: $space-8;
+}
+
+.hintIcon {
+    cursor: pointer;
 }
 
 .wrapper {

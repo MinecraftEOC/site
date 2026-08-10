@@ -88,3 +88,7 @@
 @mixin mono2 {
     font: #{$fw-regular} #{$fs-mono2}/1.5 $font-mono;
 }
+
+@mixin mono3 {
+    font: #{$fw-regular} #{$fs-mono3}/1.5 $font-mono;
+}

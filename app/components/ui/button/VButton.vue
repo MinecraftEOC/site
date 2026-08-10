@@ -72,7 +72,7 @@ const iconSize = computed(() => {
                 :size="iconSize"
             />
 
-            <span class="v-button__label">
+            <span :class="$style.label" class="v-button__label">
                 <slot />
             </span>
         </template>
@@ -201,6 +201,12 @@ const iconSize = computed(() => {
 }
 
 .loader {
+    display: flex;
+    gap: $space-4;
+    align-items: center;
+}
+
+.label {
     display: flex;
     gap: $space-4;
     align-items: center;

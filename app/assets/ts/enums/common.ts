@@ -32,6 +32,11 @@ export enum ETag {
     Div = 'div',
 }
 
+export enum ETagsLayout {
+    Row = 'row',
+    Grid = 'grid',
+}
+
 export enum EModalVariant {
     Adaptive = 'adaptive',
     Center = 'center',

@@ -136,10 +136,39 @@ $control-active: $brass-500;
 $focus-ring: $brass-500;
 $hover-surface: $parchment-300;
 
+$scrollbar-size: rem(6);
+$scrollbar-track: transparent;
+$scrollbar-thumb: $parchment-500;
+$scrollbar-thumb-hover: $brass-400;
+
 $badge-neutral-bg: $parchment-300;
 $badge-neutral-text: $taupe-600;
 $badge-online-bg: $pine-50;
 $badge-online-text: $pine-600;
+
+$tag-bg: $parchment-50;
+$tag-bg-hover: $parchment-200;
+$tag-border: $parchment-500;
+$tag-text: $ink;
+$tag-icon: $taupe-400;
+$tag-counter-text: $taupe-400;
+$tag-selected-bg: $brass-100;
+$tag-selected-border: $brass-500;
+$tag-selected-text: $ink;
+$tag-selected-icon: $brass-600;
+$tag-selected-counter-text: $brass-600;
+$tag-disabled-bg: rgba($parchment-400, 0.28);
+$tag-disabled-text: $taupe-400;
+
+$counter-btn-bg: $parchment-50;
+$counter-btn-bg-hover: $parchment-200;
+$counter-btn-border: $parchment-500;
+$counter-btn-icon: $brass-600;
+$counter-btn-disabled-bg: rgba($parchment-400, 0.28);
+$counter-btn-disabled-icon: $taupe-400;
+$counter-value-bg: $parchment-300;
+$counter-value-text: $ink;
+$counter-multiplier-text: $brass-600;
 
 $font-serif: 'Alegreya', georgia, serif;
 $font-sans: 'Alegreya Sans', system-ui, sans-serif;
@@ -166,10 +195,12 @@ $fs-l4: rem(10);
 $fs-mono-lg: rem(20);
 $fs-mono: rem(14);
 $fs-mono2: rem(12);
+$fs-mono3: rem(10);
 
 $space-2: rem(2);
 $space-4: rem(4);
 $space-8: rem(8);
+$space-10: rem(10);
 $space-12: rem(12);
 $space-16: rem(16);
 $space-20: rem(20);
@@ -188,4 +219,5 @@ $radius-full: 999px;
 
 $header-h: rem(72);
 $header-mobile-h: rem(60);
+$editor-min-height: rem(200);
 $default-transition: 0.3s ease-in-out;

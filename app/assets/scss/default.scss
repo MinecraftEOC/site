@@ -80,6 +80,35 @@ input {
     outline: none;
 }
 
+::-webkit-scrollbar {
+    width: $scrollbar-size;
+    height: $scrollbar-size;
+}
+
+::-webkit-scrollbar-track {
+    background-color: $scrollbar-track;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: $radius-full;
+    background-color: $scrollbar-thumb;
+
+    &:hover {
+        background-color: $scrollbar-thumb-hover;
+    }
+}
+
+::-webkit-scrollbar-corner {
+    background-color: $scrollbar-track;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: $scrollbar-thumb $scrollbar-track;
+    }
+}
+
 .is-locked {
     overflow: hidden;
 }
