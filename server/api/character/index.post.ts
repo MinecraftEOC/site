@@ -4,14 +4,12 @@ import { randomUUID } from 'node:crypto';
 
 import { Prisma } from '~~/generated/prisma/client';
 import { DiscordLinkStatus, UserRole } from '~~/generated/prisma/enums';
-import {
-    CHARACTER_ERRORS,
-    CHARACTER_PUBLIC_SELECT,
-    USERNAME_REGEX,
-} from '~~/server/common/constants/character';
-import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
+import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { SKIN_ERRORS } from '~~/server/common/constants/skin';
 import { USER_ERRORS } from '~~/server/common/constants/user';
 import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
+import { SKIN_MAX_COUNT } from '~~/shared/constants/skin';
+import { sharedCharacterSchema } from '~~/shared/schemas/character';
 
 /**
  * `POST /api/character` — создание персонажа (`multipart/form-data` с полями
@@ -28,20 +26,8 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     const { id: userId, role } = requireUser(event);
     const parts = await readMultipartFormData(event);
 
-    const username = getFormField(parts, 'username')?.trim();
-    if (!username || !USERNAME_REGEX.test(username)) {
-        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.INVALID_USERNAME });
-    }
-
-    const rawBiography = getFormField(parts, 'biography')?.trim();
-    if (!rawBiography) {
-        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
-    }
-
+    const { username, biography: rawBiography, states, startingItems } = parseCharacterFormOr400(parts, sharedCharacterSchema);
     const biography = prepareBiography(rawBiography);
-
-    const states = parseJsonField(parts, 'states', CHARACTER_ERRORS.EMPTY_STATES, CHARACTER_ERRORS.INVALID_STATES);
-    const startingItems = parseJsonField(parts, 'startingItems', CHARACTER_ERRORS.EMPTY_STARTING_ITEMS, CHARACTER_ERRORS.INVALID_STARTING_ITEMS);
 
     const skinBuffers = collectSkinFiles(parts);
     if (skinBuffers.length > SKIN_MAX_COUNT) {
@@ -102,31 +88,3 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw error;
     }
 });
-
-/**
- * Читает обязательное JSON-поле из multipart и парсит его.
- *
- * @param parts Части multipart-запроса.
- * @param name Имя поля.
- * @param emptyMessage Ошибка, если поле не передано.
- * @param invalidMessage Ошибка, если значение — не валидный JSON.
- * @returns Разобранное JSON-значение.
- * @throws `400` если поле отсутствует или содержит невалидный JSON.
- */
-function parseJsonField(
-    parts: Awaited<ReturnType<typeof readMultipartFormData>>,
-    name: string,
-    emptyMessage: string,
-    invalidMessage: string,
-): Prisma.InputJsonValue {
-    const raw = getFormField(parts, name);
-    if (raw === undefined) {
-        throw createError({ statusCode: 400, message: emptyMessage });
-    }
-
-    try {
-        return JSON.parse(raw);
-    } catch {
-        throw createError({ statusCode: 400, message: invalidMessage });
-    }
-}

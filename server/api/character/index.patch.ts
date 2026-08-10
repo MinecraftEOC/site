@@ -2,13 +2,11 @@ import type { ICharacterResponse } from '~~/shared/@types/response';
 
 import { Prisma } from '~~/generated/prisma/client';
 import { CharacterStatus } from '~~/generated/prisma/enums';
-import {
-    CHARACTER_ERRORS,
-    CHARACTER_PUBLIC_SELECT,
-    USERNAME_REGEX,
-} from '~~/server/common/constants/character';
-import { SKIN_ERRORS, SKIN_MAX_COUNT } from '~~/server/common/constants/skin';
+import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { SKIN_ERRORS } from '~~/server/common/constants/skin';
 import { CHARACTER_EDITABLE_STATUSES } from '~~/shared/constants/character';
+import { SKIN_MAX_COUNT } from '~~/shared/constants/skin';
+import { sharedCharacterUpdateSchema } from '~~/shared/schemas/character';
 
 /**
  * `PATCH /api/character` — доработка своего персонажа (`multipart/form-data`,
@@ -23,34 +21,24 @@ import { CHARACTER_EDITABLE_STATUSES } from '~~/shared/constants/character';
 export default defineEventHandler(async (event): Promise<ICharacterResponse> => {
     const { id: userId } = requireUser(event);
     const parts = await readMultipartFormData(event);
+
+    const fields = parseCharacterFormOr400(parts, sharedCharacterUpdateSchema);
     const data: Prisma.CharacterUpdateInput = {};
 
-    const username = getFormField(parts, 'username');
-    if (username !== undefined) {
-        const trimmed = username.trim();
-        if (!USERNAME_REGEX.test(trimmed)) {
-            throw createError({ statusCode: 400, message: CHARACTER_ERRORS.INVALID_USERNAME });
-        }
-        data.username = trimmed;
+    if (fields.username !== undefined) {
+        data.username = fields.username;
     }
 
-    const biography = getFormField(parts, 'biography');
-    if (biography !== undefined) {
-        const trimmed = biography.trim();
-        if (!trimmed) {
-            throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
-        }
-        data.biography = prepareBiography(trimmed);
+    if (fields.biography !== undefined) {
+        data.biography = prepareBiography(fields.biography);
     }
 
-    const states = getFormField(parts, 'states');
-    if (states !== undefined) {
-        data.states = parseJson(states, CHARACTER_ERRORS.INVALID_STATES);
+    if (fields.states !== undefined) {
+        data.states = fields.states;
     }
 
-    const startingItems = getFormField(parts, 'startingItems');
-    if (startingItems !== undefined) {
-        data.startingItems = parseJson(startingItems, CHARACTER_ERRORS.INVALID_STARTING_ITEMS);
+    if (fields.startingItems !== undefined) {
+        data.startingItems = fields.startingItems;
     }
 
     const skinBuffers = collectSkinFiles(parts);
@@ -99,19 +87,3 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw error;
     }
 });
-
-/**
- * Парсит JSON-строку поля формы.
- *
- * @param raw Сырое значение поля.
- * @param invalidMessage Ошибка, если значение — не валидный JSON.
- * @returns Разобранное JSON-значение.
- * @throws `400` если значение содержит невалидный JSON.
- */
-function parseJson(raw: string, invalidMessage: string): Prisma.InputJsonValue {
-    try {
-        return JSON.parse(raw);
-    } catch {
-        throw createError({ statusCode: 400, message: invalidMessage });
-    }
-}

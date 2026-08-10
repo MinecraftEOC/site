@@ -4,9 +4,9 @@ import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
 import {
     SKIN_ERRORS,
     SKIN_MANAGEABLE_STATUSES,
-    SKIN_MAX_COUNT,
 } from '~~/server/common/constants/skin';
 import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
+import { SKIN_MAX_COUNT } from '~~/shared/constants/skin';
 
 /**
  * `POST /api/character/skin` — добавление PNG-скинов существующему персонажу
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     const parts = await readMultipartFormData(event);
     const skinBuffers = collectSkinFiles(parts);
     if (skinBuffers.length === 0) {
-        throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_FILE });
+        throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_SKINS });
     }
 
     const character = await prisma.character.findFirst({

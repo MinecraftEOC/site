@@ -2,8 +2,9 @@
 import { UserRole } from '~~/generated/prisma/enums';
 import { DISCORD_LINK, VK_LINK } from '~/assets/ts/constants/common';
 
-import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
+import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 
+import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
 import LogoBlock from '~/components/common/LogoBlock.vue';
 import ServerStatus from '~/components/common/ServerStatus.vue';
 
@@ -13,12 +14,12 @@ const ADMIN_MENU = {
         {
             title: 'Игроки',
             icon: 'user-cog',
-            to: '/account/admin/users',
+            to: ACCOUNT_ROUTES.adminUsers,
         },
         {
             title: 'Настройка новостей',
             icon: 'file-pen-line',
-            to: '/account/admin/news',
+            to: ACCOUNT_ROUTES.adminNews,
         },
     ],
 };
@@ -29,27 +30,27 @@ const MENU = {
         {
             title: 'Мои персонажи',
             icon: 'users-round',
-            to: '/account',
+            to: ACCOUNT_ROUTES.root,
         },
         {
             title: 'Загрузка лаунчера',
             icon: 'download',
-            to: '/account/download',
+            to: ACCOUNT_ROUTES.download,
         },
         {
             title: 'История мира',
             icon: 'scroll-text',
-            to: '/account/lore',
+            to: ACCOUNT_ROUTES.lore,
         },
         {
             title: 'Правила проекта',
             icon: 'book-open',
-            to: '/account/rules',
+            to: ACCOUNT_ROUTES.rules,
         },
         {
             title: 'Новости',
             icon: 'newspaper',
-            to: '/account/news',
+            to: ACCOUNT_ROUTES.news,
         },
     ],
 };

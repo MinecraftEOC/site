@@ -1,7 +1,10 @@
+import type { MultiPartData } from 'h3';
+import type { ZodSchema } from 'zod';
 import type { TCharacterRow } from '~~/server/common/@types/character';
 import type { ICharacter } from '~~/shared/@types/user';
 
-import { BIOGRAPHY_MAX_HTML_LENGTH, BIOGRAPHY_MAX_LENGTH, CHARACTER_ERRORS } from '~~/server/common/constants/character';
+import { BIOGRAPHY_MAX_LENGTH, CHARACTER_FORM_FIELDS } from '~~/shared/constants/character';
+import { CHARACTER_FORM_ERRORS } from '~~/shared/schemas/character';
 
 /**
  * Приводит персонажа из Prisma к форме ответа API: даты — ISO-строки.
@@ -17,29 +20,40 @@ export function toCharacterResponse(character: TCharacterRow): ICharacter {
 }
 
 /**
- * Готовит квенту к записи в БД: чистит HTML по белому списку и проверяет
- * ограничения.
+ * Собирает поля персонажа из multipart-запроса и валидирует их общей схемой.
  *
- * @param raw Значение поля `biography` из формы.
+ * @param parts Части multipart-запроса.
+ * @param schema Схема полей: полная при создании, частичная при правке.
+ * @returns Провалидированные поля персонажа.
+ * @throws `400` с текстом первой ошибки схемы или при невалидном JSON.
+ */
+export function parseCharacterFormOr400<T>(parts: MultiPartData[] | undefined, schema: ZodSchema<T>): T {
+    return unwrapSafeParseOr400(schema.safeParse({
+        username: getFormField(parts, CHARACTER_FORM_FIELDS.username),
+        biography: getFormField(parts, CHARACTER_FORM_FIELDS.biography),
+        states: getFormJson(parts, CHARACTER_FORM_FIELDS.states, CHARACTER_FORM_ERRORS.STATES_INVALID),
+        startingItems: getFormJson(parts, CHARACTER_FORM_FIELDS.startingItems, CHARACTER_FORM_ERRORS.STARTING_ITEMS_INVALID),
+    }));
+}
+
+/**
+ * Готовит квенту к записи в БД: чистит HTML по белому списку и проверяет
+ * ограничения по видимому тексту.
+ *
+ * @param raw Провалидированное значение поля `biography`.
  * @returns Безопасный HTML для сохранения.
- * @throws `400` если квента пустая, состоит из одной разметки или слишком длинная.
+ * @throws `400` если после очистки не осталось текста или он слишком длинный.
  */
 export function prepareBiography(raw: string): string {
-    // Объём разметки проверяется до очистки: она дорогая, а прислать могли
-    // мегабайт вложенных тегов, в которых текста почти нет.
-    if (raw.length > BIOGRAPHY_MAX_HTML_LENGTH) {
-        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.BIOGRAPHY_TOO_LONG });
-    }
-
     const html = sanitizeRichText(raw);
     const text = getRichTextContent(html);
 
     if (!text) {
-        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_BIOGRAPHY });
+        throw createError({ statusCode: 400, message: CHARACTER_FORM_ERRORS.BIOGRAPHY_REQUIRED });
     }
 
     if (text.length > BIOGRAPHY_MAX_LENGTH) {
-        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.BIOGRAPHY_TOO_LONG });
+        throw createError({ statusCode: 400, message: CHARACTER_FORM_ERRORS.BIOGRAPHY_TOO_LONG });
     }
 
     return html;

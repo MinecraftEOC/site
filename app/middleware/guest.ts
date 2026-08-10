@@ -1,3 +1,5 @@
+import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
+
 /**
  * Middleware страниц «только для гостей» (например, `/auth`).
  */
@@ -7,6 +9,6 @@ export default defineNuxtRouteMiddleware(async () => {
     await userStore.fetchMe();
 
     if (userStore.isAuthenticated) {
-        return navigateTo('/account');
+        return navigateTo(ACCOUNT_ROUTES.root);
     }
 });

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { CHARACTER_CREATE } from '~/assets/ts/constants/content/account';
-
-import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
+import CharacterCreate from '~/components/pages/account/character/CharacterCreate.vue';
 
 definePageMeta({
     layout: 'account',
@@ -10,11 +8,7 @@ definePageMeta({
 </script>
 
 <template>
-    <AccountPageTemplate
-        :title="CHARACTER_CREATE.title"
-        :description="CHARACTER_CREATE.description"
-        class="CharacterCreateAccountPage"
-    />
+    <CharacterCreate />
 </template>
 
 <style module lang="scss">

@@ -1,4 +1,8 @@
 import { CharacterStatus } from '~~/generated/prisma/enums';
+import { PARAMETER_CHEAP_VALUE, PARAMETER_EXPENSIVE_COST } from '~~/shared/constants/character';
+import { SKIN_MAX_COUNT, SKIN_MAX_SIZE } from '~~/shared/constants/skin';
+import { BYTES_IN_KB } from '~/assets/ts/constants/common';
+import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 
 export const DEFAULT_TITLE = 'Мои персонажи';
 export const DEFAULT_PAGE_DESCRIPTION = 'Создавайте и управляйте историями своих персонажей.';
@@ -47,6 +51,27 @@ export const CHARACTER_STATUS_DESCRIPTION: Partial<Record<CharacterStatus, strin
 export const CHARACTER_CREATE = {
     title: 'Создание персонажа',
     description: 'Перед созданием персонажа обязательно прочитайте историю мира и правила проекта.',
+    links: [
+        {
+            title: 'История мира',
+            description: 'События, земли и устройство Рейнстолла',
+            icon: 'scroll-text',
+            to: ACCOUNT_ROUTES.lore,
+        },
+        {
+            title: 'Правила проекта',
+            description: 'Основа ролевой игры и общения',
+            icon: 'shield-check',
+            to: ACCOUNT_ROUTES.rules,
+        },
+    ],
+    button: {
+        title: 'Отправить квенту на проверку',
+        hint: '123',
+    },
+    success: 'Квента отправлена на проверку',
+    error: 'Не удалось отправить квенту',
+    invalid: 'Заполните форму до конца',
 };
 
 export const CHARACTER_DETAILS = {
@@ -56,4 +81,42 @@ export const CHARACTER_DETAILS = {
 export const CHARACTER_EDIT = {
     title: 'Редактирование персонажа',
     description: 'Исправьте замечания администрации и отправьте заявку на повторную проверку.',
+};
+
+export const CHARACTER_FORM_GENERAL = {
+    title: 'Основное',
+    name: {
+        label: 'Имя персонажа',
+        placeholder: 'Например, Адриан Вальд',
+        hint: 'Только кириллица. Имя пишется с заглавной буквы, фамилия — через пробел и может быть с приставкой. Каждое слово от двух букв, всё имя — от 5 до 16 символов.',
+        icon: 'user-round',
+    },
+    biography: {
+        label: 'Квента персонажа',
+        placeholder: 'Расскажите о происхождении, целях и характере персонажа.',
+    },
+};
+
+export const CHARACTER_FORM_PARAMETERS = {
+    title: 'Параметры и навыки',
+    description: 'Очки берутся из отдельных пулов параметров и навыков: при повышении значения соответствующий пул уменьшается. Наведите на параметр или навык, чтобы узнать подробнее.',
+    presetsTitle: 'Пресеты распределения',
+    parameters: 'Нераспределенные параметры',
+    parametersHint: `Значения параметра до ${PARAMETER_CHEAP_VALUE} стоят по одному очку. Каждое значение выше ${PARAMETER_CHEAP_VALUE} стоит ${PARAMETER_EXPENSIVE_COST} очка.`,
+    skills: 'Нераспределенные навыки',
+};
+
+export const CHARACTER_FORM_SKINS = {
+    title: 'Скины персонажа',
+    description: `Можно загрузить до ${SKIN_MAX_COUNT} скинов.`,
+    uploadDescription: `Можно загрузить несколько файлов: PNG до ${SKIN_MAX_SIZE / BYTES_IN_KB} КБ каждый`,
+    sliderTitle: 'Загруженные скины',
+};
+
+export const CHARACTER_FORM_ITEMS = {
+    title: 'Стартовые предметы',
+    description: 'Выберите предметы для начала пути персонажа.',
+    itemsTitle: 'Выберите предметы',
+    remain: 'Осталось',
+    coinsLabel: 'монет',
 };

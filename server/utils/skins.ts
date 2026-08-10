@@ -6,7 +6,8 @@ import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 
-import { PNG_SIGNATURE, SKIN_ERRORS, SKIN_FORM_FIELD, SKIN_HASH_BYTES, SKIN_MAX_SIZE, SKIN_STORAGE_DIR } from '~~/server/common/constants/skin';
+import { PNG_SIGNATURE, SKIN_ERRORS, SKIN_HASH_BYTES, SKIN_STORAGE_DIR } from '~~/server/common/constants/skin';
+import { SKIN_FORM_FIELD, SKIN_MAX_SIZE } from '~~/shared/constants/skin';
 
 /** Абсолютный путь к папке хранения скинов. */
 const storageDir = resolve(process.cwd(), SKIN_STORAGE_DIR);
@@ -69,14 +70,16 @@ export async function readSkinFile(hash: string) {
  *
  * @param parts Разобранные части multipart-запроса.
  * @returns Буферы валидных PNG-файлов (список может быть пустым).
- * @throws `400` если файл превышает лимит размера или не является PNG.
+ * @throws `400` если файл пустой, превышает лимит размера или не является PNG.
  */
 export function collectSkinFiles(parts: MultiPartData[] | undefined) {
-    const files = (parts ?? []).filter(
-        part => part.name === SKIN_FORM_FIELD && part.filename !== undefined && part.data.length > 0,
-    );
+    const files = (parts ?? []).filter(part => part.name === SKIN_FORM_FIELD && Boolean(part.filename));
 
     for (const file of files) {
+        if (file.data.length === 0) {
+            throw createError({ statusCode: 400, message: SKIN_ERRORS.EMPTY_FILE });
+        }
+
         if (file.data.length > SKIN_MAX_SIZE) {
             throw createError({ statusCode: 400, message: SKIN_ERRORS.TOO_LARGE });
         }

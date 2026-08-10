@@ -1,3 +1,4 @@
+import { AUTH_ROUTES } from '~/assets/ts/constants/routes';
 import { ENotificationType } from '~/assets/ts/enums/common';
 
 export default defineNuxtPlugin(() => {
@@ -18,7 +19,7 @@ export default defineNuxtPlugin(() => {
                 const userStore = useUserStore();
                 userStore.reset();
 
-                await navigateTo('/auth');
+                await navigateTo(AUTH_ROUTES.root);
 
                 return;
             }

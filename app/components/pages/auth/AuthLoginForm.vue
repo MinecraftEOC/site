@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 
 import { EAuthPageType } from '~/assets/ts/enums/auth';
 import { loginSchema } from '~/assets/ts/schemas/auth';
@@ -18,7 +19,7 @@ const [password] = defineField('password');
 const onSubmit = handleSubmit(async (values) => {
     try {
         await userStore.login({ email: values.email, password: values.password });
-        await navigateTo('/account');
+        await navigateTo(ACCOUNT_ROUTES.root);
     } catch (error) {
         setFieldError('email', getApiErrorMessage(error));
     }

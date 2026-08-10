@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 
 import { EAuthPageType } from '~/assets/ts/enums/auth';
 import { registerSchema } from '~/assets/ts/schemas/auth';
@@ -25,7 +26,7 @@ const onSubmit = handleSubmit(async (values) => {
     try {
         await register({ email: values.email, password: values.password });
         await userStore.login({ email: values.email, password: values.password });
-        await navigateTo('/account');
+        await navigateTo(ACCOUNT_ROUTES.root);
 
         notificationStore.add('Учетная запись успешно создана');
     } catch (error) {

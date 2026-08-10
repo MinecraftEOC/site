@@ -1,5 +1,20 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
-import type { ZodSchema } from 'zod';
+import type { SafeParseReturnType, ZodSchema } from 'zod';
+
+/**
+ * Разворачивает результат `safeParse`: успешные данные или ошибка запроса.
+ *
+ * @param result Результат разбора Zod-схемой.
+ * @returns Провалидированные и типизированные данные.
+ * @throws `400` с текстом первой ошибки схемы.
+ */
+export function unwrapSafeParseOr400<T>(result: SafeParseReturnType<T, T>): T {
+    if (!result.success) {
+        throw createError({ statusCode: 400, message: result.error.issues[0]?.message });
+    }
+
+    return result.data;
+}
 
 /**
  * Читает тело запроса и валидирует Zod-схемой; трансформы схемы (`trim`,
@@ -11,11 +26,5 @@ import type { ZodSchema } from 'zod';
  * @throws `400` с текстом первой ошибки схемы.
  */
 export async function readValidatedBodyOr400<T>(event: H3Event<EventHandlerRequest>, schema: ZodSchema<T>): Promise<T> {
-    const result = await readValidatedBody(event, schema.safeParse);
-
-    if (!result.success) {
-        throw createError({ statusCode: 400, message: result.error.issues[0]?.message });
-    }
-
-    return result.data;
+    return unwrapSafeParseOr400(await readValidatedBody(event, schema.safeParse));
 }

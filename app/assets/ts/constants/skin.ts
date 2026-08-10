@@ -21,3 +21,21 @@ export const SKIN_VISIBILITY_THRESHOLD = 0;
 
 /** Минимальный размер канваса, px: от нулевого WebGL-рендерер ругается в консоль. */
 export const SKIN_MIN_CANVAS_SIZE = 1;
+
+/** Значение `accept` для инпута загрузки скинов: сервер принимает только PNG. */
+export const SKIN_ACCEPT = 'image/png';
+
+/** Начало подписи скина, у которого нет имени файла (уже сохранённый скин). */
+export const SKIN_LABEL_PREFIX = 'Скин';
+
+/** Пометка на превью скина, который ещё не отправлен на сервер. */
+export const SKIN_NEW_LABEL = 'Новый';
+
+/** Отступ между превью в слайдере скинов, px. */
+export const SKINS_SLIDER_SPACE_BETWEEN = 16;
+
+/** Сколько превью помещается в слайдере скинов; ключи — `min-width` в px, как того требует Swiper. */
+export const SKINS_SLIDER_BREAKPOINTS = {
+    0: { slidesPerView: 2 },
+    768: { slidesPerView: 3 },
+};

@@ -1,28 +1,16 @@
 import type { Prisma } from '~~/generated/prisma/client';
 
-/** Максимальная длина квенты по видимому тексту, без учёта разметки. */
-export const BIOGRAPHY_MAX_LENGTH = 10000;
-
 /**
- * Жёсткий предел на размер присланной разметки квенты. Проверяется до очистки:
- * защищает от мегабайтных «бомб» из вложенных тегов, в которых почти нет текста.
+ * Тексты ошибок ручек персонажа, возвращаемые через `createError`. Проверки
+ * самих полей формы живут в схеме — там же и их тексты
+ * (`CHARACTER_FORM_ERRORS`).
  */
-export const BIOGRAPHY_MAX_HTML_LENGTH = 100000;
-
-/** Тексты ошибок ручек персонажа, возвращаемые через `createError`. */
 export const CHARACTER_ERRORS = {
     ALREADY_EXISTS: 'У вас уже есть активный персонаж',
     DISCORD_NOT_LINKED: 'Для создания персонажа нужно привязать Discord',
     NOT_EDITABLE: 'Нет персонажа, доступного для редактирования',
     NOTHING_TO_UPDATE: 'Не передано ни одного поля для обновления',
     USERNAME_TAKEN: 'Имя персонажа уже занято',
-    INVALID_USERNAME: 'Некорректное имя персонажа',
-    EMPTY_BIOGRAPHY: 'Квента не задана',
-    BIOGRAPHY_TOO_LONG: `Квента не должна быть длиннее ${BIOGRAPHY_MAX_LENGTH} символов`,
-    EMPTY_STATES: 'Поле states не задано',
-    EMPTY_STARTING_ITEMS: 'Поле startingItems не задано',
-    INVALID_STATES: 'Поле states имеет некорректный формат',
-    INVALID_STARTING_ITEMS: 'Поле startingItems имеет некорректный формат',
     INVALID_STATUS: 'Некорректный статус персонажа',
     NOT_FOUND: 'Персонаж не найден',
     EMPTY_ID: 'ID персонажа не задан',
@@ -53,6 +41,3 @@ export const CHARACTER_PUBLIC_SELECT = {
         },
     },
 } satisfies Prisma.CharacterSelect;
-
-/** Регулярка имени персонажа: 3–16 символов, кириллица, латиница и `_`, пробелы (не по краям). */
-export const USERNAME_REGEX = /^[а-яёА-ЯЁa-zA-Z_][а-яёА-ЯЁa-zA-Z_ ]{1,14}[а-яёА-ЯЁa-zA-Z_]$/;

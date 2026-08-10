@@ -2,6 +2,7 @@ import advantages1 from '~/assets/images/advantages_1.png';
 import advantages2 from '~/assets/images/advantages_2.png';
 import advantages3 from '~/assets/images/advantages_3.png';
 import howplay from '~/assets/images/how_play.png';
+import { ACCOUNT_ROUTES, AUTH_ROUTES } from '~/assets/ts/constants/routes';
 
 import { EColor } from '~/assets/ts/enums/common';
 
@@ -121,7 +122,7 @@ export const HOW_PLAY = {
             icon: 'user-plus',
             button: {
                 title: 'Создать персонажа',
-                to: '/auth?register=1',
+                to: `${AUTH_ROUTES.root}?register=1`,
                 color: EColor.Primary,
             },
         },
@@ -131,7 +132,7 @@ export const HOW_PLAY = {
             icon: 'download',
             button: {
                 title: 'Скачать лаунчер',
-                to: '/account',
+                to: ACCOUNT_ROUTES.root,
                 color: EColor.Accent,
             },
         },

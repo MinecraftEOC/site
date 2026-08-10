@@ -1,5 +1,4 @@
-/** Префикс маршрутов личного кабинета, которые закрыты авторизацией */
-const ACCOUNT_PREFIX = '/account';
+import { ACCOUNT_ROUTES, AUTH_ROUTES } from '~/assets/ts/constants/routes';
 
 /**
  * Глобальный гард личного кабинета.
@@ -13,7 +12,7 @@ const ACCOUNT_PREFIX = '/account';
  * запуска `admin` пользователь уже загружен в стор.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
-    if (!to.path.startsWith(ACCOUNT_PREFIX)) {
+    if (!to.path.startsWith(ACCOUNT_ROUTES.root)) {
         return;
     }
 
@@ -22,6 +21,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
     await userStore.fetchMe();
 
     if (!userStore.isAuthenticated) {
-        return navigateTo('/auth');
+        return navigateTo(AUTH_ROUTES.root);
     }
 });
