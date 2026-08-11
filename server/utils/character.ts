@@ -15,6 +15,7 @@ import { CHARACTER_FORM_ERRORS } from '~~/shared/schemas/character';
 export function toCharacterResponse(character: TCharacterRow): ICharacter {
     return {
         ...character,
+        createdAt: character.createdAt.toISOString(),
         statusChangedAt: character.statusChangedAt.toISOString(),
     };
 }

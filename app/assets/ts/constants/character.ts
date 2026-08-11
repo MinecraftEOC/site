@@ -4,7 +4,6 @@ import type { ITagItem } from '~/@types/tags';
 
 import { CharacterStatus } from '~~/generated/prisma/enums';
 import { CHARACTER_FORM_FIELDS } from '~~/shared/constants/character';
-import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 import { ECharacterParameter, ECharacterPreset, ECharacterSkill } from '~/assets/ts/enums/character';
 import { EBadgeColor } from '~/assets/ts/enums/common';
 
@@ -18,12 +17,12 @@ export const CHARACTER_STATUS_COLOR: Record<CharacterStatus, EBadgeColor> = {
     [CharacterStatus.UNAVAILABLE]: EBadgeColor.Warning,
 };
 
-/** Куда ведёт карточка персонажа: у статусов без ссылки карточка некликабельна. */
-export const CHARACTER_STATUS_LINK: Partial<Record<CharacterStatus, string>> = {
-    [CharacterStatus.ACTIVE]: ACCOUNT_ROUTES.character,
-    [CharacterStatus.UNVERIFIED]: ACCOUNT_ROUTES.characterEdit,
-    [CharacterStatus.RETURNED]: ACCOUNT_ROUTES.characterEdit,
-};
+/** Статусы, у которых на карточке показывается дата создания персонажа, а не дата смены статуса. */
+export const CHARACTER_CREATED_AT_STATUSES: CharacterStatus[] = [
+    CharacterStatus.ACTIVE,
+    CharacterStatus.UNVERIFIED,
+    CharacterStatus.RETURNED,
+];
 
 /** Имя клиентского поля формы со скинами: файлы есть только на фронте, в общей схеме их нет. */
 export const CHARACTER_SKINS_FIELD = 'skins';

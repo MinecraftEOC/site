@@ -6,9 +6,8 @@ export const AUTH_ROUTES = {
 /** Маршруты личного кабинета — единственное место, где живут эти пути. */
 export const ACCOUNT_ROUTES = {
     root: '/account',
-    character: '/account/character',
+    character: (id: number | string) => `/account/character/${id}`,
     characterCreate: '/account/character/create',
-    characterEdit: '/account/character/edit',
     lore: '/account/lore',
     rules: '/account/rules',
     download: '/account/download',

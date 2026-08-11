@@ -8,7 +8,25 @@ import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
 import LogoBlock from '~/components/common/LogoBlock.vue';
 import ServerStatus from '~/components/common/ServerStatus.vue';
 
-const ADMIN_MENU = {
+interface IMenuItem {
+    /** Подпись пункта */
+    title: string;
+    /** Имя иконки пункта */
+    icon: string;
+    /** Адрес, на который ведёт пункт */
+    to: string;
+    /** Пункт вложен в раздел выше — рисуется со сдвигом */
+    child?: boolean;
+}
+
+interface IMenuSection {
+    /** Заголовок раздела */
+    title: string;
+    /** Пункты раздела */
+    items: IMenuItem[];
+}
+
+const ADMIN_MENU: IMenuSection = {
     title: 'Администрирование',
     items: [
         {
@@ -24,7 +42,7 @@ const ADMIN_MENU = {
     ],
 };
 
-const MENU = {
+const MENU: IMenuSection = {
     title: 'Разделы',
     items: [
         {
@@ -68,6 +86,13 @@ const LINKS = [
     },
 ];
 
+const CHARACTER_CREATE_ITEM = {
+    title: 'Создание персонажа',
+    icon: 'user-round-plus',
+};
+
+const CHARACTER_DETAILS_ICON = 'user-round';
+
 const BODY_LOCK_CLASS = 'is-locked';
 
 const route = useRoute();
@@ -78,20 +103,43 @@ const userStore = useUserStore();
 
 const isMenuOpen = ref(false);
 
-const menu = computed(() => {
-    if (userStore.user?.role === UserRole.ADMIN) {
-        return [ADMIN_MENU, MENU];
+const characterItem = computed<IMenuItem | null>(() => {
+    if (route.path === ACCOUNT_ROUTES.characterCreate) {
+        return { ...CHARACTER_CREATE_ITEM, to: route.path, child: true };
     }
 
-    return [MENU];
+    const character = userStore.getCharacterById(String(route.params.id));
+
+    if (!character || route.path !== ACCOUNT_ROUTES.character(character.id)) {
+        return null;
+    }
+
+    return { title: character.username, icon: CHARACTER_DETAILS_ICON, to: route.path, child: true };
+});
+
+const menu = computed(() => {
+    const sections = userStore.user?.role === UserRole.ADMIN ? [ADMIN_MENU, MENU] : [MENU];
+    const child = characterItem.value;
+
+    if (!child) {
+        return sections;
+    }
+
+    return sections.map(section => ({
+        ...section,
+        items: section.items.flatMap(item => item.to === ACCOUNT_ROUTES.root ? [item, child] : [item]),
+    }));
 });
 
 const panelClassList = computed(() => [
     isMenuOpen.value ? style._open : '',
 ]);
 
-function getMenuItemClassList(to: string) {
-    return [route.path === to ? style._active : ''];
+function getMenuItemClassList(item: IMenuItem) {
+    return [
+        route.path === item.to ? style._active : '',
+        item.child ? style._child : '',
+    ];
 }
 
 function closeMenu() {
@@ -142,18 +190,22 @@ watch(() => route.path, closeMenu);
                             {{ section.title }}
                         </div>
 
-                        <ul :class="$style.sectionItems">
+                        <TransitionGroup
+                            tag="ul"
+                            name="fade"
+                            :class="$style.sectionItems"
+                        >
                             <li
                                 v-for="item in section.items"
-                                :key="item.title"
-                                :class="[$style.menuItem, getMenuItemClassList(item.to)]"
+                                :key="item.to"
+                                :class="[$style.menuItem, getMenuItemClassList(item)]"
                             >
                                 <NuxtLink :to="item.to" :class="$style.menuLink">
                                     <VIcon :name="item.icon" />
                                     {{ item.title }}
                                 </NuxtLink>
                             </li>
-                        </ul>
+                        </TransitionGroup>
                     </div>
                 </nav>
             </div>
@@ -324,6 +376,10 @@ watch(() => route.path, closeMenu);
             color: $btn-primary-text;
             pointer-events: none;
         }
+    }
+
+    &._child {
+        margin-left: $space-16;
     }
 }
 

@@ -10,7 +10,7 @@ import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 export default defineNuxtRouteMiddleware(() => {
     const userStore = useUserStore();
 
-    if (!userStore.isDiscordLinked || userStore.hasLiveCharacter) {
+    if (!userStore.isAdmin && (!userStore.isDiscordLinked || userStore.hasLiveCharacter)) {
         return navigateTo(ACCOUNT_ROUTES.root);
     }
 });

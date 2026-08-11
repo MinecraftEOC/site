@@ -42,6 +42,15 @@ export const CHARACTER_STATUS_LABEL: Record<CharacterStatus, string> = {
     [CharacterStatus.UNAVAILABLE]: 'Недоступен',
 };
 
+export const CHARACTER_STATUS_DATE_LABEL: Record<CharacterStatus, string> = {
+    [CharacterStatus.ACTIVE]: 'Дата создания',
+    [CharacterStatus.UNVERIFIED]: 'Дата создания',
+    [CharacterStatus.RETURNED]: 'Дата создания',
+    [CharacterStatus.BANNED]: 'Дата блокировки',
+    [CharacterStatus.DEAD]: 'Дата гибели',
+    [CharacterStatus.UNAVAILABLE]: 'Дата вывода из игры',
+};
+
 export const CHARACTER_STATUS_DESCRIPTION: Partial<Record<CharacterStatus, string>> = {
     [CharacterStatus.ACTIVE]: 'Персонаж доступен для игры.',
     [CharacterStatus.UNVERIFIED]: 'Заявка отправлена и ожидает проверки администрации.',

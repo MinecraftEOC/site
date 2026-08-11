@@ -46,9 +46,9 @@ const [skins] = defineField('skins');
 const onSubmit = handleSubmit(
     async (values) => {
         try {
-            await create(values);
+            const character = await create(values);
             await userStore.fetchMe();
-            await navigateTo(ACCOUNT_ROUTES.character);
+            await navigateTo(ACCOUNT_ROUTES.character(character.id));
 
             notificationStore.add(CHARACTER_CREATE.success);
         } catch (error) {

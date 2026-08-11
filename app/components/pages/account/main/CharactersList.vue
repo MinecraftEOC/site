@@ -3,8 +3,9 @@ import type { ICharacter } from '~~/shared/@types/user';
 
 import { CharacterStatus } from '~~/generated/prisma/enums';
 import { isCharacterLive } from '~~/shared/constants/character';
-import { CHARACTER_STATUS_COLOR, CHARACTER_STATUS_LINK } from '~/assets/ts/constants/character';
+import { CHARACTER_CREATED_AT_STATUSES, CHARACTER_STATUS_COLOR } from '~/assets/ts/constants/character';
 import {
+    CHARACTER_STATUS_DATE_LABEL,
     CHARACTER_STATUS_DESCRIPTION,
     CHARACTER_STATUS_LABEL,
     CHARACTERS_LIST,
@@ -18,6 +19,8 @@ import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.
 const userStore = useUserStore();
 
 const style = useCssModule();
+
+const showCreateButton = computed(() => !userStore.hasLiveCharacter || userStore.isAdmin);
 
 const characters = computed(() => [...userStore.characters].sort((a, b) => {
     const weight = getSortWeight(a) - getSortWeight(b);
@@ -52,8 +55,12 @@ function getDescription(character: ICharacter) {
     return CHARACTER_STATUS_DESCRIPTION[character.status] ?? character.statusComment ?? '';
 }
 
-function getLink(character: ICharacter) {
-    return CHARACTER_STATUS_LINK[character.status] ?? '';
+function getDate(character: ICharacter) {
+    const date = CHARACTER_CREATED_AT_STATUSES.includes(character.status)
+        ? character.createdAt
+        : character.statusChangedAt;
+
+    return `${CHARACTER_STATUS_DATE_LABEL[character.status]}: ${formatDate(date)}`;
 }
 </script>
 
@@ -65,7 +72,7 @@ function getLink(character: ICharacter) {
     >
         <template #header-right>
             <VButton
-                v-if="!userStore.hasLiveCharacter"
+                v-if="showCreateButton"
                 :tag="ETag.NuxtLink"
                 :to="ACCOUNT_ROUTES.characterCreate"
             >
@@ -87,6 +94,10 @@ function getLink(character: ICharacter) {
                     <div v-if="getDescription(character)" :class="$style.description">
                         {{ getDescription(character) }}
                     </div>
+
+                    <div :class="$style.date">
+                        {{ getDate(character) }}
+                    </div>
                 </div>
 
                 <div :class="$style.aside">
@@ -95,18 +106,13 @@ function getLink(character: ICharacter) {
                     </VBadge>
 
                     <VButton
-                        v-if="getLink(character)"
                         :tag="ETag.NuxtLink"
-                        :to="getLink(character)"
+                        :to="ACCOUNT_ROUTES.character(character.id)"
                         :color="EColor.Secondary"
                         :size="ESize.Small"
                     >
                         {{ CHARACTERS_LIST.cardButton }}
                     </VButton>
-
-                    <div v-else :class="$style.date">
-                        {{ formatDate(character.statusChangedAt) }}
-                    </div>
                 </div>
             </div>
         </div>
@@ -181,17 +187,17 @@ function getLink(character: ICharacter) {
     color: $text-secondary;
 }
 
+.date {
+    @include mono2;
+
+    color: $text-muted;
+}
+
 .aside {
     display: flex;
     flex-shrink: 0;
     flex-direction: column;
     gap: $space-12;
     align-items: flex-end;
-}
-
-.date {
-    @include mono2;
-
-    color: $text-muted;
 }
 </style>

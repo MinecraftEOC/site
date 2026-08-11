@@ -6,6 +6,7 @@ export interface IUser extends IUserResponse {};
 
 /** Интерфейс персонажа */
 export interface ICharacter extends Omit<Character, 'uuid' | 'password' | 'accessToken' | 'serverId' | 'createdAt' | 'updatedAt' | 'userId' | 'statusChangedAt'> {
+    createdAt: string;
     statusChangedAt: string;
     skins: Omit<Skin, 'characterId'>[];
 }

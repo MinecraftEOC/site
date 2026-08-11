@@ -26,6 +26,7 @@ export const CHARACTER_ERRORS = {
  */
 export const CHARACTER_PUBLIC_SELECT = {
     id: true,
+    createdAt: true,
     username: true,
     biography: true,
     states: true,
