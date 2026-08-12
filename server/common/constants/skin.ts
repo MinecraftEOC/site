@@ -1,5 +1,3 @@
-import { CharacterStatus } from '~~/generated/prisma/enums';
-
 /** Тексты ошибок ручек скинов, возвращаемые через `createError`. */
 export const SKIN_ERRORS = {
     NO_CHARACTER: 'Сначала создайте персонажа',
@@ -23,10 +21,3 @@ export const SKIN_HASH_REGEX = /^[a-f0-9]{32}$/;
 
 /** Сигнатура (magic bytes) PNG-файла. */
 export const PNG_SIGNATURE = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-
-/** Статусы персонажа, в которых пользователь может добавлять/удалять скины. */
-export const SKIN_MANAGEABLE_STATUSES: CharacterStatus[] = [
-    CharacterStatus.UNVERIFIED,
-    CharacterStatus.RETURNED,
-    CharacterStatus.ACTIVE,
-];

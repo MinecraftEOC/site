@@ -1,7 +1,8 @@
 import type { ISuccessResponse } from '~~/shared/@types/response';
 
 import { UserRole } from '~~/generated/prisma/enums';
-import { SKIN_ERRORS, SKIN_MANAGEABLE_STATUSES } from '~~/server/common/constants/skin';
+import { SKIN_ERRORS } from '~~/server/common/constants/skin';
+import { SKIN_MANAGEABLE_STATUSES } from '~~/shared/constants/skin';
 
 /**
  * `DELETE /api/character/skin/:id` — удаление скина из БД и с диска. Админу

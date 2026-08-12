@@ -23,3 +23,19 @@ export function toCharacterFormData(form: TCharacterForm): FormData {
 
     return data;
 }
+
+/**
+ * Собирает тело `multipart/form-data` для ручки добавления скинов.
+ *
+ * @param files Файлы скинов из инпута.
+ * @returns `FormData` только с файлами скинов.
+ */
+export function toSkinsFormData(files: File[]): FormData {
+    const data = new FormData();
+
+    for (const skin of files) {
+        data.append(SKIN_FORM_FIELD, skin);
+    }
+
+    return data;
+}

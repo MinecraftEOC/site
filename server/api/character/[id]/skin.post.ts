@@ -1,25 +1,27 @@
 import type { ICharacterResponse } from '~~/shared/@types/response';
 
-import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
-import {
-    SKIN_ERRORS,
-    SKIN_MANAGEABLE_STATUSES,
-} from '~~/server/common/constants/skin';
+import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { SKIN_ERRORS } from '~~/server/common/constants/skin';
 import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
-import { SKIN_MAX_COUNT } from '~~/shared/constants/skin';
+import { SKIN_MANAGEABLE_STATUSES, SKIN_MAX_COUNT } from '~~/shared/constants/skin';
 
 /**
- * `POST /api/character/skin` — добавление PNG-скинов существующему персонажу
+ * `POST /api/character/:id/skin` — добавление PNG-скинов своему персонажу
  * без смены его статуса. При создании и доработке скины грузятся вместе с
- * персонажем через `POST`/`PATCH /api/character`.
+ * персонажем через `POST /api/character` и `PATCH /api/character/:id`.
  *
  * @throws 401 если запрос не авторизован.
- * @throws 400 если файлы не переданы или невалидны.
- * @throws 404 если у пользователя нет персонажа.
+ * @throws 400 если id некорректен, файлы не переданы или невалидны.
+ * @throws 404 если персонаж не найден или чужой.
  * @throws 409 если персонаж в неподходящем статусе или превышен лимит скинов.
  */
 export default defineEventHandler(async (event): Promise<ICharacterResponse> => {
     const { id: userId } = requireUser(event);
+    const characterId = Number(getRouterParam(event, 'id'));
+
+    if (!Number.isInteger(characterId)) {
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_ID });
+    }
 
     const parts = await readMultipartFormData(event);
     const skinBuffers = collectSkinFiles(parts);
@@ -28,7 +30,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     const character = await prisma.character.findFirst({
-        where: { userId, status: { notIn: CHARACTER_RETIRED_STATUSES } },
+        where: { id: characterId, userId, status: { notIn: CHARACTER_RETIRED_STATUSES } },
         select: {
             id: true,
             status: true,

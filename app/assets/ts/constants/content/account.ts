@@ -43,12 +43,12 @@ export const CHARACTER_STATUS_LABEL: Record<CharacterStatus, string> = {
 };
 
 export const CHARACTER_STATUS_DATE_LABEL: Record<CharacterStatus, string> = {
-    [CharacterStatus.ACTIVE]: 'Дата создания',
-    [CharacterStatus.UNVERIFIED]: 'Дата создания',
-    [CharacterStatus.RETURNED]: 'Дата создания',
-    [CharacterStatus.BANNED]: 'Дата блокировки',
-    [CharacterStatus.DEAD]: 'Дата гибели',
-    [CharacterStatus.UNAVAILABLE]: 'Дата вывода из игры',
+    [CharacterStatus.ACTIVE]: 'Создан',
+    [CharacterStatus.UNVERIFIED]: 'Создан',
+    [CharacterStatus.RETURNED]: 'Создан',
+    [CharacterStatus.BANNED]: 'Заблокирован',
+    [CharacterStatus.DEAD]: 'Погиб',
+    [CharacterStatus.UNAVAILABLE]: 'Выведен из игры',
 };
 
 export const CHARACTER_STATUS_DESCRIPTION: Partial<Record<CharacterStatus, string>> = {
@@ -76,20 +76,41 @@ export const CHARACTER_CREATE = {
     ],
     button: {
         title: 'Отправить квенту на проверку',
-        hint: '123',
     },
     success: 'Квента отправлена на проверку',
     error: 'Не удалось отправить квенту',
     invalid: 'Заполните форму до конца',
 };
 
+export const CHARACTER_REVIEW = {
+    title: 'Комментарий администрации',
+};
+
+export const CHARACTER_REVIEW_LABEL: Partial<Record<CharacterStatus, string>> = {
+    [CharacterStatus.ACTIVE]: 'Заявка одобрена',
+    [CharacterStatus.RETURNED]: 'Требуются правки',
+    [CharacterStatus.BANNED]: 'Персонаж заблокирован',
+    [CharacterStatus.DEAD]: 'Персонаж погиб',
+    [CharacterStatus.UNAVAILABLE]: 'Персонаж выведен из игры',
+};
+
 export const CHARACTER_DETAILS = {
-    title: 'Мой персонаж',
+    biographyTitle: 'Квента персонажа',
+    skinsButton: 'Сохранить скины',
+    skinsSuccess: 'Скины сохранены',
+    skinsError: 'Не удалось сохранить скины',
+    skinDeleteError: 'Не удалось удалить скин',
 };
 
 export const CHARACTER_EDIT = {
-    title: 'Редактирование персонажа',
-    description: 'Исправьте замечания администрации и отправьте заявку на повторную проверку.',
+    title: 'Редактирование персонажа —',
+    button: {
+        title: 'Отправить на повторную проверку',
+    },
+    success: 'Квента отправлена на проверку',
+    error: 'Не удалось сохранить изменения',
+    invalid: 'Заполните форму до конца',
+    skinError: 'Не удалось удалить скин',
 };
 
 export const CHARACTER_FORM_GENERAL = {

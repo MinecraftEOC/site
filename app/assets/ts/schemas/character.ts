@@ -15,3 +15,20 @@ export const characterFormSchema = toTypedSchema(
             .min(1, SKINS_REQUIRED_ERROR),
     }),
 );
+
+/**
+ * Собирает схему формы правки персонажа: новый файл обязателен, только если
+ * все сохранённые скины удалены — хотя бы один скин у персонажа быть должен.
+ *
+ * @param savedSkinsCount Сколько скинов уже сохранено у персонажа.
+ * @returns Схема формы под текущее число сохранённых скинов.
+ */
+export function getCharacterEditFormSchema(savedSkinsCount: number) {
+    const skinsField = z.array(z.custom<File>());
+
+    return toTypedSchema(
+        sharedCharacterSchema.extend({
+            [CHARACTER_SKINS_FIELD]: savedSkinsCount > 0 ? skinsField : skinsField.min(1, SKINS_REQUIRED_ERROR),
+        }),
+    );
+}

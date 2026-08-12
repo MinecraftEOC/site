@@ -17,6 +17,16 @@ export const CHARACTER_STATUS_COLOR: Record<CharacterStatus, EBadgeColor> = {
     [CharacterStatus.UNAVAILABLE]: EBadgeColor.Warning,
 };
 
+/** Иконка статуса персонажа — в плашке комментария администрации. */
+export const CHARACTER_STATUS_ICON: Record<CharacterStatus, string> = {
+    [CharacterStatus.ACTIVE]: 'circle-check',
+    [CharacterStatus.UNVERIFIED]: 'clock',
+    [CharacterStatus.RETURNED]: 'message-square-warning',
+    [CharacterStatus.BANNED]: 'ban',
+    [CharacterStatus.DEAD]: 'skull',
+    [CharacterStatus.UNAVAILABLE]: 'circle-slash',
+};
+
 /** Статусы, у которых на карточке показывается дата создания персонажа, а не дата смены статуса. */
 export const CHARACTER_CREATED_AT_STATUSES: CharacterStatus[] = [
     CharacterStatus.ACTIVE,

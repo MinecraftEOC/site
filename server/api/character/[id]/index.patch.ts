@@ -9,17 +9,23 @@ import { SKIN_MAX_COUNT } from '~~/shared/constants/skin';
 import { sharedCharacterUpdateSchema } from '~~/shared/schemas/character';
 
 /**
- * `PATCH /api/character` — доработка своего персонажа (`multipart/form-data`,
+ * `PATCH /api/character/:id` — доработка своего персонажа (`multipart/form-data`,
  * любое подмножество полей). После сохранения персонаж уходит на повторную
  * модерацию: статус сбрасывается в `UNVERIFIED`, комментарии админа чистятся.
  *
  * @throws 401 если запрос не авторизован.
- * @throws 400 если не передано ни одного изменения или поля некорректны.
- * @throws 404 если нет персонажа, доступного для редактирования.
+ * @throws 400 если id некорректен, нет изменений, поля невалидны или не осталось скинов.
+ * @throws 404 если персонаж не найден, чужой или недоступен для редактирования.
  * @throws 409 если имя занято или превышен лимит скинов.
  */
 export default defineEventHandler(async (event): Promise<ICharacterResponse> => {
     const { id: userId } = requireUser(event);
+    const characterId = Number(getRouterParam(event, 'id'));
+
+    if (!Number.isInteger(characterId)) {
+        throw createError({ statusCode: 400, message: CHARACTER_ERRORS.EMPTY_ID });
+    }
+
     const parts = await readMultipartFormData(event);
 
     const fields = parseCharacterFormOr400(parts, sharedCharacterUpdateSchema);
@@ -47,7 +53,7 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     const character = await prisma.character.findFirst({
-        where: { userId, status: { in: CHARACTER_EDITABLE_STATUSES } },
+        where: { id: characterId, userId, status: { in: CHARACTER_EDITABLE_STATUSES } },
         select: { id: true, _count: { select: { skins: true } } },
     });
 
@@ -57,6 +63,12 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     if (character._count.skins + skinBuffers.length > SKIN_MAX_COUNT) {
         throw createError({ statusCode: 409, message: SKIN_ERRORS.LIMIT_REACHED });
+    }
+
+    // Скины могли быть удалены по одному через `DELETE /api/character/skin/:id`,
+    // так что на повторную проверку персонаж способен уйти вообще без скина.
+    if (character._count.skins + skinBuffers.length === 0) {
+        throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_SKINS });
     }
 
     data.status = CharacterStatus.UNVERIFIED;

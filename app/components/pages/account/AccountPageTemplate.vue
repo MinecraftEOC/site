@@ -16,11 +16,16 @@ const showHeader = computed(() => props.title || props.description);
     <div :class="$style.AccountPageTemplate">
         <div v-if="showHeader" :class="$style.header">
             <div :class="$style.headerLeft">
-                <h1
-                    v-if="title"
-                    :class="$style.title"
-                    v-html="props.title"
-                />
+                <div :class="$style.titleRow">
+                    <h1
+                        v-if="title"
+                        :class="$style.title"
+                        v-html="props.title"
+                    />
+
+                    <slot name="title-append" />
+                </div>
+
                 <div
                     v-if="description"
                     :class="$style.description"
@@ -39,7 +44,7 @@ const showHeader = computed(() => props.title || props.description);
 .AccountPageTemplate {
     display: flex;
     flex-direction: column;
-    gap: $space-48;
+    gap: $space-32;
     width: 100%;
     min-height: 100dvh;
     padding: $space-64;
@@ -79,6 +84,13 @@ const showHeader = computed(() => props.title || props.description);
     display: flex;
     flex-direction: column;
     gap: $space-8;
+}
+
+.titleRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-12;
+    align-items: center;
 }
 
 .title {

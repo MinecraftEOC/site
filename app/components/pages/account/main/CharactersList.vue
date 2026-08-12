@@ -40,15 +40,8 @@ function getSortWeight(character: ICharacter) {
     return isCharacterLive(character.status) ? 1 : 2;
 }
 
-function isWide(index: number) {
-    return index === 0 && characters.value.length !== 2;
-}
-
-function getCardClassList(character: ICharacter, index: number) {
-    return [
-        style[`--color-${CHARACTER_STATUS_COLOR[character.status]}`],
-        isWide(index) ? style._wide : '',
-    ];
+function getCardClassList(character: ICharacter) {
+    return [style[`--color-${CHARACTER_STATUS_COLOR[character.status]}`]];
 }
 
 function getDescription(character: ICharacter) {
@@ -60,7 +53,7 @@ function getDate(character: ICharacter) {
         ? character.createdAt
         : character.statusChangedAt;
 
-    return `${CHARACTER_STATUS_DATE_LABEL[character.status]}: ${formatDate(date)}`;
+    return `${CHARACTER_STATUS_DATE_LABEL[character.status]} ${formatDate(date)}`;
 }
 </script>
 
@@ -82,28 +75,30 @@ function getDate(character: ICharacter) {
 
         <div :class="$style.list">
             <div
-                v-for="(character, index) in characters"
+                v-for="character in characters"
                 :key="character.id"
-                :class="[$style.card, getCardClassList(character, index)]"
+                :class="[$style.card, getCardClassList(character)]"
             >
-                <div :class="$style.info">
-                    <div :class="$style.name">
-                        {{ character.username }}
+                <div :class="$style.main">
+                    <div :class="$style.info">
+                        <div :class="$style.name">
+                            {{ character.username }}
+                        </div>
+
+                        <div v-if="getDescription(character)" :class="$style.description">
+                            {{ getDescription(character) }}
+                        </div>
                     </div>
 
-                    <div v-if="getDescription(character)" :class="$style.description">
-                        {{ getDescription(character) }}
-                    </div>
-
-                    <div :class="$style.date">
-                        {{ getDate(character) }}
-                    </div>
-                </div>
-
-                <div :class="$style.aside">
                     <VBadge :color="CHARACTER_STATUS_COLOR[character.status]" :size="ESize.Small">
                         {{ CHARACTER_STATUS_LABEL[character.status] }}
                     </VBadge>
+                </div>
+
+                <div :class="$style.footer">
+                    <div :class="$style.date">
+                        {{ getDate(character) }}
+                    </div>
 
                     <VButton
                         :tag="ETag.NuxtLink"
@@ -137,18 +132,14 @@ function getDate(character: ICharacter) {
 
 .card {
     display: flex;
-    gap: $space-16;
+    flex-direction: column;
+    gap: $space-8;
     justify-content: space-between;
-    align-items: flex-start;
     padding: $space-16 $space-16 $space-16 $space-12;
     border: 1px solid $border-subtle;
     border-left: rem(4) solid $border;
     border-radius: $radius-12;
     background-color: $surface-raised;
-
-    &._wide {
-        grid-column: 1 / -1;
-    }
 
     &.--color-neutral {
         border-left-color: $badge-neutral-bg;
@@ -169,6 +160,13 @@ function getDate(character: ICharacter) {
     &.--color-info {
         border-left-color: $info;
     }
+}
+
+.main {
+    display: flex;
+    gap: $space-16;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .info {
@@ -193,11 +191,10 @@ function getDate(character: ICharacter) {
     color: $text-muted;
 }
 
-.aside {
+.footer {
     display: flex;
-    flex-shrink: 0;
-    flex-direction: column;
-    gap: $space-12;
+    gap: $space-16;
+    justify-content: space-between;
     align-items: flex-end;
 }
 </style>

@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import type { ICharacter } from '~~/shared/@types/user';
 import type { TCharacterForm } from '~/@types/character';
+import type { ISkinHashItem } from '~/@types/skin';
 import { useForm } from 'vee-validate';
 
-import { PARAMETERS_DEFAULT_VALUE, SKILLS_DEFAULT_VALUE } from '~~/shared/constants/character';
+import { CharacterStatus } from '~~/generated/prisma/enums';
 import { CHARACTER_FORM_ORDER } from '~/assets/ts/constants/character';
-import { CHARACTER_CREATE } from '~/assets/ts/constants/content/account';
-import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
+import { CHARACTER_EDIT } from '~/assets/ts/constants/content/account';
 import { ENotificationType } from '~/assets/ts/enums/common';
-import { characterFormSchema } from '~/assets/ts/schemas/character';
+import { getCharacterEditFormSchema } from '~/assets/ts/schemas/character';
 
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
+import CharacterReview from '~/components/pages/account/character/CharacterReview.vue';
 import CharacterFormGeneral from '~/components/pages/account/character/form/CharacterFormGeneral.vue';
 import CharacterFormItems from '~/components/pages/account/character/form/CharacterFormItems.vue';
 import CharacterFormParameters from '~/components/pages/account/character/form/CharacterFormParameters.vue';
@@ -17,21 +19,38 @@ import CharacterFormSkins from '~/components/pages/account/character/form/Charac
 
 import { useCharacterApi } from '~/composables/api/useCharacterApi';
 
+interface IProps {
+    /** Редактируемый персонаж: из него берутся начальные значения формы */
+    character: ICharacter;
+}
+
+const props = defineProps<IProps>();
+
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
 
-const { create } = useCharacterApi();
+const { update, deleteSkin } = useCharacterApi();
+
+const title = computed(() => `${CHARACTER_EDIT.title} ${props.character.username}`);
+
+const reviewComment = computed(() => props.character.status === CharacterStatus.RETURNED
+    ? props.character.reviewComment
+    : '');
+
+// Схема пересобирается при удалении скинов: как только сохранённых не
+// осталось, форма начинает требовать новый файл.
+const validationSchema = computed(() => getCharacterEditFormSchema(props.character.skins.length));
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterForm>({
-    validationSchema: characterFormSchema,
+    validationSchema,
     initialValues: {
-        username: '',
-        biography: '',
+        username: props.character.username,
+        biography: props.character.biography,
         states: {
-            parameters: { ...PARAMETERS_DEFAULT_VALUE },
-            skills: { ...SKILLS_DEFAULT_VALUE },
+            parameters: { ...props.character.states.parameters },
+            skills: { ...props.character.states.skills },
         },
-        startingItems: [],
+        startingItems: [...props.character.startingItems],
         skins: [],
     },
 });
@@ -46,13 +65,14 @@ const [skins] = defineField('skins');
 const onSubmit = handleSubmit(
     async (values) => {
         try {
-            const character = await create(values);
+            await update(props.character.id, values);
             await userStore.fetchMe();
-            await navigateTo(ACCOUNT_ROUTES.character(character.id));
 
-            notificationStore.add(CHARACTER_CREATE.success);
+            skins.value = [];
+
+            notificationStore.add(CHARACTER_EDIT.success);
         } catch (error) {
-            notificationStore.add(CHARACTER_CREATE.error, getApiErrorMessage(error), ENotificationType.Error);
+            notificationStore.add(CHARACTER_EDIT.error, getApiErrorMessage(error), ENotificationType.Error);
         }
     },
     ({ errors: invalidFields }) => {
@@ -61,36 +81,28 @@ const onSubmit = handleSubmit(
             .filter(Boolean)
             .join('<br>');
 
-        notificationStore.add(CHARACTER_CREATE.invalid, text, ENotificationType.Error);
+        notificationStore.add(CHARACTER_EDIT.invalid, text, ENotificationType.Error);
     },
 );
+
+async function removeSkin(skin: ISkinHashItem) {
+    try {
+        await deleteSkin(skin.id);
+        await userStore.fetchMe();
+    } catch (error) {
+        notificationStore.add(CHARACTER_EDIT.skinError, getApiErrorMessage(error), ENotificationType.Error);
+    }
+}
 </script>
 
 <template>
-    <AccountPageTemplate
-        :title="CHARACTER_CREATE.title"
-        :description="CHARACTER_CREATE.description"
-    >
+    <AccountPageTemplate :title="title">
         <div :class="$style.main">
-            <div :class="$style.links">
-                <NuxtLink
-                    v-for="link in CHARACTER_CREATE.links"
-                    :key="link.title"
-                    :to="link.to"
-                    :class="$style.link"
-                >
-                    <div :class="$style.linkIconWrapper">
-                        <VIcon :name="link.icon" :size="18" />
-                    </div>
-
-                    <div :class="$style.linkContent">
-                        <div :class="$style.linkTitle" v-html="link.title" />
-                        <div :class="$style.linkDescription" v-html="link.description" />
-                    </div>
-
-                    <VIcon name="arrow-up-right" :class="$style.linkExternalIcon" />
-                </NuxtLink>
-            </div>
+            <CharacterReview
+                v-if="reviewComment"
+                :text="reviewComment"
+                :status="character.status"
+            />
 
             <form :class="$style.formWrapper" @submit.prevent="onSubmit">
                 <CharacterFormGeneral
@@ -106,14 +118,18 @@ const onSubmit = handleSubmit(
 
                 <CharacterFormItems v-model:items="startingItems" />
 
-                <CharacterFormSkins v-model:files="skins" />
+                <CharacterFormSkins
+                    v-model:files="skins"
+                    :skins="character.skins"
+                    @remove-skin="removeSkin"
+                />
 
                 <VButton
                     type="submit"
                     :loading="isSubmitting"
                     :class="$style.button"
                 >
-                    {{ CHARACTER_CREATE.button.title }}
+                    {{ CHARACTER_EDIT.button.title }}
                 </VButton>
             </form>
         </div>
@@ -125,65 +141,6 @@ const onSubmit = handleSubmit(
     display: flex;
     flex-direction: column;
     gap: $space-24;
-}
-
-.links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-24;
-
-    @include respond-to(tablet) {
-        gap: $space-16;
-    }
-
-    @include respond-to(mobile) {
-        flex-direction: column;
-        gap: $space-12;
-    }
-}
-
-.link {
-    display: flex;
-    flex: 1;
-    gap: $space-12;
-    align-items: center;
-    padding: $space-16;
-    border: 1px solid $border-subtle;
-    border-radius: $radius-12;
-    background-color: $surface-raised;
-    transition: background-color $default-transition;
-
-    @include hover {
-        background-color: $surface-sunken;
-    }
-}
-
-.linkIconWrapper {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    width: rem(36);
-    height: rem(36);
-    border-radius: $radius-8;
-    background-color: $surface-sunken;
-    color: $text-link;
-}
-
-.linkContent {
-    flex: 1;
-}
-
-.linkTitle {
-    @include h4;
-}
-
-.linkDescription {
-    color: $text-secondary;
-}
-
-.linkExternalIcon {
-    color: $text-link;
 }
 
 .formWrapper {

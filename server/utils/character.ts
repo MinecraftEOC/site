@@ -1,6 +1,7 @@
 import type { MultiPartData } from 'h3';
 import type { ZodSchema } from 'zod';
 import type { TCharacterRow } from '~~/server/common/@types/character';
+import type { ICharacterItem, ICharacterStates } from '~~/shared/@types/character';
 import type { ICharacter } from '~~/shared/@types/user';
 
 import { BIOGRAPHY_MAX_LENGTH, CHARACTER_FORM_FIELDS } from '~~/shared/constants/character';
@@ -17,6 +18,10 @@ export function toCharacterResponse(character: TCharacterRow): ICharacter {
         ...character,
         createdAt: character.createdAt.toISOString(),
         statusChangedAt: character.statusChangedAt.toISOString(),
+        // В БД это Json, и Prisma отдаёт их широким `JsonValue`. Структуру
+        // гарантирует схема, которой поля проверены перед записью.
+        states: character.states as unknown as ICharacterStates,
+        startingItems: character.startingItems as unknown as ICharacterItem[],
     };
 }
 
