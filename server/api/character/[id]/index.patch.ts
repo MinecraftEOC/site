@@ -11,7 +11,8 @@ import { sharedCharacterUpdateSchema } from '~~/shared/schemas/character';
 /**
  * `PATCH /api/character/:id` — доработка своего персонажа (`multipart/form-data`,
  * любое подмножество полей). После сохранения персонаж уходит на повторную
- * модерацию: статус сбрасывается в `UNVERIFIED`, комментарии админа чистятся.
+ * модерацию: статус сбрасывается в `UNVERIFIED`, комментарий к статусу чистится,
+ * а замечания модерации сохраняются для админа.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 если id некорректен, нет изменений, поля невалидны или не осталось скинов.
@@ -65,8 +66,6 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw createError({ statusCode: 409, message: SKIN_ERRORS.LIMIT_REACHED });
     }
 
-    // Скины могли быть удалены по одному через `DELETE /api/character/skin/:id`,
-    // так что на повторную проверку персонаж способен уйти вообще без скина.
     if (character._count.skins + skinBuffers.length === 0) {
         throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_SKINS });
     }
@@ -74,7 +73,6 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     data.status = CharacterStatus.UNVERIFIED;
     data.statusChangedAt = new Date();
     data.statusComment = null;
-    data.reviewComment = null;
 
     const hashes = await saveSkinFiles(skinBuffers);
 

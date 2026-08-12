@@ -127,7 +127,7 @@ export const CHARACTER_FORM_GENERAL = {
     },
 };
 
-export const CHARACTER_FORM_PARAMETERS = {
+export const CHARACTER_FORM_STATES = {
     title: 'Параметры и навыки',
     description: 'Очки берутся из отдельных пулов параметров и навыков: при повышении значения соответствующий пул уменьшается. Наведите на параметр или навык, чтобы узнать подробнее.',
     presetsTitle: 'Пресеты распределения',

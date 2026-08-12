@@ -12,8 +12,8 @@ import { characterFormSchema } from '~/assets/ts/schemas/character';
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
 import CharacterFormGeneral from '~/components/pages/account/character/form/CharacterFormGeneral.vue';
 import CharacterFormItems from '~/components/pages/account/character/form/CharacterFormItems.vue';
-import CharacterFormParameters from '~/components/pages/account/character/form/CharacterFormParameters.vue';
 import CharacterFormSkins from '~/components/pages/account/character/form/CharacterFormSkins.vue';
+import CharacterFormStates from '~/components/pages/account/character/form/CharacterFormStates.vue';
 
 import { useCharacterApi } from '~/composables/api/useCharacterApi';
 
@@ -99,7 +99,7 @@ const onSubmit = handleSubmit(
                     :name-error="errors.username"
                 />
 
-                <CharacterFormParameters
+                <CharacterFormStates
                     v-model:parameters="parameters"
                     v-model:skills="skills"
                 />

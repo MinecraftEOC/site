@@ -11,13 +11,10 @@ import CharacterFormTemplate from '~/components/pages/account/character/form/Cha
 interface IProps {
     /** Уже сохранённые скины персонажа: выводятся в слайдере вместе с выбранными файлами */
     skins?: ISkinHashItem[];
-    /** Только просмотр: загрузка новых файлов и удаление скинов недоступны */
-    readonly?: boolean;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
     skins: () => [],
-    readonly: false,
 });
 
 const emits = defineEmits<{
@@ -45,10 +42,9 @@ function removeSkin(skin: ISkinHashItem) {
 <template>
     <CharacterFormTemplate
         :title="CHARACTER_FORM_SKINS.title"
-        :description="readonly ? '' : CHARACTER_FORM_SKINS.description"
+        :description="CHARACTER_FORM_SKINS.description"
     >
         <VFile
-            v-if="!readonly"
             v-model="files"
             multiple
             :accept="SKIN_ACCEPT"
@@ -63,7 +59,6 @@ function removeSkin(skin: ISkinHashItem) {
                 v-if="items.length"
                 :items="items"
                 :title="CHARACTER_FORM_SKINS.sliderTitle"
-                :readonly="readonly"
                 @remove-file="removeFile"
                 @remove-hash="removeSkin"
             />

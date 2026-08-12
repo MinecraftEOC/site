@@ -8,9 +8,9 @@ import { CHARACTER_DETAILS, CHARACTER_STATUS_LABEL } from '~/assets/ts/constants
 import { ENotificationType, ESize } from '~/assets/ts/enums/common';
 
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
-import CharacterReview from '~/components/pages/account/character/CharacterReview.vue';
 import CharacterFormSkins from '~/components/pages/account/character/form/CharacterFormSkins.vue';
 import CharacterBiography from '~/components/pages/account/character/view/CharacterBiography.vue';
+import CharacterReview from '~/components/pages/account/character/view/CharacterReview.vue';
 import CharacterStates from '~/components/pages/account/character/view/CharacterStates.vue';
 
 import { useCharacterApi } from '~/composables/api/useCharacterApi';
@@ -83,7 +83,6 @@ async function removeSkin(skin: ISkinHashItem) {
                 <CharacterFormSkins
                     v-model:files="files"
                     :skins="character.skins"
-                    :readonly="!canManageSkins"
                     @remove-skin="removeSkin"
                 />
 

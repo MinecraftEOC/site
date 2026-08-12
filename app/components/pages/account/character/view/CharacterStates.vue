@@ -2,7 +2,7 @@
 import type { ICharacterStates } from '~~/shared/@types/character';
 
 import { CHARACTER_PARAMETERS, CHARACTER_PARAMETERS_COLUMN_SIZE } from '~/assets/ts/constants/character';
-import { CHARACTER_FORM_PARAMETERS } from '~/assets/ts/constants/content/account';
+import { CHARACTER_FORM_STATES } from '~/assets/ts/constants/content/account';
 
 import CharacterFormTemplate from '~/components/pages/account/character/form/CharacterFormTemplate.vue';
 
@@ -20,7 +20,7 @@ const cols = [
 </script>
 
 <template>
-    <CharacterFormTemplate :title="CHARACTER_FORM_PARAMETERS.title">
+    <CharacterFormTemplate :title="CHARACTER_FORM_STATES.title">
         <div :class="$style.parameters">
             <div
                 v-for="(col, index) in cols"

@@ -3,7 +3,7 @@ import type { ICharacterParameters, ICharacterSkills } from '~~/shared/@types/ch
 import type { ECharacterParameter, ECharacterPreset, ECharacterSkill } from '~/assets/ts/enums/character';
 import { MAX_PARAMETER_VALUE, MAX_PARAMETERS_POINTS, MAX_SKILL_VALUE, MAX_SKILLS_POINTS, PARAMETER_CHEAP_VALUE, PARAMETER_EXPENSIVE_COST, PARAMETERS_DEFAULT_VALUE, SKILLS_DEFAULT_VALUE } from '~~/shared/constants/character';
 import { CHARACTER_PARAMETERS, CHARACTER_PARAMETERS_COLUMN_SIZE, CHARACTER_PRESET_VALUES, CHARACTER_PRESETS } from '~/assets/ts/constants/character';
-import { CHARACTER_FORM_PARAMETERS } from '~/assets/ts/constants/content/account';
+import { CHARACTER_FORM_STATES } from '~/assets/ts/constants/content/account';
 import { ESize } from '~/assets/ts/enums/common';
 
 import CharacterFormTemplate from '~/components/pages/account/character/form/CharacterFormTemplate.vue';
@@ -25,7 +25,7 @@ const presetValue = ref<ECharacterPreset | null>(null);
 const parametersPoints = computed(() => MAX_PARAMETERS_POINTS - getParametersSpent(parameters.value));
 const skillsPoints = computed(() => MAX_SKILLS_POINTS - getSkillsSpent(skills.value));
 
-const description = computed(() => !props.isEditable ? CHARACTER_FORM_PARAMETERS.description : '');
+const description = computed(() => !props.isEditable ? CHARACTER_FORM_STATES.description : '');
 const cols = computed(() => [
     CHARACTER_PARAMETERS.slice(0, CHARACTER_PARAMETERS_COLUMN_SIZE),
     CHARACTER_PARAMETERS.slice(CHARACTER_PARAMETERS_COLUMN_SIZE),
@@ -76,15 +76,15 @@ watch(presetValue, (newValue) => {
 
 <template>
     <CharacterFormTemplate
-        :title="CHARACTER_FORM_PARAMETERS.title"
+        :title="CHARACTER_FORM_STATES.title"
         :description="description"
-        :class="$style.CharacterFormParameters"
+        :class="$style.CharacterFormStates"
     >
         <div :class="$style.counts">
             <div :class="$style.countsCard">
-                {{ CHARACTER_FORM_PARAMETERS.parameters }}
+                {{ CHARACTER_FORM_STATES.parameters }}
 
-                <VTooltip :text="CHARACTER_FORM_PARAMETERS.parametersHint" :max-width="260">
+                <VTooltip :text="CHARACTER_FORM_STATES.parametersHint" :max-width="260">
                     <VIcon
                         name="info"
                         :size="12"
@@ -97,7 +97,7 @@ watch(presetValue, (newValue) => {
                 </span>
             </div>
             <div :class="$style.countsCard">
-                {{ CHARACTER_FORM_PARAMETERS.skills }}
+                {{ CHARACTER_FORM_STATES.skills }}
                 <span :class="$style.countsNum">
                     <VNumber :value="skillsPoints" />
                 </span>
@@ -106,7 +106,7 @@ watch(presetValue, (newValue) => {
 
         <div :class="$style.presets">
             <div :class="$style.presetsTitle">
-                {{ CHARACTER_FORM_PARAMETERS.presetsTitle }}
+                {{ CHARACTER_FORM_STATES.presetsTitle }}
             </div>
 
             <VTags

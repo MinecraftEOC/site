@@ -11,11 +11,11 @@ import { ENotificationType } from '~/assets/ts/enums/common';
 import { getCharacterEditFormSchema } from '~/assets/ts/schemas/character';
 
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
-import CharacterReview from '~/components/pages/account/character/CharacterReview.vue';
 import CharacterFormGeneral from '~/components/pages/account/character/form/CharacterFormGeneral.vue';
 import CharacterFormItems from '~/components/pages/account/character/form/CharacterFormItems.vue';
-import CharacterFormParameters from '~/components/pages/account/character/form/CharacterFormParameters.vue';
 import CharacterFormSkins from '~/components/pages/account/character/form/CharacterFormSkins.vue';
+import CharacterFormStates from '~/components/pages/account/character/form/CharacterFormStates.vue';
+import CharacterReview from '~/components/pages/account/character/view/CharacterReview.vue';
 
 import { useCharacterApi } from '~/composables/api/useCharacterApi';
 
@@ -32,13 +32,7 @@ const notificationStore = useNotificationStore();
 const { update, deleteSkin } = useCharacterApi();
 
 const title = computed(() => `${CHARACTER_EDIT.title} ${props.character.username}`);
-
-const reviewComment = computed(() => props.character.status === CharacterStatus.RETURNED
-    ? props.character.reviewComment
-    : '');
-
-// Схема пересобирается при удалении скинов: как только сохранённых не
-// осталось, форма начинает требовать новый файл.
+const reviewComment = computed(() => props.character.status === CharacterStatus.RETURNED ? props.character.reviewComment : '');
 const validationSchema = computed(() => getCharacterEditFormSchema(props.character.skins.length));
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterForm>({
@@ -111,7 +105,7 @@ async function removeSkin(skin: ISkinHashItem) {
                     :name-error="errors.username"
                 />
 
-                <CharacterFormParameters
+                <CharacterFormStates
                     v-model:parameters="parameters"
                     v-model:skills="skills"
                 />
