@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
+import { CharacterStatus } from '~~/generated/prisma/enums';
 import {
     BIOGRAPHY_MAX_HTML_LENGTH,
     BIOGRAPHY_MAX_LENGTH,
+    CHARACTER_COMMENT_OPTIONAL_STATUSES,
     ITEMS,
     MAX_COINS,
     MAX_PARAMETER_VALUE,
@@ -12,6 +14,8 @@ import {
     MIN_ITEMS_SPENT,
     PARAMETERS_DEFAULT_VALUE,
     SKILLS_DEFAULT_VALUE,
+    STATUS_COMMENT_MAX_HTML_LENGTH,
+    STATUS_COMMENT_MAX_LENGTH,
     USERNAME_REGEX,
 } from '~~/shared/constants/character';
 import { getItemsSpent, getParametersSpent, getSkillsSpent } from '~~/shared/utils/character';
@@ -141,3 +145,50 @@ export type TCharacterBody = z.infer<typeof sharedCharacterSchema>;
 
 /** Тип валидных полей правки персонажа. */
 export type TCharacterUpdateBody = z.infer<typeof sharedCharacterUpdateSchema>;
+
+/** Тексты ошибок смены статуса персонажа админом. */
+export const CHARACTER_STATUS_ERRORS = {
+    ID_INVALID: 'ID персонажа не задан',
+    STATUS_INVALID: 'Некорректный статус персонажа',
+    COMMENT_REQUIRED: 'Опишите решение — без комментария статус не меняется',
+    COMMENT_TOO_LONG: `Комментарий не должен быть длиннее ${STATUS_COMMENT_MAX_LENGTH} символов`,
+    COMMENT_HTML_TOO_LONG: 'Оформление комментария слишком объёмное — упростите разметку',
+};
+
+/** Общие ограничения комментария администрации: объём разметки и видимый текст. */
+const commentField = z
+    .string({ required_error: CHARACTER_STATUS_ERRORS.COMMENT_REQUIRED })
+    .trim()
+    .max(STATUS_COMMENT_MAX_HTML_LENGTH, CHARACTER_STATUS_ERRORS.COMMENT_HTML_TOO_LONG)
+    .refine(
+        html => stripRichText(html).length <= STATUS_COMMENT_MAX_LENGTH,
+        CHARACTER_STATUS_ERRORS.COMMENT_TOO_LONG,
+    );
+
+/**
+ * Схема тела `PATCH /api/character/status` — смена статуса персонажа админом.
+ * Игрок видит комментарий вместе с новым статусом, поэтому без пояснения
+ * проходят только статусы из {@link CHARACTER_COMMENT_OPTIONAL_STATUSES}.
+ */
+export const sharedCharacterStatusSchema = z
+    .object({
+        characterId: z
+            .number({
+                required_error: CHARACTER_STATUS_ERRORS.ID_INVALID,
+                invalid_type_error: CHARACTER_STATUS_ERRORS.ID_INVALID,
+            })
+            .int(CHARACTER_STATUS_ERRORS.ID_INVALID),
+        status: z.nativeEnum(CharacterStatus, {
+            required_error: CHARACTER_STATUS_ERRORS.STATUS_INVALID,
+            invalid_type_error: CHARACTER_STATUS_ERRORS.STATUS_INVALID,
+        }),
+        statusComment: commentField,
+        reviewComment: commentField.optional(),
+    })
+    .refine(
+        body => CHARACTER_COMMENT_OPTIONAL_STATUSES.includes(body.status) || hasRichText(body.statusComment),
+        CHARACTER_STATUS_ERRORS.COMMENT_REQUIRED,
+    );
+
+/** Тип валидного тела смены статуса персонажа. */
+export type TCharacterStatusBody = z.infer<typeof sharedCharacterStatusSchema>;

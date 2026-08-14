@@ -3,7 +3,6 @@ import type { TCharacterForm } from '~/@types/character';
 import { useForm } from 'vee-validate';
 
 import { PARAMETERS_DEFAULT_VALUE, SKILLS_DEFAULT_VALUE } from '~~/shared/constants/character';
-import { CHARACTER_FORM_ORDER } from '~/assets/ts/constants/character';
 import { CHARACTER_CREATE } from '~/assets/ts/constants/content/account';
 import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 import { ENotificationType } from '~/assets/ts/enums/common';
@@ -56,12 +55,7 @@ const onSubmit = handleSubmit(
         }
     },
     ({ errors: invalidFields }) => {
-        const text = CHARACTER_FORM_ORDER
-            .map(field => invalidFields[field])
-            .filter(Boolean)
-            .join('<br>');
-
-        notificationStore.add(CHARACTER_CREATE.invalid, text, ENotificationType.Error);
+        notificationStore.add(CHARACTER_CREATE.invalid, getCharacterFormErrorText(invalidFields), ENotificationType.Error);
     },
 );
 </script>

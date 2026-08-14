@@ -13,5 +13,6 @@ export const ACCOUNT_ROUTES = {
     download: '/account/download',
     news: '/account/news',
     adminUsers: '/account/admin/users',
+    adminCharacter: (id: number | string) => `/account/admin/character/${id}`,
     adminNews: '/account/admin/news',
 };

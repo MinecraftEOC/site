@@ -11,7 +11,6 @@ export const CHARACTER_ERRORS = {
     NOT_EDITABLE: 'Нет персонажа, доступного для редактирования',
     NOTHING_TO_UPDATE: 'Не передано ни одного поля для обновления',
     USERNAME_TAKEN: 'Имя персонажа уже занято',
-    INVALID_STATUS: 'Некорректный статус персонажа',
     NOT_FOUND: 'Персонаж не найден',
     EMPTY_ID: 'ID персонажа не задан',
     EMPTY_UUID: 'UUID персонажа не задан',

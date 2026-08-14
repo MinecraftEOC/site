@@ -102,6 +102,15 @@ export const CHARACTER_DETAILS = {
     skinDeleteError: 'Не удалось удалить скин',
 };
 
+export const CHARACTER_ADMIN = {
+    commentTitle: 'Комментарий администрации',
+    commentDescription: 'Этот текст увидит игрок вместе со статусом заявки.',
+    commentPlaceholder: 'Опишите решение по заявке или перечислите необходимые правки...',
+    success: 'Статус персонажа обновлён',
+    error: 'Не удалось обновить статус',
+    loadError: 'Не удалось загрузить персонажа',
+};
+
 export const CHARACTER_EDIT = {
     title: 'Редактирование персонажа —',
     button: {

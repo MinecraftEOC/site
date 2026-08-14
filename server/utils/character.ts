@@ -64,3 +64,21 @@ export function prepareBiography(raw: string): string {
 
     return html;
 }
+
+/**
+ * Готовит комментарий администрации к записи: чистит HTML по белому списку,
+ * пустой результат трактует как очистку поля. Длину проверять не нужно —
+ * её уже ограничила схема, а очистка текст только укорачивает.
+ *
+ * @param raw Провалидированное значение комментария из тела запроса.
+ * @returns Безопасный HTML или `null`, если текста не осталось.
+ */
+export function prepareComment(raw: string): string | null {
+    const html = sanitizeRichText(raw);
+
+    if (!getRichTextContent(html)) {
+        return null;
+    }
+
+    return html;
+}

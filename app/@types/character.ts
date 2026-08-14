@@ -1,5 +1,7 @@
+import type { CharacterStatus } from '~~/generated/prisma/enums';
 import type { TCharacterBody } from '~~/shared/schemas/character';
 import type { ECharacterParameter, ECharacterSkill } from '~/assets/ts/enums/character';
+import type { EColor } from '~/assets/ts/enums/common';
 
 /** Навык в форме персонажа: подпись и подсказка к счётчику */
 export interface ICharacterSkillItem {
@@ -30,3 +32,18 @@ export type TCharacterForm = TCharacterBody & {
     /** Файлы скинов из инпута */
     skins: File[];
 };
+
+/** Кнопка смены статуса персонажа на админской деталке */
+export interface ICharacterAdminAction {
+    /** Подпись кнопки */
+    label: string;
+    /** Статус, в который переводится персонаж */
+    status: CharacterStatus;
+    /** Цветовая схема кнопки */
+    color: EColor;
+    /**
+     * Что делать с замечаниями модерации: `true` — сохранить текст комментария,
+     * `false` — очистить. Не задано — оставить как есть
+     */
+    review?: boolean;
+}

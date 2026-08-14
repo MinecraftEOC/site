@@ -5,7 +5,7 @@ import type { ISkinHashItem } from '~/@types/skin';
 import { useForm } from 'vee-validate';
 
 import { CharacterStatus } from '~~/generated/prisma/enums';
-import { CHARACTER_FORM_ORDER } from '~/assets/ts/constants/character';
+import { PARAMETERS_DEFAULT_VALUE, SKILLS_DEFAULT_VALUE } from '~~/shared/constants/character';
 import { CHARACTER_EDIT } from '~/assets/ts/constants/content/account';
 import { ENotificationType } from '~/assets/ts/enums/common';
 import { getCharacterEditFormSchema } from '~/assets/ts/schemas/character';
@@ -41,8 +41,8 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterFo
         username: props.character.username,
         biography: props.character.biography,
         states: {
-            params: { ...props.character.states.params },
-            skills: { ...props.character.states.skills },
+            params: { ...PARAMETERS_DEFAULT_VALUE, ...props.character.states.params },
+            skills: { ...SKILLS_DEFAULT_VALUE, ...props.character.states.skills },
         },
         startingItems: [...props.character.startingItems],
         skins: [],
@@ -70,12 +70,7 @@ const onSubmit = handleSubmit(
         }
     },
     ({ errors: invalidFields }) => {
-        const text = CHARACTER_FORM_ORDER
-            .map(field => invalidFields[field])
-            .filter(Boolean)
-            .join('<br>');
-
-        notificationStore.add(CHARACTER_EDIT.invalid, text, ENotificationType.Error);
+        notificationStore.add(CHARACTER_EDIT.invalid, getCharacterFormErrorText(invalidFields), ENotificationType.Error);
     },
 );
 

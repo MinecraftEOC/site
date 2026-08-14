@@ -5,7 +5,7 @@ import { CHARACTER_STATUS_COLOR, CHARACTER_STATUS_ICON } from '~/assets/ts/const
 import { CHARACTER_REVIEW, CHARACTER_REVIEW_LABEL } from '~/assets/ts/constants/content/account';
 
 interface IProps {
-    /** Текст комментария администрации */
+    /** Комментарий администрации: HTML из редактора */
     text: string;
     /** Статус персонажа: задаёт цвет плашки, иконку и подпись над текстом */
     status: CharacterStatus;
@@ -35,9 +35,11 @@ const label = computed(() => CHARACTER_REVIEW_LABEL[props.status] ?? '');
                 {{ label }}
             </div>
 
-            <div :class="$style.text">
-                {{ text }}
-            </div>
+            <VEditor
+                :model-value="text"
+                readonly
+                :class="$style.text"
+            />
         </div>
     </div>
 </template>
@@ -126,9 +128,17 @@ const label = computed(() => CHARACTER_REVIEW_LABEL[props.status] ?? '');
     text-transform: uppercase;
 }
 
-.text {
+.text:global(.v-editor--readonly) {
     @include t4;
 
     color: $text-secondary;
+
+    :global(.ql-container.ql-snow) {
+        @include t4;
+
+        min-height: 0;
+        border: 0;
+        color: inherit;
+    }
 }
 </style>

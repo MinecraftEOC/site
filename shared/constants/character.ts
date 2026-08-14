@@ -109,6 +109,18 @@ export const CHARACTER_RETIRED_STATUSES: CharacterStatus[] = [CharacterStatus.DE
 export const CHARACTER_EDITABLE_STATUSES: CharacterStatus[] = [CharacterStatus.UNVERIFIED, CharacterStatus.RETURNED];
 
 /**
+ * Статусы, в которые персонажа переводят без обязательного комментария:
+ * одобренная заявка понятна игроку и без пояснений.
+ */
+export const CHARACTER_COMMENT_OPTIONAL_STATUSES: CharacterStatus[] = [CharacterStatus.ACTIVE];
+
+/** Максимальная длина комментария администрации по видимому тексту, без учёта разметки. */
+export const STATUS_COMMENT_MAX_LENGTH = 2000;
+
+/** Жёсткий предел на размер присланной разметки комментария администрации. */
+export const STATUS_COMMENT_MAX_HTML_LENGTH = 20000;
+
+/**
  * Занимает ли персонаж слот игрока. Считается от {@link CHARACTER_RETIRED_STATUSES},
  * как и на бэке: новый статус в enum по умолчанию трактуется как «живой»
  * одинаково на обеих сторонах.

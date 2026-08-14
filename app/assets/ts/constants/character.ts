@@ -1,11 +1,11 @@
 import type { ICharacterStates } from '~~/shared/@types/character';
-import type { ICharacterParameterItem } from '~/@types/character';
+import type { ICharacterAdminAction, ICharacterParameterItem } from '~/@types/character';
 import type { ITagItem } from '~/@types/tags';
 
 import { CharacterStatus } from '~~/generated/prisma/enums';
 import { CHARACTER_FORM_FIELDS } from '~~/shared/constants/character';
 import { ECharacterParameter, ECharacterPreset, ECharacterSkill } from '~/assets/ts/enums/character';
-import { EBadgeColor } from '~/assets/ts/enums/common';
+import { EBadgeColor, EColor } from '~/assets/ts/enums/common';
 
 /** Цвет бейджа статуса персонажа. */
 export const CHARACTER_STATUS_COLOR: Record<CharacterStatus, EBadgeColor> = {
@@ -25,6 +25,36 @@ export const CHARACTER_STATUS_ICON: Record<CharacterStatus, string> = {
     [CharacterStatus.BANNED]: 'ban',
     [CharacterStatus.DEAD]: 'skull',
     [CharacterStatus.UNAVAILABLE]: 'circle-slash',
+};
+
+/** Блокировка: доступна из любого статуса, кроме уже заблокированного. */
+const BAN_ACTION: ICharacterAdminAction = {
+    label: 'Заблокировать',
+    status: CharacterStatus.BANNED,
+    color: EColor.Danger,
+};
+
+/**
+ * Кнопки смены статуса на админской деталке персонажа — по текущему статусу.
+ * Статуса нет в словаре — админ ничего с персонажем сделать не может.
+ * Обязательность комментария здесь не задаётся: она выводится из
+ * `CHARACTER_COMMENT_OPTIONAL_STATUSES`, общей с серверной схемой.
+ */
+export const CHARACTER_ADMIN_ACTIONS: Partial<Record<CharacterStatus, ICharacterAdminAction[]>> = {
+    [CharacterStatus.UNVERIFIED]: [
+        { label: 'Вернуть на доработку', status: CharacterStatus.RETURNED, color: EColor.Danger, review: true },
+        { label: 'Одобрить заявку', status: CharacterStatus.ACTIVE, color: EColor.Accent, review: false },
+    ],
+    [CharacterStatus.ACTIVE]: [
+        { label: 'Вывести из игры', status: CharacterStatus.UNAVAILABLE, color: EColor.Secondary },
+        BAN_ACTION,
+    ],
+    [CharacterStatus.RETURNED]: [BAN_ACTION],
+    [CharacterStatus.DEAD]: [BAN_ACTION],
+    [CharacterStatus.UNAVAILABLE]: [BAN_ACTION],
+    [CharacterStatus.BANNED]: [
+        { label: 'Разблокировать', status: CharacterStatus.ACTIVE, color: EColor.Accent },
+    ],
 };
 
 /** Статусы, у которых на карточке показывается дата создания персонажа, а не дата смены статуса. */
