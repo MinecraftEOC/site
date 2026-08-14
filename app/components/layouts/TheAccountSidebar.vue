@@ -30,7 +30,7 @@ const ADMIN_MENU: IMenuSection = {
     title: 'Администрирование',
     items: [
         {
-            title: 'Игроки',
+            title: 'Список игроков',
             icon: 'user-cog',
             to: ACCOUNT_ROUTES.adminUsers,
         },

@@ -2,6 +2,8 @@
 export enum EUsersColumn {
     /** Id пользователя. */
     Id = 'id',
+    /** Email пользователя. */
+    Email = 'email',
     /** Ник в Discord. */
     Discord = 'discord',
     /** Дата регистрации аккаунта. */
@@ -24,6 +26,8 @@ export enum ESortDirection {
 
 /** Значения фильтра таблицы игроков, не являющиеся статусом персонажа. */
 export enum EUsersFilter {
+    /** Аккаунты с подтверждённой привязкой Discord. */
+    DiscordLinked = 'discord-linked',
     /** Аккаунты, у которых персонажа нет вообще. */
     NoCharacter = 'no-character',
 }

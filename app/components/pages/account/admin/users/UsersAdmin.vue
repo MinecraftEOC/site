@@ -4,7 +4,7 @@ import type { ITagItem, TTagValue } from '~/@types/tags';
 import type { IUsersColumn, IUsersRow } from '~/@types/user';
 
 import { USERS_ADMIN, USERS_ADMIN_COLUMN_LABEL } from '~/assets/ts/constants/content/account';
-import { USERS_COLUMNS, USERS_FILTERS, USERS_SORT_ICON, USERS_SORT_IDLE_ICON } from '~/assets/ts/constants/user';
+import { USERS_ACCOUNT_FILTERS, USERS_COLUMNS, USERS_DEFAULT_FILTERS, USERS_FILTERS, USERS_SORT_ICON, USERS_SORT_IDLE_ICON } from '~/assets/ts/constants/user';
 import { ESize } from '~/assets/ts/enums/common';
 import { ESortDirection, EUsersColumn, EUsersFilter } from '~/assets/ts/enums/user';
 
@@ -22,26 +22,36 @@ const props = defineProps<IProps>();
 const style = useCssModule();
 
 const search = ref('');
-const filters = ref<TTagValue[]>([]);
+const filters = ref<TTagValue[]>([...USERS_DEFAULT_FILTERS]);
 const sortColumn = ref<EUsersColumn>(EUsersColumn.Id);
 const sortDirection = ref<ESortDirection>(ESortDirection.Asc);
 
 const query = computed(() => search.value.trim().toLowerCase());
 
+const statusFilters = computed(() => filters.value.filter(value => !USERS_ACCOUNT_FILTERS.includes(value)));
+
 const foundUsers = computed(() => props.users.filter(user => matchesUserSearch(user, query.value)));
+
+const filteredUsers = computed(() => {
+    if (!filters.value.includes(EUsersFilter.DiscordLinked)) {
+        return foundUsers.value;
+    }
+
+    return foundUsers.value.filter(isDiscordLinked);
+});
 
 const filterItems = computed<ITagItem[]>(() => USERS_FILTERS.map(item => ({
     ...item,
     counter: getFilterCounter(item.value),
 })));
 
-const rows = computed(() => foundUsers.value
+const rows = computed(() => filteredUsers.value
     .map(toRow)
     .filter(isRowVisible)
     .sort((first, second) => compareUsersRows(first, second, sortColumn.value, sortDirection.value)));
 
 function isCharacterVisible(character: ICharacter): boolean {
-    return !filters.value.length || filters.value.includes(character.status);
+    return !statusFilters.value.length || statusFilters.value.includes(character.status);
 }
 
 function toRow(user: IUser): IUsersRow {
@@ -55,15 +65,19 @@ function isRowVisible(row: IUsersRow): boolean {
         return true;
     }
 
-    return !row.user.characters.length && (!filters.value.length || filters.value.includes(EUsersFilter.NoCharacter));
+    return !row.user.characters.length && (!statusFilters.value.length || filters.value.includes(EUsersFilter.NoCharacter));
 }
 
 function getFilterCounter(value: TTagValue): number {
-    if (value === EUsersFilter.NoCharacter) {
-        return foundUsers.value.filter(user => !user.characters.length).length;
+    if (value === EUsersFilter.DiscordLinked) {
+        return foundUsers.value.filter(isDiscordLinked).length;
     }
 
-    return foundUsers.value.reduce((count, user) => {
+    if (value === EUsersFilter.NoCharacter) {
+        return filteredUsers.value.filter(user => !user.characters.length).length;
+    }
+
+    return filteredUsers.value.reduce((count, user) => {
         return count + user.characters.filter(character => character.status === value).length;
     }, 0);
 }
@@ -98,20 +112,22 @@ function onSort(column: IUsersColumn) {
 </script>
 
 <template>
-    <AccountPageTemplate :title="USERS_ADMIN.title" :description="USERS_ADMIN.description">
-        <template #title-append>
-            <VBadge :size="ESize.Small">
-                {{ rows.length }}
-            </VBadge>
-        </template>
-
+    <AccountPageTemplate :title="USERS_ADMIN.title">
         <div :class="$style.controls">
-            <VInput
-                v-model="search"
-                :icon="USERS_ADMIN.searchIcon"
-                :placeholder="USERS_ADMIN.searchPlaceholder"
-                :class="$style.search"
-            />
+            <div :class="$style.controlsTop">
+                <VInput
+                    v-model="search"
+                    :icon="USERS_ADMIN.searchIcon"
+                    :placeholder="USERS_ADMIN.searchPlaceholder"
+                    :class="$style.search"
+                />
+
+                <div :class="$style.count">
+                    {{ USERS_ADMIN.countLabel }}
+
+                    <span :class="$style.countValue">{{ rows.length }}</span>
+                </div>
+            </div>
 
             <VTags
                 v-model="filters"
@@ -123,6 +139,14 @@ function onSort(column: IUsersColumn) {
 
         <div v-if="rows.length" :class="$style.wrapper">
             <table :class="$style.table">
+                <colgroup>
+                    <col
+                        v-for="column in USERS_COLUMNS"
+                        :key="column.value"
+                        :style="{ width: column.width }"
+                    >
+                </colgroup>
+
                 <thead>
                     <tr>
                         <th
@@ -168,9 +192,30 @@ function onSort(column: IUsersColumn) {
     gap: $space-16;
 }
 
+.controlsTop {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-16;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .search {
     width: 100%;
     max-width: rem(360);
+}
+
+.count {
+    @include t3;
+
+    color: $text-secondary;
+    white-space: nowrap;
+}
+
+.countValue {
+    @include mono;
+
+    color: $text-primary;
 }
 
 .wrapper {
@@ -182,8 +227,9 @@ function onSort(column: IUsersColumn) {
 
 .table {
     width: 100%;
-    min-width: rem(880);
+    min-width: rem(1100);
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .headerCell {

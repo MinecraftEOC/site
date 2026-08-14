@@ -5,6 +5,8 @@ import type { EUsersColumn } from '~/assets/ts/enums/user';
 export interface IUsersColumn {
     /** Ключ колонки: по нему берётся заголовок и идёт сортировка */
     value: EUsersColumn;
+    /** Доля ширины таблицы, отданная колонке — таблица с фиксированной раскладкой */
+    width: string;
     /** Колонка открывает группу персонажа — слева от неё рисуется разделитель */
     divider?: boolean;
 }

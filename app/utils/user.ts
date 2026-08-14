@@ -2,6 +2,7 @@ import type { CharacterStatus } from '~~/generated/prisma/enums';
 import type { ICharacter, IUser } from '~~/shared/@types/user';
 import type { IUsersRow } from '~/@types/user';
 
+import { DiscordLinkStatus } from '~~/generated/prisma/enums';
 import { CHARACTER_STATUS_ORDER } from '~/assets/ts/constants/character';
 import { ESortDirection, EUsersColumn } from '~/assets/ts/enums/user';
 
@@ -22,6 +23,16 @@ export function sortCharacters(characters: ICharacter[]): ICharacter[] {
 
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+}
+
+/**
+ * Проверяет, доведена ли у пользователя привязка Discord до конца.
+ *
+ * @param user Пользователь с его Discord-аккаунтом.
+ * @returns `true`, если привязка подтверждена ботом.
+ */
+export function isDiscordLinked(user: IUser): boolean {
+    return user.discordAccount?.status === DiscordLinkStatus.LINKED;
 }
 
 /**
@@ -96,6 +107,8 @@ function getSortValue(row: IUsersRow, column: EUsersColumn): number | string | n
     switch (column) {
         case EUsersColumn.Id:
             return row.user.id;
+        case EUsersColumn.Email:
+            return row.user.email.toLowerCase();
         case EUsersColumn.Discord:
             return row.user.discordAccount?.username?.toLowerCase() ?? null;
         case EUsersColumn.CreatedAt:

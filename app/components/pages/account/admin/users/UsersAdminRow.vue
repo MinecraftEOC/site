@@ -62,6 +62,10 @@ function onRowClick(character: ICharacter | null) {
                 #{{ row.user.id }}
             </td>
 
+            <td :class="[$style.cell, $style.email]" :title="row.user.email">
+                {{ row.user.email }}
+            </td>
+
             <td :class="$style.cell">
                 <component
                     :is="discordTag"
@@ -144,7 +148,7 @@ function onRowClick(character: ICharacter | null) {
             :class="[$style.row, $style._sub, $style._clickable]"
             @click="onRowClick(character)"
         >
-            <td colspan="3" :class="$style.cell" />
+            <td colspan="4" :class="$style.cell" />
 
             <td :class="[$style.cell, $style._divider]">
                 <div :class="$style.character">
@@ -196,7 +200,9 @@ function onRowClick(character: ICharacter | null) {
     @include t3;
 
     vertical-align: middle;
+    overflow: hidden;
     padding: $space-12 $space-16;
+    text-overflow: ellipsis;
     white-space: nowrap;
 
     &._divider {
@@ -216,12 +222,16 @@ function onRowClick(character: ICharacter | null) {
     color: $text-secondary;
 }
 
+.email {
+    color: $text-secondary;
+}
+
 .empty {
     color: $text-muted;
 }
 
 .discord {
-    display: inline-flex;
+    display: flex;
     gap: $space-8;
     align-items: center;
     transition: color $default-transition;
@@ -252,9 +262,13 @@ function onRowClick(character: ICharacter | null) {
 
 .discordName {
     @include t3;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .discordIcon {
+    flex-shrink: 0;
     color: $text-muted;
 }
 
@@ -266,14 +280,19 @@ function onRowClick(character: ICharacter | null) {
 
 .characterName {
     @include l2;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .subIcon {
+    flex-shrink: 0;
     color: $text-muted;
 }
 
 .toggle {
     display: inline-flex;
+    flex-shrink: 0;
     gap: $space-4;
     align-items: center;
     height: $space-20;

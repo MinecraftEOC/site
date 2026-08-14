@@ -165,8 +165,10 @@ export const USERS_ADMIN = {
     title: 'Список игроков',
     searchPlaceholder: 'Email, Discord или имя персонажа',
     searchIcon: 'search',
+    countLabel: 'Найдено игроков:',
     noCharacter: 'Нет персонажа',
     noDiscord: 'Не привязан',
+    discordFilter: 'С Discord',
     noCharacterFilter: 'Без персонажа',
     loadError: 'Не удалось загрузить список игроков',
     empty: {
@@ -178,6 +180,7 @@ export const USERS_ADMIN = {
 
 export const USERS_ADMIN_COLUMN_LABEL: Record<EUsersColumn, string> = {
     [EUsersColumn.Id]: 'ID',
+    [EUsersColumn.Email]: 'Email',
     [EUsersColumn.Discord]: 'Discord',
     [EUsersColumn.CreatedAt]: 'Регистрация',
     [EUsersColumn.CharacterName]: 'Персонаж',
