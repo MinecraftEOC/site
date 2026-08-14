@@ -4,6 +4,7 @@ import type { ICharacterAdminAction } from '~/@types/character';
 
 import { CHARACTER_COMMENT_OPTIONAL_STATUSES, STATUS_COMMENT_MAX_LENGTH } from '~~/shared/constants/character';
 import { CHARACTER_ADMIN } from '~/assets/ts/constants/content/account';
+import { ESize } from '~/assets/ts/enums/common';
 
 import CharacterFormTemplate from '~/components/pages/account/character/form/CharacterFormTemplate.vue';
 
@@ -24,6 +25,8 @@ const props = withDefaults(defineProps<IProps>(), {
 const emits = defineEmits<{
     submit: [action: ICharacterAdminAction, comment: string];
 }>();
+
+const EDITOR_MAX_HEIGHT = 150;
 
 const comment = defineModel<string>({ default: '' });
 
@@ -54,14 +57,12 @@ function isActionDisabled(action: ICharacterAdminAction) {
 </script>
 
 <template>
-    <CharacterFormTemplate
-        :title="CHARACTER_ADMIN.commentTitle"
-        :description="CHARACTER_ADMIN.commentDescription"
-    >
+    <CharacterFormTemplate :title="CHARACTER_ADMIN.commentTitle">
         <div :class="$style.field">
             <VEditor
                 v-model="comment"
                 :placeholder="CHARACTER_ADMIN.commentPlaceholder"
+                :max-height="EDITOR_MAX_HEIGHT"
             />
 
             <div :class="[$style.counter, counterClassList]">
@@ -73,6 +74,7 @@ function isActionDisabled(action: ICharacterAdminAction) {
             <VButton
                 v-for="action in actions"
                 :key="action.status"
+                :size="ESize.Small"
                 :color="action.color"
                 :disabled="isActionDisabled(action)"
                 :loading="pendingStatus === action.status"

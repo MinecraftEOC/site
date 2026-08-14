@@ -10,12 +10,14 @@ const props = withDefaults(defineProps<IProps>(), {
     title: '',
     description: '',
 });
+
+const showHeader = computed(() => props.title || props.description);
 </script>
 
 <template>
     <div :class="$style.CharacterFormTemplate">
         <slot name="header">
-            <div :class="$style.header">
+            <div v-if="showHeader" :class="$style.header">
                 <h2
                     v-if="title"
                     :class="$style.title"
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<IProps>(), {
 .CharacterFormTemplate {
     display: flex;
     flex-direction: column;
+    gap: $space-12;
     padding: $space-16;
     border: 1px solid $border-subtle;
     border-radius: $radius-12;
@@ -67,6 +70,5 @@ const props = withDefaults(defineProps<IProps>(), {
     flex: 1;
     flex-direction: column;
     gap: $space-16;
-    margin-top: $space-12;
 }
 </style>

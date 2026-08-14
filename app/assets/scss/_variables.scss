@@ -96,7 +96,7 @@ $btn-primary-bg-hover: $brass-400;
 $btn-primary-bg-active: $brass-600;
 $btn-primary-text: $cream;
 $btn-primary-disabled-bg: rgba($brass-500, 0.28);
-$btn-primary-disabled-text: $taupe-400;
+$btn-primary-disabled-text: rgba($brass-700, 0.6);
 
 $btn-secondary-bg: transparent;
 $btn-secondary-bg-hover: $parchment-300;
@@ -117,14 +117,14 @@ $btn-accent-bg-hover: $pine-400;
 $btn-accent-bg-active: $pine-600;
 $btn-accent-text: $cream;
 $btn-accent-disabled-bg: rgba($pine-500, 0.28);
-$btn-accent-disabled-text: $taupe-400;
+$btn-accent-disabled-text: rgba($pine-600, 0.6);
 
 $btn-danger-bg: $brick-500;
 $btn-danger-bg-hover: $brick-400;
 $btn-danger-bg-active: $brick-600;
 $btn-danger-text: $cream;
 $btn-danger-disabled-bg: rgba($brick-500, 0.28);
-$btn-danger-disabled-text: $taupe-400;
+$btn-danger-disabled-text: rgba($brick-700, 0.6);
 
 $input-bg: $parchment-50;
 $input-bg-disabled: $parchment-300;

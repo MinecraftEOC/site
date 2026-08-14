@@ -91,7 +91,6 @@ watch(() => props.character, () => {
             <CharacterSkins
                 v-if="character.skins.length"
                 :skins="character.skins"
-                :class="$style.aside"
             />
 
             <CharacterAdminComment
@@ -116,9 +115,5 @@ watch(() => props.character, () => {
         grid-template-columns: minmax(0, 1fr);
         gap: $space-16;
     }
-}
-
-.aside {
-    align-self: start;
 }
 </style>

@@ -115,7 +115,7 @@ onBeforeUnmount(() => {
             @update="syncEdges"
         >
             <SwiperSlide
-                v-for="(item, index) in props.items"
+                v-for="item in props.items"
                 :key="getSkinKey(item)"
             >
                 <div :class="$style.preview">
@@ -131,7 +131,6 @@ onBeforeUnmount(() => {
                     <button
                         v-if="!props.readonly"
                         type="button"
-                        :title="getSkinLabel(item, index)"
                         :class="$style.remove"
                         @click="remove(item)"
                     >
@@ -141,7 +140,6 @@ onBeforeUnmount(() => {
                     <VSkin
                         :file="getSkinFile(item)"
                         :hash="getSkinHash(item)"
-                        :label="getSkinLabel(item, index)"
                     />
                 </div>
             </SwiperSlide>
@@ -170,6 +168,7 @@ onBeforeUnmount(() => {
 .nav {
     display: flex;
     gap: $space-8;
+    margin-left: auto;
 }
 
 .navButton {

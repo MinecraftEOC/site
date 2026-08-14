@@ -63,7 +63,6 @@ const props = withDefaults(defineProps<IProps>(), {
     fov: SKIN_VIEWER_DEFAULTS.fov,
     paused: false,
     pauseWhenHidden: true,
-    label: SKIN_VIEWER_DEFAULTS.label,
 });
 
 const emits = defineEmits<{
@@ -305,7 +304,6 @@ watch(viewerOptions, applyOptions);
             ref="canvas"
             :class="$style.canvas"
             role="img"
-            :aria-label="props.label"
         />
     </div>
 </template>

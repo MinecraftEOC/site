@@ -20,7 +20,7 @@ export const CHARACTER_FORM_FIELDS = {
 export const USERNAME_REGEX = /^(?=.{5,16}$)[\u0410-\u042F\u0401][\u0410-\u044F\u0401\u0451]+( [\u0410-\u044F\u0401\u0451]{2,})+$/;
 
 /** Максимальная длина квенты по видимому тексту, без учёта разметки. */
-export const BIOGRAPHY_MAX_LENGTH = 10000;
+export const BIOGRAPHY_MAX_LENGTH = 5000;
 
 /**
  * Жёсткий предел на размер присланной разметки квенты. Проверяется до очистки:

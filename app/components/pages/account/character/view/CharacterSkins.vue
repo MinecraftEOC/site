@@ -15,8 +15,12 @@ defineProps<IProps>();
 </script>
 
 <template>
-    <CharacterFormTemplate :title="CHARACTER_FORM_SKINS.title">
-        <SkinsSlider :items="skins" readonly />
+    <CharacterFormTemplate>
+        <SkinsSlider
+            :items="skins"
+            :title="CHARACTER_FORM_SKINS.title"
+            readonly
+        />
     </CharacterFormTemplate>
 </template>
 

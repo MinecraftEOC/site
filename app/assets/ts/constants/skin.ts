@@ -10,7 +10,6 @@ export const SKIN_VIEWER_DEFAULTS = {
     autoRotateSpeed: 1,
     zoom: 0.85,
     fov: 50,
-    label: 'Скин персонажа',
 } as const;
 
 /**
@@ -25,11 +24,8 @@ export const SKIN_MIN_CANVAS_SIZE = 1;
 /** Значение `accept` для инпута загрузки скинов: сервер принимает только PNG. */
 export const SKIN_ACCEPT = 'image/png';
 
-/** Начало подписи скина, у которого нет имени файла (уже сохранённый скин). */
-export const SKIN_LABEL_PREFIX = 'Скин';
-
 /** Пометка на превью скина, который ещё не отправлен на сервер. */
-export const SKIN_NEW_LABEL = 'Новый';
+export const SKIN_NEW_LABEL = 'NEW';
 
 /** Отступ между превью в слайдере скинов, px. */
 export const SKINS_SLIDER_SPACE_BETWEEN = 16;

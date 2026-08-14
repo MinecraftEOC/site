@@ -1,7 +1,5 @@
 import type { ISkinFileItem, TSkinItem } from '~/@types/skin';
 
-import { SKIN_LABEL_PREFIX } from '~/assets/ts/constants/skin';
-
 /**
  * Проверяет, что элемент слайдера — ещё не отправленный файл.
  *
@@ -44,19 +42,4 @@ export function getSkinKey(item: TSkinItem): string {
     }
 
     return `skin-${item.id}`;
-}
-
-/**
- * Подпись под превью скина.
- *
- * @param item Элемент слайдера скинов.
- * @param index Позиция элемента в списке.
- * @returns Имя файла, переданная подпись или порядковый номер.
- */
-export function getSkinLabel(item: TSkinItem, index: number): string {
-    if (isSkinFileItem(item)) {
-        return item.file.name;
-    }
-
-    return item.label || `${SKIN_LABEL_PREFIX} ${index + 1}`;
 }

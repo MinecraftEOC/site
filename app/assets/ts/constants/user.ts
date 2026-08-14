@@ -11,13 +11,13 @@ import { ESortDirection, EUsersColumn, EUsersFilter } from '~/assets/ts/enums/us
  * иначе колонки прыгали бы при каждой смене фильтра вслед за содержимым.
  */
 export const USERS_COLUMNS: IUsersColumn[] = [
-    { value: EUsersColumn.Id, width: '6%' },
-    { value: EUsersColumn.Email, width: '23%' },
+    { value: EUsersColumn.Id, width: '5%' },
+    { value: EUsersColumn.Email, width: '20%' },
     { value: EUsersColumn.Discord, width: '19%' },
     { value: EUsersColumn.CreatedAt, width: '11%' },
-    { value: EUsersColumn.CharacterName, width: '19%', divider: true },
+    { value: EUsersColumn.CharacterName, width: '20%', divider: true },
     { value: EUsersColumn.CharacterCreatedAt, width: '10%' },
-    { value: EUsersColumn.CharacterStatus, width: '12%' },
+    { value: EUsersColumn.CharacterStatus, width: '15%' },
 ];
 
 /** Теги фильтра таблицы: отбор аккаунтов по краям, статусы персонажей в середине. */
