@@ -81,14 +81,17 @@ function onUpdate(value: unknown) {
             </VTooltip>
         </span>
 
-        <ClientOnly>
+        <div v-if="props.readonly" class="ql-container ql-snow">
+            <div class="ql-editor" v-html="props.modelValue" />
+        </div>
+
+        <ClientOnly v-else>
             <QuillEditor
                 theme="snow"
                 content-type="html"
                 :content="props.modelValue"
                 :toolbar="props.toolbar"
                 :placeholder="props.placeholder"
-                :read-only="props.readonly"
                 @update:content="onUpdate"
             />
 

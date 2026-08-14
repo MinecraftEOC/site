@@ -118,36 +118,31 @@ onBeforeUnmount(() => {
                 v-for="(item, index) in props.items"
                 :key="getSkinKey(item)"
             >
-                <div :class="$style.card">
-                    <div :class="$style.preview">
-                        <VBadge
-                            v-if="isSkinFileItem(item)"
-                            :size="ESize.Small"
-                            :color="EBadgeColor.Info"
-                            :class="$style.badge"
-                        >
-                            {{ SKIN_NEW_LABEL }}
-                        </VBadge>
+                <div :class="$style.preview">
+                    <VBadge
+                        v-if="isSkinFileItem(item)"
+                        :size="ESize.Small"
+                        :color="EBadgeColor.Info"
+                        :class="$style.badge"
+                    >
+                        {{ SKIN_NEW_LABEL }}
+                    </VBadge>
 
-                        <VSkin
-                            :file="getSkinFile(item)"
-                            :hash="getSkinHash(item)"
-                            :label="getSkinLabel(item, index)"
-                        />
-                    </div>
+                    <button
+                        v-if="!props.readonly"
+                        type="button"
+                        :title="getSkinLabel(item, index)"
+                        :class="$style.remove"
+                        @click="remove(item)"
+                    >
+                        <VIcon name="x" :size="14" />
+                    </button>
 
-                    <div :class="$style.footer">
-                        <span :class="$style.name">{{ getSkinLabel(item, index) }}</span>
-
-                        <button
-                            v-if="!props.readonly"
-                            type="button"
-                            :class="$style.remove"
-                            @click="remove(item)"
-                        >
-                            <VIcon name="x" :size="12" />
-                        </button>
-                    </div>
+                    <VSkin
+                        :file="getSkinFile(item)"
+                        :hash="getSkinHash(item)"
+                        :label="getSkinLabel(item, index)"
+                    />
                 </div>
             </SwiperSlide>
         </Swiper>
@@ -203,12 +198,6 @@ onBeforeUnmount(() => {
     }
 }
 
-.card {
-    display: flex;
-    flex-direction: column;
-    gap: $space-8;
-}
-
 .preview {
     position: relative;
     overflow: hidden;
@@ -224,29 +213,17 @@ onBeforeUnmount(() => {
     z-index: 1;
 }
 
-.footer {
-    display: flex;
-    gap: $space-8;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.name {
-    @include mono2;
-
-    overflow: hidden;
-    color: $text-secondary;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .remove {
+    position: absolute;
+    top: $space-8;
+    right: $space-8;
+    z-index: 1;
     display: flex;
     flex-shrink: 0;
     justify-content: center;
     align-items: center;
-    width: $space-24;
-    height: $space-24;
+    width: $space-28;
+    height: $space-28;
     border-radius: 50%;
     background-color: $danger-bg;
     color: $text-danger;
