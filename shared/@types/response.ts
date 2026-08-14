@@ -9,6 +9,8 @@ export interface IUserResponse {
     email: string;
     /** Роль пользователя (`USER`/`ADMIN`). */
     role: UserRole;
+    /** Момент создания аккаунта в ISO-формате. */
+    createdAt: string;
     /** Список персонажей пользователя. */
     characters: ICharacter[];
     /** Привязанный аккаунт Discord. */

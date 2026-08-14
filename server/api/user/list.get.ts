@@ -14,6 +14,7 @@ export default defineEventHandler(async (event): Promise<IUserResponse[]> => {
 
     const users = await prisma.user.findMany({
         select: USER_PUBLIC_SELECT,
+        orderBy: { id: 'asc' },
     });
 
     return users.map(toUserResponse);

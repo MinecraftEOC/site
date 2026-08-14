@@ -19,6 +19,7 @@ export const USER_PUBLIC_SELECT = {
     id: true,
     email: true,
     role: true,
+    createdAt: true,
     characters: {
         select: CHARACTER_PUBLIC_SELECT,
     },

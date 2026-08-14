@@ -31,14 +31,7 @@ const notificationStore = useNotificationStore();
 const { updateStatus } = useCharacterApi();
 
 const comment = ref(getComment());
-
-/**
- * Текст, с которым открыли карточку. Поле предзаполнено прошлыми замечаниями
- * как заготовкой, и по нему `CharacterAdminComment` понимает, правил ли его
- * админ.
- */
 const initialComment = ref(comment.value);
-
 const pendingStatus = ref<CharacterStatus | null>(null);
 
 const actions = computed(() => CHARACTER_ADMIN_ACTIONS[props.character.status] ?? []);

@@ -27,6 +27,20 @@ export const CHARACTER_STATUS_ICON: Record<CharacterStatus, string> = {
     [CharacterStatus.UNAVAILABLE]: 'circle-slash',
 };
 
+/**
+ * Порядок статусов персонажа для админки: сверху те, что требуют решения,
+ * снизу — выбывшие. По нему сортируется колонка статуса и выбирается
+ * персонаж, который показывается в свёрнутой строке таблицы игроков.
+ */
+export const CHARACTER_STATUS_ORDER: CharacterStatus[] = [
+    CharacterStatus.UNVERIFIED,
+    CharacterStatus.RETURNED,
+    CharacterStatus.ACTIVE,
+    CharacterStatus.UNAVAILABLE,
+    CharacterStatus.DEAD,
+    CharacterStatus.BANNED,
+];
+
 /** Блокировка: доступна из любого статуса, кроме уже заблокированного. */
 const BAN_ACTION: ICharacterAdminAction = {
     label: 'Заблокировать',

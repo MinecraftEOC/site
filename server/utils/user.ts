@@ -10,6 +10,7 @@ import type { IUserResponse } from '~~/shared/@types/response';
 export function toUserResponse(user: TUserRow): IUserResponse {
     return {
         ...user,
+        createdAt: user.createdAt.toISOString(),
         characters: user.characters.map(toCharacterResponse),
     };
 }

@@ -3,6 +3,7 @@ import { PARAMETER_CHEAP_VALUE, PARAMETER_EXPENSIVE_COST } from '~~/shared/const
 import { SKIN_MAX_COUNT, SKIN_MAX_SIZE } from '~~/shared/constants/skin';
 import { BYTES_IN_KB } from '~/assets/ts/constants/common';
 import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
+import { EUsersColumn } from '~/assets/ts/enums/user';
 
 export const DEFAULT_TITLE = 'Мои персонажи';
 export const DEFAULT_PAGE_DESCRIPTION = 'Создавайте и управляйте историями своих персонажей.';
@@ -158,4 +159,28 @@ export const CHARACTER_FORM_ITEMS = {
     itemsTitle: 'Выберите предметы',
     remain: 'Осталось',
     coinsLabel: 'монет',
+};
+
+export const USERS_ADMIN = {
+    title: 'Список игроков',
+    searchPlaceholder: 'Email, Discord или имя персонажа',
+    searchIcon: 'search',
+    noCharacter: 'Нет персонажа',
+    noDiscord: 'Не привязан',
+    noCharacterFilter: 'Без персонажа',
+    loadError: 'Не удалось загрузить список игроков',
+    empty: {
+        icon: 'users-round',
+        title: 'Никого не нашлось',
+        description: 'Измените фильтр по статусу или поисковый запрос.',
+    },
+};
+
+export const USERS_ADMIN_COLUMN_LABEL: Record<EUsersColumn, string> = {
+    [EUsersColumn.Id]: 'ID',
+    [EUsersColumn.Discord]: 'Discord',
+    [EUsersColumn.CreatedAt]: 'Регистрация',
+    [EUsersColumn.CharacterName]: 'Персонаж',
+    [EUsersColumn.CharacterCreatedAt]: 'Создан',
+    [EUsersColumn.CharacterStatus]: 'Статус',
 };

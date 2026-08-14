@@ -72,13 +72,6 @@ async function removeSkin(skin: ISkinHashItem) {
 
             <CharacterStates :states="character.states" />
 
-            <CharacterReview
-                v-if="character.statusComment"
-                :text="character.statusComment"
-                :status="character.status"
-                :class="$style.review"
-            />
-
             <div v-if="canManageSkins" :class="$style.skins">
                 <CharacterFormSkins
                     v-model:files="files"
@@ -94,6 +87,13 @@ async function removeSkin(skin: ISkinHashItem) {
                     {{ CHARACTER_DETAILS.skinsButton }}
                 </VButton>
             </div>
+
+            <CharacterReview
+                v-if="character.statusComment"
+                :text="character.statusComment"
+                :status="character.status"
+                :class="$style.review"
+            />
         </div>
     </AccountPageTemplate>
 </template>
