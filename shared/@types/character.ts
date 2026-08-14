@@ -55,7 +55,7 @@ export interface ICharacterSkills {
 /** Распределённые характеристики персонажа: параметры вместе с навыками. */
 export interface ICharacterStates {
     /** Основные параметры. */
-    parameters: ICharacterParameters;
+    params: ICharacterParameters;
     /** Навыки. */
     skills: ICharacterSkills;
 }

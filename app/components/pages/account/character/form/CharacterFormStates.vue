@@ -69,7 +69,7 @@ watch(presetValue, (newValue) => {
 
     const preset = CHARACTER_PRESET_VALUES[newValue];
 
-    parameters.value = { ...preset.parameters };
+    parameters.value = { ...preset.params };
     skills.value = { ...preset.skills };
 });
 </script>

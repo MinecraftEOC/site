@@ -52,7 +52,7 @@ const cols = [
                         </div>
 
                         <div :class="$style.value">
-                            {{ states.parameters?.[param.value] }}
+                            {{ states.params?.[param.value] }}
                         </div>
                     </div>
 
@@ -159,9 +159,8 @@ const cols = [
     flex-shrink: 0;
     justify-content: center;
     align-items: center;
-    min-width: rem(28);
+    width: rem(32);
     height: rem(24);
-    padding: 0 $space-8;
     border: 1px solid $border-subtle;
     border-radius: $radius-4;
     background-color: $surface-sunken;

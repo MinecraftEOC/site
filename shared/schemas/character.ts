@@ -86,7 +86,7 @@ const biographyField = z
 const statesField = z
     .object(
         {
-            parameters: toStatesSchema(PARAMETERS_DEFAULT_VALUE, MAX_PARAMETER_VALUE),
+            params: toStatesSchema(PARAMETERS_DEFAULT_VALUE, MAX_PARAMETER_VALUE),
             skills: toStatesSchema(SKILLS_DEFAULT_VALUE, MAX_SKILL_VALUE),
         },
         {
@@ -95,7 +95,7 @@ const statesField = z
         },
     )
     .refine(
-        states => getParametersSpent(states.parameters) === MAX_PARAMETERS_POINTS
+        states => getParametersSpent(states.params) === MAX_PARAMETERS_POINTS
             && getSkillsSpent(states.skills) === MAX_SKILLS_POINTS,
         CHARACTER_FORM_ERRORS.STATES_NOT_DISTRIBUTED,
     );

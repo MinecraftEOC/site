@@ -28,7 +28,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterFo
         username: '',
         biography: '',
         states: {
-            parameters: { ...PARAMETERS_DEFAULT_VALUE },
+            params: { ...PARAMETERS_DEFAULT_VALUE },
             skills: { ...SKILLS_DEFAULT_VALUE },
         },
         startingItems: [],
@@ -38,7 +38,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterFo
 
 const [username] = defineField('username');
 const [biography] = defineField('biography');
-const [parameters] = defineField('states.parameters');
+const [parameters] = defineField('states.params');
 const [skills] = defineField('states.skills');
 const [startingItems] = defineField('startingItems');
 const [skins] = defineField('skins');

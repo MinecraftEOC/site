@@ -41,7 +41,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterFo
         username: props.character.username,
         biography: props.character.biography,
         states: {
-            parameters: { ...props.character.states.parameters },
+            params: { ...props.character.states.params },
             skills: { ...props.character.states.skills },
         },
         startingItems: [...props.character.startingItems],
@@ -51,7 +51,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<TCharacterFo
 
 const [username] = defineField('username');
 const [biography] = defineField('biography');
-const [parameters] = defineField('states.parameters');
+const [parameters] = defineField('states.params');
 const [skills] = defineField('states.skills');
 const [startingItems] = defineField('startingItems');
 const [skins] = defineField('skins');

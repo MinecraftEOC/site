@@ -122,7 +122,7 @@ export const CHARACTER_PARAMETERS_COLUMN_SIZE = 3;
 /** Готовые наборы характеристик пресетов: подставляются в форму при выборе тега. */
 export const CHARACTER_PRESET_VALUES: Record<ECharacterPreset, ICharacterStates> = {
     [ECharacterPreset.Warrior]: {
-        parameters: {
+        params: {
             int: 4,
             agility: 3,
             const: 8,
@@ -151,7 +151,7 @@ export const CHARACTER_PRESET_VALUES: Record<ECharacterPreset, ICharacterStates>
         },
     },
     [ECharacterPreset.Trader]: {
-        parameters: {
+        params: {
             int: 9,
             agility: 5,
             const: 4,
@@ -180,7 +180,7 @@ export const CHARACTER_PRESET_VALUES: Record<ECharacterPreset, ICharacterStates>
         },
     },
     [ECharacterPreset.Sledopit]: {
-        parameters: {
+        params: {
             int: 4,
             agility: 9,
             const: 3,
@@ -209,7 +209,7 @@ export const CHARACTER_PRESET_VALUES: Record<ECharacterPreset, ICharacterStates>
         },
     },
     [ECharacterPreset.Crafter]: {
-        parameters: {
+        params: {
             int: 6,
             agility: 2,
             const: 6,
