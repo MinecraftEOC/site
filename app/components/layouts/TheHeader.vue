@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { DISCORD_LINK, VK_LINK } from '~/assets/ts/constants/common';
+import { MAIN_ROUTES } from '~/assets/ts/constants/routes';
 import { EColor, ESize, ETag } from '~/assets/ts/enums/common';
 
 import LogoBlock from '~/components/common/LogoBlock.vue';
@@ -53,9 +54,16 @@ const BUTTONS = [
     },
 ];
 
+const router = useRouter();
+
 function onNavItemClick(link: string) {
     const block = document.getElementById(link.replace('#', ''));
+
+    // Шапка общая для всех публичных страниц: если якоря на текущей нет,
+    // уводим на главную — до блока браузер доскроллит сам.
     if (!block) {
+        router.push({ path: MAIN_ROUTES.root, hash: link });
+
         return;
     }
 

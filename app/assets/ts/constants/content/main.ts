@@ -2,7 +2,7 @@ import advantages1 from '~/assets/images/advantages_1.png';
 import advantages2 from '~/assets/images/advantages_2.png';
 import advantages3 from '~/assets/images/advantages_3.png';
 import howplay from '~/assets/images/how_play.png';
-import { ACCOUNT_ROUTES, AUTH_ROUTES } from '~/assets/ts/constants/routes';
+import { AUTH_ROUTES, MAIN_ROUTES } from '~/assets/ts/constants/routes';
 
 import { EColor } from '~/assets/ts/enums/common';
 
@@ -112,7 +112,7 @@ export const HOW_PLAY = {
             icon: 'scroll-text',
             button: {
                 title: 'Правила проекта',
-                to: '/rules',
+                to: MAIN_ROUTES.rules,
                 color: EColor.Secondary,
             },
         },
@@ -132,7 +132,7 @@ export const HOW_PLAY = {
             icon: 'download',
             button: {
                 title: 'Скачать лаунчер',
-                to: ACCOUNT_ROUTES.root,
+                to: MAIN_ROUTES.download,
                 color: EColor.Accent,
             },
         },

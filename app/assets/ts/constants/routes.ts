@@ -1,3 +1,10 @@
+/** Маршруты публичной части сайта — единственное место, где живут эти пути. */
+export const MAIN_ROUTES = {
+    root: '/',
+    download: '/download',
+    rules: '/rules',
+};
+
 /** Маршруты авторизации — единственное место, где живут эти пути. */
 export const AUTH_ROUTES = {
     root: '/auth',
