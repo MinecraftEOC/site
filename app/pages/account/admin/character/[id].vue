@@ -1,36 +1,23 @@
 <script setup lang="ts">
-import { CHARACTER_ADMIN } from '~/assets/ts/constants/content/account';
-
 import CharacterAdmin from '~/components/pages/account/admin/character/CharacterAdmin.vue';
-
-import { useCharacterApi } from '~/composables/api/useCharacterApi';
 
 definePageMeta({
     layout: 'account',
-    middleware: 'admin',
+    middleware: ['admin', 'character-admin'],
 });
 
 const route = useRoute();
 
-const { getById } = useCharacterApi();
+const adminCharacterStore = useAdminCharacterStore();
 
-const characterId = Number(route.params.id);
-
-const { data: character, error, refresh } = await useAsyncData(`admin-character-${characterId}`, () => getById(characterId));
-
-if (error.value || !character.value) {
-    throw showError({
-        statusCode: error.value?.statusCode ?? 404,
-        statusMessage: getApiErrorMessage(error.value, CHARACTER_ADMIN.loadError),
-    });
-}
+const characterId = computed(() => Number(route.params.id));
 </script>
 
 <template>
     <CharacterAdmin
-        v-if="character"
-        :character="character"
-        @updated="refresh()"
+        v-if="adminCharacterStore.character"
+        :character="adminCharacterStore.character"
+        @updated="adminCharacterStore.fetchById(characterId)"
     />
 </template>
 

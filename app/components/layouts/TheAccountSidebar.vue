@@ -101,6 +101,8 @@ const style = useCssModule();
 
 const userStore = useUserStore();
 
+const adminCharacterStore = useAdminCharacterStore();
+
 const isMenuOpen = ref(false);
 
 const characterItem = computed<IMenuItem | null>(() => {
@@ -117,17 +119,46 @@ const characterItem = computed<IMenuItem | null>(() => {
     return { title: character.username, icon: CHARACTER_DETAILS_ICON, to: route.path, child: true };
 });
 
+const adminCharacterItem = computed<IMenuItem | null>(() => {
+    const character = adminCharacterStore.character;
+
+    if (!character || route.path !== ACCOUNT_ROUTES.adminCharacter(character.id)) {
+        return null;
+    }
+
+    return { title: character.username, icon: CHARACTER_DETAILS_ICON, to: route.path, child: true };
+});
+
+/** Подпункты меню в виде «адрес родительского пункта → сам подпункт» */
+const childItems = computed(() => {
+    const items = new Map<string, IMenuItem>();
+
+    if (characterItem.value) {
+        items.set(ACCOUNT_ROUTES.root, characterItem.value);
+    }
+
+    if (adminCharacterItem.value) {
+        items.set(ACCOUNT_ROUTES.adminUsers, adminCharacterItem.value);
+    }
+
+    return items;
+});
+
 const menu = computed(() => {
     const sections = userStore.user?.role === UserRole.ADMIN ? [ADMIN_MENU, MENU] : [MENU];
-    const child = characterItem.value;
+    const children = childItems.value;
 
-    if (!child) {
+    if (!children.size) {
         return sections;
     }
 
     return sections.map(section => ({
         ...section,
-        items: section.items.flatMap(item => item.to === ACCOUNT_ROUTES.root ? [item, child] : [item]),
+        items: section.items.flatMap((item) => {
+            const child = children.get(item.to);
+
+            return child ? [item, child] : [item];
+        }),
     }));
 });
 
