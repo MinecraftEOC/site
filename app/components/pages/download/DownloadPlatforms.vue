@@ -51,8 +51,7 @@ import { ETag } from '~/assets/ts/enums/common';
 }
 
 .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(rem(320), 1fr));
+    display: flex;
     gap: $space-24;
 
     @include respond-to(laptop) {
@@ -60,12 +59,13 @@ import { ETag } from '~/assets/ts/enums/common';
     }
 
     @include respond-to(mobile) {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
 }
 
 .card {
     display: flex;
+    flex: 1;
     gap: $space-16;
     justify-content: space-between;
     align-items: center;

@@ -13,9 +13,8 @@ useHead({
 
 <template>
     <div :class="$style.DownloadPage">
-        <div class="container">
-            <div :class="$style.container">
-                <div :class="$style.pretitle" v-html="DOWNLOAD_PAGE.pretitle" />
+        <div class="container" :class="$style.container">
+            <div :class="$style.content">
                 <h1 :class="$style.title" v-html="DOWNLOAD_PAGE.title" />
                 <div :class="$style.description" v-html="DOWNLOAD_PAGE.description" />
 
@@ -39,6 +38,10 @@ useHead({
 }
 
 .container {
+    max-width: 100rem;
+}
+
+.content {
     display: flex;
     flex-direction: column;
     padding: $space-64 0;

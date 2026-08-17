@@ -1,3 +1,5 @@
+import { viteMarkdown } from './build/vite-markdown';
+
 export default defineNuxtConfig({
     devtools: {
         enabled: true,
@@ -52,6 +54,8 @@ export default defineNuxtConfig({
     css: ['~/assets/scss/default.scss'],
 
     vite: {
+        plugins: [viteMarkdown()],
+
         css: {
             preprocessorOptions: {
                 scss: {

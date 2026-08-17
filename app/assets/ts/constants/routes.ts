@@ -21,5 +21,5 @@ export const ACCOUNT_ROUTES = {
     news: '/account/news',
     adminUsers: '/account/admin/users',
     adminCharacter: (id: number | string) => `/account/admin/character/${id}`,
-    adminNews: '/account/admin/news',
+    adminContent: '/account/admin/content',
 };

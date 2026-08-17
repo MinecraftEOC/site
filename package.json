@@ -32,6 +32,7 @@
         "@vueup/vue-quill": "^1.5.5",
         "bcryptjs": "^3.0.3",
         "discord.js": "^14.26.4",
+        "markdown-it": "^15.0.0",
         "nuxt": "4.4.8",
         "pg": "^8.22.0",
         "pinia": "3.0.4",

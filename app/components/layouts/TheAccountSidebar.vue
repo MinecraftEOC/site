@@ -35,9 +35,9 @@ const ADMIN_MENU: IMenuSection = {
             to: ACCOUNT_ROUTES.adminUsers,
         },
         {
-            title: 'Настройка новостей',
+            title: 'Настройка контента',
             icon: 'file-pen-line',
-            to: ACCOUNT_ROUTES.adminNews,
+            to: ACCOUNT_ROUTES.adminContent,
         },
     ],
 };
