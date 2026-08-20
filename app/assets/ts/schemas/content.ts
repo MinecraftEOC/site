@@ -20,6 +20,8 @@ export function getContentFormSchema(isEdit: boolean) {
         sharedContentSchema.extend({
             [CONTENT_FORM_FIELDS.image]: isEdit ? imageField : imageField.min(1, CONTENT_FORM_ERRORS.IMAGE_REQUIRED),
             [CONTENT_FORM_FIELDS.markdown]: isEdit ? markdownField : markdownField.min(1, CONTENT_FORM_ERRORS.MARKDOWN_REQUIRED),
+            [CONTENT_FORM_FIELDS.gallery]: z.array(z.custom<File>()),
+            [CONTENT_FORM_FIELDS.removedImages]: z.array(z.number()),
         }),
     );
 }

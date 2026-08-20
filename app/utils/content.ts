@@ -1,9 +1,6 @@
 import type { TContentForm } from '~/@types/content';
 
-import { CONTENT_FORM_FIELDS } from '~~/shared/constants/content';
-
-/** Адрес ручки, отдающей картинки материалов. */
-const CONTENT_IMAGE_PATH = '/api/content/image';
+import { CONTENT_FORM_FIELDS, CONTENT_IMAGE_PATH } from '~~/shared/constants/content';
 
 /**
  * Собирает тело `multipart/form-data` для ручек создания и правки материала.
@@ -31,6 +28,14 @@ export function toContentFormData(form: TContentForm): FormData {
         data.append(CONTENT_FORM_FIELDS.markdown, markdown);
     }
 
+    for (const file of form.gallery) {
+        data.append(CONTENT_FORM_FIELDS.gallery, file);
+    }
+
+    if (form.removedImages.length) {
+        data.append(CONTENT_FORM_FIELDS.removedImages, JSON.stringify(form.removedImages));
+    }
+
     return data;
 }
 
@@ -42,4 +47,25 @@ export function toContentFormData(form: TContentForm): FormData {
  */
 export function getContentImageUrl(file: string): string {
     return `${CONTENT_IMAGE_PATH}/${file}`;
+}
+
+/**
+ * Имя, под которым картинка ищется в тексте материала: сервер сопоставляет
+ * ссылки из `.md` с загруженными файлами по имени без пути и регистра.
+ *
+ * @param filename Имя файла.
+ * @returns Имя файла в нижнем регистре.
+ */
+export function getContentImageName(filename: string): string {
+    return filename.trim().toLowerCase();
+}
+
+/**
+ * Готовая markdown-разметка для вставки картинки в текст материала.
+ *
+ * @param name Имя файла картинки.
+ * @returns Строка вида `![](battle.png)`.
+ */
+export function getContentImageMarkdown(name: string): string {
+    return `![](${name})`;
 }

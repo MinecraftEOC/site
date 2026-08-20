@@ -19,6 +19,8 @@ import { EColor, ENotificationType, ESize, ETag } from '~/assets/ts/enums/common
 import { getContentFormSchema } from '~/assets/ts/schemas/content';
 
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
+import ContentFileItem from '~/components/pages/account/admin/content/ContentFileItem.vue';
+import ContentFormGallery from '~/components/pages/account/admin/content/ContentFormGallery.vue';
 
 import { useContentApi } from '~/composables/api/useContentApi';
 
@@ -55,6 +57,8 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<TContentForm
         description: props.entry?.description ?? '',
         image: [],
         markdown: [],
+        gallery: [],
+        removedImages: [],
     },
 });
 
@@ -64,6 +68,8 @@ const [title] = defineField('title');
 const [description] = defineField('description');
 const [image] = defineField('image');
 const [markdown] = defineField('markdown');
+const [gallery] = defineField('gallery');
+const [removedImages] = defineField('removedImages');
 
 const filePreview = ref('');
 
@@ -73,7 +79,7 @@ const savedImageUrl = computed(() => props.entry ? getContentImageUrl(props.entr
 
 const imageUrl = computed(() => filePreview.value || savedImageUrl.value);
 
-const imageTitle = computed(() => filePreview.value ? CONTENT_FORM.image.replacedTitle : CONTENT_FORM.image.currentTitle);
+const imageName = computed(() => image.value?.[0]?.name ?? CONTENT_FORM.image.currentTitle);
 
 const markdownName = computed(() => markdown.value?.[0]?.name ?? '');
 
@@ -129,6 +135,8 @@ const onSubmit = handleSubmit(
 
             image.value = [];
             markdown.value = [];
+            gallery.value = [];
+            removedImages.value = [];
 
             emits('saved');
 
@@ -160,51 +168,76 @@ const onSubmit = handleSubmit(
         </template>
 
         <form :class="$style.form" @submit.prevent="onSubmit">
-            <div :class="$style.column">
-                <div :class="$style.section">
-                    <div :class="$style.sectionTitle">
-                        {{ CONTENT_FORM.type.label }}
-                    </div>
-
-                    <VSwitcher
-                        v-model="type"
-                        :items="CONTENT_TYPE_TABS"
-                        :size="ESize.Small"
-                        :class="$style.switcher"
-                    />
-
-                    <div :class="$style.fields">
-                        <VInput
-                            v-model="title"
-                            :label="CONTENT_FORM.title.label"
-                            :placeholder="CONTENT_FORM.title.placeholder"
-                            :icon="CONTENT_FORM.title.icon"
-                            :error="errors.title"
-                            :class="$style.field"
-                        />
-
-                        <VInput
-                            v-model="slug"
-                            :label="CONTENT_FORM.slug.label"
-                            :placeholder="CONTENT_FORM.slug.placeholder"
-                            :hint="CONTENT_FORM.slug.hint"
-                            :icon="CONTENT_FORM.slug.icon"
-                            :error="errors.slug"
-                            :class="$style.field"
-                        />
-
-                        <VInput
-                            v-model="description"
-                            :label="CONTENT_FORM.description.label"
-                            :placeholder="CONTENT_FORM.description.placeholder"
-                            :hint="CONTENT_FORM.description.hint"
-                            :icon="CONTENT_FORM.description.icon"
-                            :error="errors.description"
-                            :class="$style.field"
-                        />
-                    </div>
+            <div :class="[$style.section, $style.mainSection]">
+                <div :class="$style.sectionTitle">
+                    {{ CONTENT_FORM.type.label }}
                 </div>
 
+                <VSwitcher
+                    v-model="type"
+                    :items="CONTENT_TYPE_TABS"
+                    :size="ESize.Small"
+                    :class="$style.switcher"
+                />
+
+                <div :class="$style.fields">
+                    <VInput
+                        v-model="title"
+                        :label="CONTENT_FORM.title.label"
+                        :placeholder="CONTENT_FORM.title.placeholder"
+                        :icon="CONTENT_FORM.title.icon"
+                        :error="errors.title"
+                        :class="$style.field"
+                    />
+
+                    <VInput
+                        v-model="slug"
+                        :label="CONTENT_FORM.slug.label"
+                        :placeholder="CONTENT_FORM.slug.placeholder"
+                        :hint="CONTENT_FORM.slug.hint"
+                        :icon="CONTENT_FORM.slug.icon"
+                        :error="errors.slug"
+                        :class="$style.field"
+                    />
+
+                    <VInput
+                        v-model="description"
+                        :label="CONTENT_FORM.description.label"
+                        :placeholder="CONTENT_FORM.description.placeholder"
+                        :hint="CONTENT_FORM.description.hint"
+                        :icon="CONTENT_FORM.description.icon"
+                        :error="errors.description"
+                        :class="$style.field"
+                    />
+                </div>
+
+                <div :class="$style.imageLabel">
+                    {{ CONTENT_FORM.image.label }}
+                </div>
+
+                <VFile
+                    v-model="image"
+                    :accept="CONTENT_IMAGE_ACCEPT"
+                    :max="1"
+                    :max-size="CONTENT_IMAGE_MAX_SIZE"
+                    :title="CONTENT_FORM.image.title"
+                    :description="imageDescription"
+                    :button="CONTENT_FORM.image.button"
+                    :icon="CONTENT_FORM.image.icon"
+                    :error="errors.image"
+                    :class="$style.imageFile"
+                />
+
+                <ContentFileItem
+                    v-if="imageUrl"
+                    :preview="imageUrl"
+                    :name="imageName"
+                    :removable="hasImageFile"
+                    @remove="removeImage"
+                />
+            </div>
+
+            <div :class="$style.column">
                 <div :class="$style.section">
                     <div :class="$style.sectionTitle">
                         {{ CONTENT_FORM.markdown.label }}
@@ -250,48 +283,18 @@ const onSubmit = handleSubmit(
                         <VMarkdown :content="props.entry.html" :class="$style.markdown" />
                     </div>
                 </div>
-            </div>
 
-            <div :class="[$style.section, $style.imageSection]">
-                <div :class="$style.sectionTitle">
-                    {{ CONTENT_FORM.image.label }}
-                </div>
-
-                <VFile
-                    v-model="image"
-                    :accept="CONTENT_IMAGE_ACCEPT"
-                    :max="1"
-                    :max-size="CONTENT_IMAGE_MAX_SIZE"
-                    :title="CONTENT_FORM.image.title"
-                    :description="imageDescription"
-                    :button="CONTENT_FORM.image.button"
-                    :icon="CONTENT_FORM.image.icon"
-                    :error="errors.image"
-                />
-
-                <div v-if="imageUrl" :class="$style.preview">
-                    <div :class="$style.previewTitle">
-                        {{ imageTitle }}
+                <div :class="$style.section">
+                    <div :class="$style.sectionTitle">
+                        {{ CONTENT_FORM.gallery.label }}
                     </div>
 
-                    <div :class="$style.previewImageWrapper">
-                        <img
-                            :src="imageUrl"
-                            :alt="imageTitle"
-                            :class="$style.previewImage"
-                        >
-
-                        <button
-                            v-if="hasImageFile"
-                            type="button"
-                            :title="CONTENT_FORM.image.remove"
-                            :aria-label="CONTENT_FORM.image.remove"
-                            :class="$style.previewRemove"
-                            @click="removeImage"
-                        >
-                            <VIcon name="x" :size="REMOVE_ICON_SIZE" />
-                        </button>
-                    </div>
+                    <ContentFormGallery
+                        v-model:files="gallery"
+                        v-model:removed="removedImages"
+                        :saved="props.entry?.images"
+                        :description="imageDescription"
+                    />
                 </div>
             </div>
 
@@ -345,7 +348,7 @@ const onSubmit = handleSubmit(
     background-color: $surface-raised;
 }
 
-.imageSection {
+.mainSection {
     height: 100%;
 
     @include respond-to(tablet) {
@@ -392,40 +395,15 @@ const onSubmit = handleSubmit(
     color: $text-secondary;
 }
 
-.previewImageWrapper {
-    position: relative;
+.imageLabel {
+    @include l2;
+
+    margin-bottom: -$space-4;
+}
+
+.imageFile {
     flex: 1;
-    width: 100%;
     min-height: rem(200);
-}
-
-.previewImage {
-    display: block;
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    border-radius: $radius-8;
-}
-
-.previewRemove {
-    position: absolute;
-    top: $space-8;
-    right: $space-8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: rem(28);
-    height: rem(28);
-    border: 1px solid $border-subtle;
-    border-radius: $radius-8;
-    background-color: $surface-raised;
-    color: $text-secondary;
-    transition: all $default-transition;
-
-    @include hover {
-        border-color: $danger;
-        color: $danger;
-    }
 }
 
 .file {

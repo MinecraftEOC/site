@@ -8,6 +8,8 @@ export const CONTENT_FORM_FIELDS = {
     description: 'description',
     image: 'image',
     markdown: 'markdown',
+    gallery: 'gallery',
+    removedImages: 'removedImages',
 } as const;
 
 /** Разделы контента в порядке вывода: и в табах админки, и в фильтрах. */
@@ -34,6 +36,12 @@ export const CONTENT_IMAGE_MAX_SIZE = 2 * 1024 * 1024;
 
 /** Максимальный размер `.md`-файла с текстом, байт (256 КБ). */
 export const CONTENT_MARKDOWN_MAX_SIZE = 256 * 1024;
+
+/** Путь ручки, отдающей файлы картинок. */
+export const CONTENT_IMAGE_PATH = '/api/content/image';
+
+/** Максимум картинок в тексте одного материала. */
+export const CONTENT_GALLERY_MAX_COUNT = 30;
 
 /** Значение `accept` для инпута картинки. */
 export const CONTENT_IMAGE_ACCEPT = 'image/png,image/jpeg,image/webp';

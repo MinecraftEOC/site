@@ -26,8 +26,20 @@ export interface IContentEntry extends IContentItem {
     html: string;
 }
 
-/** Материал в админке: с разметкой и исходным markdown. */
+/** Картинка, вставленная в текст материала. */
+export interface IContentImage {
+    /** Id картинки. */
+    id: number;
+    /** Имя файла в хранилище. */
+    file: string;
+    /** Имя, под которым картинка упоминается в тексте материала. */
+    name: string;
+}
+
+/** Материал в админке: с разметкой, исходным markdown и картинками текста. */
 export interface IContentAdminEntry extends IContentEntry {
     /** Исходный текст загруженного `.md`-файла. */
     source: string;
+    /** Картинки, на которые ссылается текст материала. */
+    images: IContentImage[];
 }

@@ -15,6 +15,10 @@ export const CONTENT_ERRORS = {
     IMAGE_TOO_LARGE: 'Картинка слишком большая',
     IMAGE_INVALID: 'Картинка должна быть в формате PNG, JPEG или WebP',
     IMAGE_NOT_FOUND: 'Картинка не найдена',
+    GALLERY_LIMIT: 'Слишком много картинок в тексте материала',
+    GALLERY_NAME_INVALID: 'У картинки для текста должно быть имя файла',
+    GALLERY_NAME_TAKEN: 'Картинки для текста должны быть с разными именами',
+    REMOVED_IMAGES_INVALID: 'Некорректный список удаляемых картинок',
     MARKDOWN_EMPTY: 'Файл с текстом пустой',
     MARKDOWN_TOO_LARGE: 'Файл с текстом слишком большой',
     MARKDOWN_INVALID: 'Текст материала должен быть .md-файлом',
@@ -78,8 +82,16 @@ export const CONTENT_ENTRY_SELECT = {
     html: true,
 } satisfies Prisma.ContentEntrySelect;
 
-/** `select` материала для админки — плюс исходный markdown. */
+/** `select` материала для админки — плюс исходный markdown и картинки текста. */
 export const CONTENT_ADMIN_SELECT = {
     ...CONTENT_ENTRY_SELECT,
     source: true,
+    images: {
+        select: {
+            id: true,
+            file: true,
+            name: true,
+        },
+        orderBy: { name: 'asc' },
+    },
 } satisfies Prisma.ContentEntrySelect;

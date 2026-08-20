@@ -20,12 +20,18 @@ export interface IImageFormat {
     signatures: IFileSignature[];
 }
 
-/** Картинка материала, прошедшая проверки: содержимое и опознанный формат. */
-export interface IContentImage {
+/** Картинка, прошедшая проверки: содержимое и опознанный формат. */
+export interface IContentImageUpload {
     /** Содержимое файла. */
     data: Buffer;
     /** Формат, опознанный по сигнатуре. */
     format: IImageFormat;
+}
+
+/** Картинка для текста материала: та же проверенная картинка плюс имя из формы. */
+export interface IContentGalleryUpload extends IContentImageUpload {
+    /** Имя, под которым картинка упоминается в тексте материала. */
+    name: string;
 }
 
 /** Материал в форме `CONTENT_ITEM_SELECT`. */

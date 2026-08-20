@@ -21,7 +21,10 @@ export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
 
     const entry = await prisma.contentEntry.findUnique({
         where: { id },
-        select: { image: true },
+        select: {
+            image: true,
+            images: { select: { file: true } },
+        },
     });
 
     if (!entry) {
@@ -29,7 +32,7 @@ export default defineEventHandler(async (event): Promise<ISuccessResponse> => {
     }
 
     await prisma.contentEntry.delete({ where: { id } });
-    await deleteContentImage(entry.image);
+    await deleteContentImages([entry.image, ...entry.images.map(item => item.file)]);
 
     return { success: true };
 });
