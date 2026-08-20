@@ -3,6 +3,10 @@ export const MAIN_ROUTES = {
     root: '/',
     download: '/download',
     rules: '/rules',
+    news: '/news',
+    newsEntry: (slug: string) => `/news/${slug}`,
+    lore: '/lore',
+    loreEntry: (slug: string) => `/lore/${slug}`,
 };
 
 /** Маршруты авторизации — единственное место, где живут эти пути. */
@@ -19,6 +23,8 @@ export const ACCOUNT_ROUTES = {
     rules: '/account/rules',
     download: '/account/download',
     news: '/account/news',
+    newsEntry: (slug: string) => `/account/news/${slug}`,
+    loreEntry: (slug: string) => `/account/lore/${slug}`,
     adminUsers: '/account/admin/users',
     adminCharacter: (id: number | string) => `/account/admin/character/${id}`,
     adminContent: '/account/admin/content',

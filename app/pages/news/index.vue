@@ -2,14 +2,10 @@
 import { ContentType } from '~~/generated/prisma/enums';
 
 import ContentList from '~/components/pages/content/ContentList.vue';
-
-definePageMeta({
-    layout: 'account',
-});
 </script>
 
 <template>
-    <ContentList :type="ContentType.LORE" account />
+    <ContentList :type="ContentType.NEWS" />
 </template>
 
 <style module lang="scss">
