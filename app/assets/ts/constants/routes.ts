@@ -22,4 +22,6 @@ export const ACCOUNT_ROUTES = {
     adminUsers: '/account/admin/users',
     adminCharacter: (id: number | string) => `/account/admin/character/${id}`,
     adminContent: '/account/admin/content',
+    adminContentCreate: '/account/admin/content/create',
+    adminContentEdit: (id: number | string) => `/account/admin/content/${id}`,
 };

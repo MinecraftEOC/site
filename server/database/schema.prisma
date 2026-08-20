@@ -79,6 +79,22 @@ model Skin {
     character   Character @relation(fields: [characterId], references: [id])
 }
 
+model ContentEntry {
+    id          Int         @id @default(autoincrement())
+    type        ContentType
+    slug        String
+    title       String
+    description String?
+    image       String
+    source      String
+    html        String
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+
+    @@unique([type, slug])
+    @@index([type, createdAt])
+}
+
 // ENUMS
 enum UserRole {
     USER
@@ -92,6 +108,11 @@ enum CharacterStatus {
     BANNED
     DEAD
     UNAVAILABLE
+}
+
+enum ContentType {
+    NEWS
+    LORE
 }
 
 enum DiscordLinkStatus {

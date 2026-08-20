@@ -1,4 +1,5 @@
 import type { DiscordLinkStatus, UserRole } from '~~/generated/prisma/client';
+import type { IContentAdminEntry, IContentEntry, IContentItem } from '~~/shared/@types/content';
 import type { ICharacter, IDiscordAccount, IServerCharacter } from '~~/shared/@types/user';
 
 /** Ответ `GET /api/user` — пользователь по id. */
@@ -35,6 +36,15 @@ export interface IMeResponse extends IUserResponse {}
 
 /** Ответ `POST`/`PATCH /api/character` — персонаж пользователя. */
 export interface ICharacterResponse extends ICharacter {}
+
+/** Элемент ответа `GET /api/content/list` — карточка материала без текста. */
+export interface IContentItemResponse extends IContentItem {}
+
+/** Ответ `GET /api/content` — материал раздела с готовой разметкой текста. */
+export interface IContentResponse extends IContentEntry {}
+
+/** Ответ `GET`/`POST`/`PATCH /api/content/:id` — материал для админки. */
+export interface IContentAdminResponse extends IContentAdminEntry {}
 
 /** Универсальный ответ об успехе для операций без полезной нагрузки (logout, сброс пароля и т.п.). */
 export interface ISuccessResponse {

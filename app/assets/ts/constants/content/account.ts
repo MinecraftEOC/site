@@ -1,8 +1,9 @@
-import { CharacterStatus } from '~~/generated/prisma/enums';
+import { CharacterStatus, ContentType } from '~~/generated/prisma/enums';
 import { PARAMETER_CHEAP_VALUE, PARAMETER_EXPENSIVE_COST } from '~~/shared/constants/character';
 import { SKIN_MAX_COUNT, SKIN_MAX_SIZE } from '~~/shared/constants/skin';
 import { BYTES_IN_KB } from '~/assets/ts/constants/common';
 import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
+import { EContentColumn } from '~/assets/ts/enums/content';
 import { EUsersColumn } from '~/assets/ts/enums/user';
 
 export const DEFAULT_TITLE = 'Мои персонажи';
@@ -185,4 +186,102 @@ export const USERS_ADMIN_COLUMN_LABEL: Record<EUsersColumn, string> = {
     [EUsersColumn.CharacterName]: 'Персонаж',
     [EUsersColumn.CharacterCreatedAt]: 'Создан',
     [EUsersColumn.CharacterStatus]: 'Статус',
+};
+
+export const CONTENT_TYPE_LABEL: Record<ContentType, string> = {
+    [ContentType.NEWS]: 'Новости',
+    [ContentType.LORE]: 'История мира',
+};
+
+export const CONTENT_TYPE_ICON: Record<ContentType, string> = {
+    [ContentType.NEWS]: 'newspaper',
+    [ContentType.LORE]: 'scroll-text',
+};
+
+export const CONTENT_ADMIN = {
+    title: 'Настройка контента',
+    description: 'Новости и история мира: карточка в списке и текст материала из .md-файла.',
+    searchPlaceholder: 'Заголовок или слаг материала',
+    searchIcon: 'search',
+    countLabel: 'Материалов в разделе:',
+    createButton: 'Добавить материал',
+    editButton: 'Редактировать',
+    deleteButton: 'Удалить',
+    noDescription: 'Без описания',
+    loadError: 'Не удалось загрузить список материалов',
+    empty: {
+        icon: 'file-pen-line',
+        title: 'В разделе пока пусто',
+        description: 'Добавьте первый материал или измените поисковый запрос.',
+    },
+    remove: {
+        title: 'Удаление материала',
+        description: 'Материал и его картинка будут удалены безвозвратно.',
+        confirm: 'Удалить материал',
+        cancel: 'Отмена',
+        success: 'Материал удалён',
+        error: 'Не удалось удалить материал',
+    },
+};
+
+export const CONTENT_ADMIN_COLUMN_LABEL: Record<EContentColumn, string> = {
+    [EContentColumn.Image]: 'Картинка',
+    [EContentColumn.Title]: 'Заголовок',
+    [EContentColumn.Slug]: 'Слаг',
+    [EContentColumn.CreatedAt]: 'Создан',
+    [EContentColumn.UpdatedAt]: 'Изменён',
+    [EContentColumn.Actions]: '',
+};
+
+export const CONTENT_FORM = {
+    createTitle: 'Новый материал',
+    editTitle: 'Редактирование материала',
+    backButton: 'К списку материалов',
+    submitCreate: 'Создать материал',
+    submitEdit: 'Сохранить изменения',
+    loadError: 'Не удалось загрузить материал',
+    createSuccess: 'Материал создан',
+    createError: 'Не удалось создать материал',
+    editSuccess: 'Изменения сохранены',
+    editError: 'Не удалось сохранить материал',
+    invalid: 'Проверьте поля формы',
+    type: {
+        label: 'Раздел',
+    },
+    slug: {
+        label: 'Слаг',
+        placeholder: 'velikaya-voyna',
+        hint: 'Часть адреса материала: латиница в нижнем регистре, цифры и дефис.',
+        icon: 'link',
+    },
+    title: {
+        label: 'Заголовок',
+        placeholder: 'Великая война',
+        icon: 'heading',
+    },
+    description: {
+        label: 'Краткое описание',
+        placeholder: 'Пара предложений для карточки в списке',
+        hint: 'Необязательное: выводится на карточке под заголовком.',
+        icon: 'text',
+    },
+    image: {
+        label: 'Картинка',
+        title: 'Перетащите картинку сюда или выберите на компьютере',
+        button: 'Выбрать картинку',
+        icon: 'image',
+        remove: 'Убрать выбранную картинку',
+        currentTitle: 'Текущая картинка',
+        replacedTitle: 'Новая картинка',
+    },
+    markdown: {
+        label: 'Текст материала',
+        title: 'Перетащите .md-файл сюда или выберите на компьютере',
+        button: 'Выбрать файл',
+        icon: 'file-text',
+        remove: 'Убрать выбранный файл',
+        selected: 'Выбран файл:',
+        previewTitle: 'Текущий текст',
+        previewHint: 'Так материал выглядит сейчас — новый файл заменит его целиком.',
+    },
 };

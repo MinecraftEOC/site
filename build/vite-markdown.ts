@@ -1,90 +1,6 @@
-import type { IOptions } from 'sanitize-html';
 import type { Plugin } from 'vite';
 
-import MarkdownIt from 'markdown-it';
-import sanitizeHtml from 'sanitize-html';
-
-/**
- * Белый список HTML для контента из `.md`-файлов. Шире, чем у текстового
- * редактора: разметку пишут разработчики в репозитории, поэтому разрешены
- * заголовки, таблицы, картинки и блоки кода.
- *
- * Очистка нужна не от авторов, а от чужого HTML, который может приехать
- * вместе с текстом при копировании: `html: true` у markdown-it пропускает
- * сырую разметку как есть.
- */
-const MARKDOWN_SANITIZE_OPTIONS: IOptions = {
-    allowedTags: [
-        'p',
-        'br',
-        'hr',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'strong',
-        'em',
-        'u',
-        's',
-        'code',
-        'pre',
-        'blockquote',
-        'ul',
-        'ol',
-        'li',
-        'table',
-        'thead',
-        'tbody',
-        'tr',
-        'th',
-        'td',
-        'a',
-        'img',
-    ],
-
-    allowedAttributes: {
-        a: ['href', 'rel', 'target'],
-        img: ['src', 'alt', 'title', 'loading', 'decoding'],
-        th: ['align'],
-        td: ['align'],
-    },
-
-    allowedSchemes: ['http', 'https', 'mailto'],
-
-    transformTags: {
-        a: (tagName, attribs) => {
-            const href = attribs.href ?? '';
-
-            // Внутренние ссылки остаются обычными: новая вкладка нужна только
-            // для ухода с сайта
-            if (href.startsWith('/') || href.startsWith('#')) {
-                return { tagName, attribs };
-            }
-
-            return {
-                tagName,
-                attribs: { ...attribs, rel: 'noopener noreferrer', target: '_blank' },
-            };
-        },
-    },
-};
-
-const markdown = new MarkdownIt({
-    html: true,
-    linkify: true,
-    typographer: true,
-});
-
-const renderImage = markdown.renderer.rules.image!;
-
-markdown.renderer.rules.image = (tokens, idx, options, env, self) => {
-    tokens[idx]!.attrSet('loading', 'lazy');
-    tokens[idx]!.attrSet('decoding', 'async');
-
-    return renderImage(tokens, idx, options, env, self);
-};
+import { renderMarkdown } from '../shared/utils/markdown';
 
 /** Пути картинок, которые отдаются сборщику: относительные и через алиасы. */
 const BUNDLED_SRC_RE = /^[.~@]/;
@@ -152,10 +68,8 @@ export function viteMarkdown(): Plugin {
                 return null;
             }
 
-            const html = sanitizeHtml(markdown.render(code), MARKDOWN_SANITIZE_OPTIONS).trim();
-
             return {
-                code: buildModuleCode(html),
+                code: buildModuleCode(renderMarkdown(code)),
                 map: null,
             };
         },

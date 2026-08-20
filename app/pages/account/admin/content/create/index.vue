@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ContentForm from '~/components/pages/account/admin/content/ContentForm.vue';
+
 definePageMeta({
     layout: 'account',
     middleware: 'admin',
@@ -6,9 +8,7 @@ definePageMeta({
 </script>
 
 <template>
-    <div class="NewsAdminAccountPage">
-        <!--  -->
-    </div>
+    <ContentForm />
 </template>
 
 <style module lang="scss">

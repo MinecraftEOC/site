@@ -66,6 +66,10 @@ dist
 /storage/skins/*
 !/storage/skins/.gitkeep
 
+# Файлы разделов новостей и истории мира (runtime-контент)
+/storage/content/*
+!/storage/content/.gitkeep
+
 # Environments
 .env
 .venv
