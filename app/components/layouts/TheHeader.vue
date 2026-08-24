@@ -19,6 +19,10 @@ const MAIN_NAV_LIST = [
         link: '#about',
     },
     {
+        title: 'Новости',
+        link: '#news',
+    },
+    {
         title: 'Ценности',
         link: '#rules',
     },

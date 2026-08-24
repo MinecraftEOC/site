@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ContentType } from '~~/generated/prisma/enums';
 import {
     CONTENT_DESCRIPTION_MAX_LENGTH,
+    CONTENT_LIST_MAX_TAKE,
     CONTENT_SLUG_MAX_LENGTH,
     CONTENT_SLUG_REGEX,
     CONTENT_TITLE_MAX_LENGTH,
@@ -22,6 +23,11 @@ export const CONTENT_FORM_ERRORS = {
     DESCRIPTION_TOO_LONG: `Описание не должно быть длиннее ${CONTENT_DESCRIPTION_MAX_LENGTH} символов`,
     IMAGE_REQUIRED: 'Загрузите картинку материала',
     MARKDOWN_REQUIRED: 'Загрузите .md-файл с текстом материала',
+};
+
+/** Тексты ошибок параметров выборки списка материалов. */
+export const CONTENT_LIST_ERRORS = {
+    TAKE_INVALID: `Размер выборки — целое число от 1 до ${CONTENT_LIST_MAX_TAKE}`,
 };
 
 /** Поле раздела: значение из enum Prisma. */
@@ -71,10 +77,25 @@ export const sharedContentQuerySchema = z.object({
     slug: slugField,
 });
 
-/** Схема параметров `GET /api/content/list` — раздел, если список фильтруется. */
+/** Поле размера выборки: целое в границах одного запроса списка. */
+const takeField = z.coerce
+    .number({ invalid_type_error: CONTENT_LIST_ERRORS.TAKE_INVALID })
+    .int(CONTENT_LIST_ERRORS.TAKE_INVALID)
+    .min(1, CONTENT_LIST_ERRORS.TAKE_INVALID)
+    .max(CONTENT_LIST_MAX_TAKE, CONTENT_LIST_ERRORS.TAKE_INVALID);
+
+/**
+ * Схема параметров `GET /api/content/list` — раздел и размер выборки. Без
+ * `take` отдаётся раздел целиком: так список забирают страницы разделов и
+ * админка, ограничение нужно только блоку новостей на главной.
+ */
 export const sharedContentListSchema = z.object({
     type: typeField.optional(),
+    take: takeField.optional(),
 });
+
+/** Тип валидных параметров выборки списка материалов. */
+export type TContentListQuery = z.infer<typeof sharedContentListSchema>;
 
 /** Тип валидных текстовых полей материала. */
 export type TContentBody = z.infer<typeof sharedContentSchema>;

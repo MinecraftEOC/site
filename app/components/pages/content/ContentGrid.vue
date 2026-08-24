@@ -9,8 +9,8 @@ interface IProps {
     entries: IContentItemResponse[];
     /** Адреса раздела — из них берётся ссылка на детальную страницу */
     routes: IContentSectionRoutes;
-    /** Заглушка, когда материалов нет */
-    empty: IContentEmptyState;
+    /** Заглушка, когда материалов нет: без неё пустой список не выводится вовсе */
+    empty?: IContentEmptyState;
 }
 
 const props = defineProps<IProps>();
@@ -28,7 +28,7 @@ const EMPTY_ICON_SIZE = 28;
         />
     </div>
 
-    <div v-else :class="$style.empty">
+    <div v-else-if="props.empty" :class="$style.empty">
         <div :class="$style.emptyIconWrapper">
             <VIcon :name="props.empty.icon" :size="EMPTY_ICON_SIZE" />
         </div>

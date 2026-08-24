@@ -1,5 +1,6 @@
 import type { ContentType } from '~~/generated/prisma/enums';
 import type { IContentAdminResponse, IContentItemResponse, IContentResponse, ISuccessResponse } from '~~/shared/@types/response';
+import type { TContentListQuery } from '~~/shared/schemas/content';
 import type { TContentForm } from '~/@types/content';
 
 const CONTENT_PATH = '/api/content';
@@ -10,7 +11,7 @@ export function useContentApi() {
     return {
         get: (type: ContentType, slug: string) => $api<IContentResponse>(CONTENT_PATH, { query: { type, slug } }),
 
-        list: (type?: ContentType) => $api<IContentItemResponse[]>(`${CONTENT_PATH}/list`, { query: { type } }),
+        list: (type?: ContentType, range?: Omit<TContentListQuery, 'type'>) => $api<IContentItemResponse[]>(`${CONTENT_PATH}/list`, { query: { type, ...range } }),
 
         getById: (id: number) => $api<IContentAdminResponse>(`${CONTENT_PATH}/${id}`),
 

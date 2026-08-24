@@ -3,6 +3,7 @@ import About from '~/components/pages/main/About.vue';
 import Advantages from '~/components/pages/main/Advantages.vue';
 import Hero from '~/components/pages/main/Hero.vue';
 import HowPlay from '~/components/pages/main/HowPlay.vue';
+import News from '~/components/pages/main/News.vue';
 import Rules from '~/components/pages/main/Rules.vue';
 </script>
 
@@ -11,6 +12,7 @@ import Rules from '~/components/pages/main/Rules.vue';
         <Hero />
         <About id="about" />
         <Advantages />
+        <News id="news" />
         <Rules id="rules" />
         <HowPlay id="game" />
     </div>

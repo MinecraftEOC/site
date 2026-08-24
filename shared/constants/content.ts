@@ -51,3 +51,6 @@ export const CONTENT_MARKDOWN_ACCEPT = '.md';
 
 /** Расширение файла с текстом материала. */
 export const CONTENT_MARKDOWN_EXTENSION = '.md';
+
+/** Максимальный размер одной порции списка материалов. */
+export const CONTENT_LIST_MAX_TAKE = 60;

@@ -61,7 +61,6 @@ import { ESize, ETag } from '~/assets/ts/enums/common';
 <style module lang="scss">
 .HowPlay {
     width: 100%;
-    background-color: $surface;
 }
 
 .container {

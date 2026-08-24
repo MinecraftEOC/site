@@ -101,6 +101,16 @@ export const RULES = {
     ],
 };
 
+/** Сколько свежих новостей показывает блок на главной. */
+export const NEWS_COUNT = 6;
+
+export const NEWS = {
+    pretitle: 'Хроника мира',
+    title: 'Новости сервера',
+    description: 'Обновления, события мира и объявления администрации.',
+    button: 'Все новости',
+};
+
 export const HOW_PLAY = {
     pretitle: 'Первые шаги',
     title: 'Как начать играть',
