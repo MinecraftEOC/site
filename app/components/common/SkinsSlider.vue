@@ -5,11 +5,13 @@ import type { ISkinHashItem, TSkinItem } from '~/@types/skin';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 
 import {
+    SKIN_ACTIVATE_LABEL,
+    SKIN_ACTIVE_LABEL,
     SKIN_NEW_LABEL,
     SKINS_SLIDER_BREAKPOINTS,
     SKINS_SLIDER_SPACE_BETWEEN,
 } from '~/assets/ts/constants/skin';
-import { EBadgeColor, ESize } from '~/assets/ts/enums/common';
+import { EBadgeColor, EColor, ESize } from '~/assets/ts/enums/common';
 
 import 'swiper/css';
 
@@ -20,16 +22,23 @@ interface IProps {
     title?: string;
     /** Только просмотр: кнопка удаления не выводится */
     readonly?: boolean;
+    /** Ключ активного скина (см. `getSkinKey`): он помечается как тот, что уходит в игру */
+    activeKey?: string;
+    /** Выводить на остальных превью кнопку «Сделать активным» */
+    selectable?: boolean;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
     title: '',
     readonly: false,
+    activeKey: '',
+    selectable: false,
 });
 
 const emits = defineEmits<{
     removeFile: [file: File];
     removeHash: [skin: ISkinHashItem];
+    activate: [item: TSkinItem];
 }>();
 
 const style = useCssModule();
@@ -62,6 +71,14 @@ function prev() {
 
 function next() {
     swiper?.slideNext();
+}
+
+function isActive(item: TSkinItem) {
+    return getSkinKey(item) === props.activeKey;
+}
+
+function getPreviewClassList(item: TSkinItem) {
+    return [isActive(item) ? style._active : ''];
 }
 
 function remove(item: TSkinItem) {
@@ -118,15 +135,24 @@ onBeforeUnmount(() => {
                 v-for="item in props.items"
                 :key="getSkinKey(item)"
             >
-                <div :class="$style.preview">
-                    <VBadge
-                        v-if="isSkinFileItem(item)"
-                        :size="ESize.Small"
-                        :color="EBadgeColor.Info"
-                        :class="$style.badge"
-                    >
-                        {{ SKIN_NEW_LABEL }}
-                    </VBadge>
+                <div :class="[$style.preview, getPreviewClassList(item)]">
+                    <div :class="$style.badges">
+                        <VBadge
+                            v-if="isActive(item)"
+                            :size="ESize.Small"
+                            :color="EBadgeColor.Success"
+                        >
+                            {{ SKIN_ACTIVE_LABEL }}
+                        </VBadge>
+
+                        <VBadge
+                            v-if="isSkinFileItem(item)"
+                            :size="ESize.Small"
+                            :color="EBadgeColor.Info"
+                        >
+                            {{ SKIN_NEW_LABEL }}
+                        </VBadge>
+                    </div>
 
                     <button
                         v-if="!props.readonly"
@@ -141,6 +167,16 @@ onBeforeUnmount(() => {
                         :file="getSkinFile(item)"
                         :hash="getSkinHash(item)"
                     />
+
+                    <VButton
+                        v-if="props.selectable && !isActive(item)"
+                        :size="ESize.Small"
+                        :color="EColor.Secondary"
+                        :class="$style.activate"
+                        @click="emits('activate', item)"
+                    >
+                        {{ SKIN_ACTIVATE_LABEL }}
+                    </VButton>
                 </div>
             </SwiperSlide>
         </Swiper>
@@ -201,13 +237,30 @@ onBeforeUnmount(() => {
     position: relative;
     overflow: hidden;
     aspect-ratio: 2 / 3;
+    border: 1px solid transparent;
     border-radius: $radius-8;
     background-color: $surface-sunken;
+    transition: border-color $default-transition;
+
+    &._active {
+        border-color: $success;
+    }
 }
 
-.badge {
+.badges {
     position: absolute;
     top: $space-8;
+    left: $space-8;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-4;
+}
+
+.activate {
+    position: absolute;
+    right: $space-8;
+    bottom: $space-8;
     left: $space-8;
     z-index: 1;
 }

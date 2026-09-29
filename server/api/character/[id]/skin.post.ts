@@ -1,6 +1,7 @@
+import type { TCharacterRow } from '~~/server/common/@types/character';
 import type { ICharacterResponse } from '~~/shared/@types/response';
 
-import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 import { SKIN_ERRORS } from '~~/server/common/constants/skin';
 import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
 import { SKIN_MANAGEABLE_STATUSES, SKIN_MAX_COUNT } from '~~/shared/constants/skin';
@@ -9,6 +10,7 @@ import { SKIN_MANAGEABLE_STATUSES, SKIN_MAX_COUNT } from '~~/shared/constants/sk
  * `POST /api/character/:id/skin` — добавление PNG-скинов своему персонажу
  * без смены его статуса. При создании и доработке скины грузятся вместе с
  * персонажем через `POST /api/character` и `PATCH /api/character/:id`.
+ * Активным становится выбранный файл, а если активного ещё не было — первый.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 если id некорректен, файлы не переданы или невалидны.
@@ -29,11 +31,15 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_SKINS });
     }
 
+    const activeIndex = getActiveSkinIndex(parts, skinBuffers.length);
+
     const character = await prisma.character.findFirst({
         where: { id: characterId, userId, status: { notIn: CHARACTER_RETIRED_STATUSES } },
         select: {
             id: true,
+            uuid: true,
             status: true,
+            activeSkinId: true,
             _count: { select: { skins: true } },
         },
     });
@@ -51,20 +57,26 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     const hashes = await saveSkinFiles(skinBuffers);
+    const activeHash = pickActiveSkinHash(hashes, activeIndex, character.activeSkinId !== null);
+
+    let updated: TCharacterRow;
 
     try {
-        await prisma.skin.createMany({
-            data: hashes.map(hash => ({ hash, characterId: character.id })),
+        updated = await prisma.$transaction(async (tx) => {
+            await tx.skin.createMany({
+                data: hashes.map(hash => ({ hash, characterId: character.id })),
+            });
+
+            return selectCharacterWithActiveSkin(tx, character.id, activeHash);
         });
     } catch (error) {
         await deleteSkinFiles(hashes);
         throw error;
     }
 
-    const updated = await prisma.character.findUniqueOrThrow({
-        where: { id: character.id },
-        select: CHARACTER_PUBLIC_SELECT,
-    });
+    if (activeHash) {
+        await linkActiveSkin(character.uuid, activeHash);
+    }
 
     return toCharacterResponse(updated);
 });

@@ -1,8 +1,9 @@
+import type { TCharacterRow } from '~~/server/common/@types/character';
 import type { ICharacterResponse } from '~~/shared/@types/response';
 
 import { Prisma } from '~~/generated/prisma/client';
 import { CharacterStatus } from '~~/generated/prisma/enums';
-import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 import { SKIN_ERRORS } from '~~/server/common/constants/skin';
 import { CHARACTER_EDITABLE_STATUSES } from '~~/shared/constants/character';
 import { SKIN_MAX_COUNT } from '~~/shared/constants/skin';
@@ -12,7 +13,8 @@ import { sharedCharacterUpdateSchema } from '~~/shared/schemas/character';
  * `PATCH /api/character/:id` — доработка своего персонажа (`multipart/form-data`,
  * любое подмножество полей). После сохранения персонаж уходит на повторную
  * модерацию: статус сбрасывается в `UNVERIFIED`, комментарий к статусу чистится,
- * а замечания модерации сохраняются для админа.
+ * а замечания модерации сохраняются для админа. Из новых скинов активным
+ * становится выбранный, а если активного ещё не было — первый.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 если id некорректен, нет изменений, поля невалидны или не осталось скинов.
@@ -49,13 +51,15 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     }
 
     const skinBuffers = collectSkinFiles(parts);
+    const activeIndex = getActiveSkinIndex(parts, skinBuffers.length);
+
     if (Object.keys(data).length === 0 && skinBuffers.length === 0) {
         throw createError({ statusCode: 400, message: CHARACTER_ERRORS.NOTHING_TO_UPDATE });
     }
 
     const character = await prisma.character.findFirst({
         where: { id: characterId, userId, status: { in: CHARACTER_EDITABLE_STATUSES } },
-        select: { id: true, _count: { select: { skins: true } } },
+        select: { id: true, uuid: true, activeSkinId: true, _count: { select: { skins: true } } },
     });
 
     if (!character) {
@@ -75,18 +79,23 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     data.statusComment = null;
 
     const hashes = await saveSkinFiles(skinBuffers);
+    const activeHash = pickActiveSkinHash(hashes, activeIndex, character.activeSkinId !== null);
+
+    let updated: TCharacterRow;
 
     try {
-        const updated = await prisma.character.update({
-            where: { id: character.id },
-            data: {
-                ...data,
-                skins: { create: hashes.map(hash => ({ hash })) },
-            },
-            select: CHARACTER_PUBLIC_SELECT,
-        });
+        updated = await prisma.$transaction(async (tx) => {
+            await tx.character.update({
+                where: { id: character.id },
+                data: {
+                    ...data,
+                    skins: { create: hashes.map(hash => ({ hash })) },
+                },
+                select: { id: true },
+            });
 
-        return toCharacterResponse(updated);
+            return selectCharacterWithActiveSkin(tx, character.id, activeHash);
+        });
     } catch (error) {
         await deleteSkinFiles(hashes);
 
@@ -96,4 +105,10 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
         throw error;
     }
+
+    if (activeHash) {
+        await linkActiveSkin(character.uuid, activeHash);
+    }
+
+    return toCharacterResponse(updated);
 });

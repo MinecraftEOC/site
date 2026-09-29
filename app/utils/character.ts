@@ -1,16 +1,36 @@
 import type { TCharacterForm } from '~/@types/character';
 
 import { CHARACTER_FORM_FIELDS } from '~~/shared/constants/character';
-import { SKIN_FORM_FIELD } from '~~/shared/constants/skin';
+import { SKIN_ACTIVE_FORM_FIELD, SKIN_FORM_FIELD } from '~~/shared/constants/skin';
 import { CHARACTER_FORM_ORDER } from '~/assets/ts/constants/character';
+
+/**
+ * Добавляет в тело запроса файлы скинов и индекс того, что выбран активным.
+ *
+ * @param data Собираемое тело запроса.
+ * @param files Файлы скинов из инпута.
+ * @param activeFile Файл, выбранный активным; не из списка — поле не передаётся.
+ */
+function appendSkinFiles(data: FormData, files: File[], activeFile: File | null) {
+    for (const skin of files) {
+        data.append(SKIN_FORM_FIELD, skin);
+    }
+
+    const activeIndex = activeFile ? files.indexOf(activeFile) : -1;
+
+    if (activeIndex >= 0) {
+        data.append(SKIN_ACTIVE_FORM_FIELD, String(activeIndex));
+    }
+}
 
 /**
  * Собирает тело `multipart/form-data` для ручек создания и правки персонажа.
  *
  * @param form Данные формы персонажа.
+ * @param activeFile Файл скина, выбранный активным.
  * @returns `FormData` с полями персонажа и файлами скинов.
  */
-export function toCharacterFormData(form: TCharacterForm): FormData {
+export function toCharacterFormData(form: TCharacterForm, activeFile: File | null = null): FormData {
     const data = new FormData();
 
     data.append(CHARACTER_FORM_FIELDS.username, form.username);
@@ -18,9 +38,7 @@ export function toCharacterFormData(form: TCharacterForm): FormData {
     data.append(CHARACTER_FORM_FIELDS.states, JSON.stringify(form.states));
     data.append(CHARACTER_FORM_FIELDS.startingItems, JSON.stringify(form.startingItems));
 
-    for (const skin of form.skins) {
-        data.append(SKIN_FORM_FIELD, skin);
-    }
+    appendSkinFiles(data, form.skins, activeFile);
 
     return data;
 }
@@ -29,14 +47,13 @@ export function toCharacterFormData(form: TCharacterForm): FormData {
  * Собирает тело `multipart/form-data` для ручки добавления скинов.
  *
  * @param files Файлы скинов из инпута.
+ * @param activeFile Файл скина, выбранный активным.
  * @returns `FormData` только с файлами скинов.
  */
-export function toSkinsFormData(files: File[]): FormData {
+export function toSkinsFormData(files: File[], activeFile: File | null = null): FormData {
     const data = new FormData();
 
-    for (const skin of files) {
-        data.append(SKIN_FORM_FIELD, skin);
-    }
+    appendSkinFiles(data, files, activeFile);
 
     return data;
 }

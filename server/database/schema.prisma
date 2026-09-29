@@ -65,7 +65,11 @@ model Character {
     statusChangedAt DateTime        @default(now())
     statusComment   String?
     reviewComment   String?
-    skins           Skin[]
+    skins           Skin[]          @relation("CharacterSkins")
+
+    // Скин, который уходит в игру через лаунчер: он умеет отдавать только один.
+    activeSkinId Int?  @unique
+    activeSkin   Skin? @relation("ActiveSkin", fields: [activeSkinId], references: [id], onDelete: SetNull)
 
     userId Int
     user   User @relation(fields: [userId], references: [id])
@@ -76,7 +80,8 @@ model Skin {
     hash String @unique
 
     characterId Int
-    character   Character @relation(fields: [characterId], references: [id])
+    character   Character  @relation("CharacterSkins", fields: [characterId], references: [id])
+    activeFor   Character? @relation("ActiveSkin")
 }
 
 model ContentEntry {

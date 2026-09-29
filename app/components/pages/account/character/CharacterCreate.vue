@@ -42,10 +42,12 @@ const [skills] = defineField('states.skills');
 const [startingItems] = defineField('startingItems');
 const [skins] = defineField('skins');
 
+const activeSkin = ref<File | null>(null);
+
 const onSubmit = handleSubmit(
     async (values) => {
         try {
-            const character = await create(values);
+            const character = await create(values, activeSkin.value);
             await userStore.fetchMe();
             await navigateTo(ACCOUNT_ROUTES.character(character.id));
 
@@ -100,7 +102,10 @@ const onSubmit = handleSubmit(
 
                 <CharacterFormItems v-model:items="startingItems" />
 
-                <CharacterFormSkins v-model:files="skins" />
+                <CharacterFormSkins
+                    v-model:files="skins"
+                    v-model:active-file="activeSkin"
+                />
 
                 <VButton
                     type="submit"

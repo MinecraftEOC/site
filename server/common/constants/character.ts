@@ -34,6 +34,7 @@ export const CHARACTER_PUBLIC_SELECT = {
     statusChangedAt: true,
     statusComment: true,
     reviewComment: true,
+    activeSkinId: true,
     skins: {
         select: {
             id: true,

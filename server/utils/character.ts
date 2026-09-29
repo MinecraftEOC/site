@@ -1,9 +1,11 @@
 import type { MultiPartData } from 'h3';
 import type { ZodSchema } from 'zod';
+import type { Prisma } from '~~/generated/prisma/client';
 import type { TCharacterRow } from '~~/server/common/@types/character';
 import type { ICharacterItem, ICharacterStates } from '~~/shared/@types/character';
 import type { ICharacter } from '~~/shared/@types/user';
 
+import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
 import { BIOGRAPHY_MAX_LENGTH, CHARACTER_FORM_FIELDS } from '~~/shared/constants/character';
 import { CHARACTER_FORM_ERRORS } from '~~/shared/schemas/character';
 
@@ -23,6 +25,28 @@ export function toCharacterResponse(character: TCharacterRow): ICharacter {
         states: character.states as unknown as ICharacterStates,
         startingItems: character.startingItems as unknown as ICharacterItem[],
     };
+}
+
+/**
+ * Читает персонажа в публичной форме, по пути назначая активный скин.
+ * Вызывается внутри транзакции, уже после создания строк скинов: `connect`
+ * по хэшу не найдёт скин, созданный в том же запросе.
+ *
+ * @param tx Клиент транзакции.
+ * @param characterId Id персонажа.
+ * @param activeHash Хэш нового активного скина; не задан — активный не меняется.
+ * @returns Персонаж в форме `CHARACTER_PUBLIC_SELECT`.
+ */
+export function selectCharacterWithActiveSkin(tx: Prisma.TransactionClient, characterId: number, activeHash: string | undefined) {
+    if (!activeHash) {
+        return tx.character.findUniqueOrThrow({ where: { id: characterId }, select: CHARACTER_PUBLIC_SELECT });
+    }
+
+    return tx.character.update({
+        where: { id: characterId },
+        data: { activeSkin: { connect: { hash: activeHash } } },
+        select: CHARACTER_PUBLIC_SELECT,
+    });
 }
 
 /**

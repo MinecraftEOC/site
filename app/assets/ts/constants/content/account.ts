@@ -1,6 +1,6 @@
 import { CharacterStatus, ContentType } from '~~/generated/prisma/enums';
 import { PARAMETER_CHEAP_VALUE, PARAMETER_EXPENSIVE_COST } from '~~/shared/constants/character';
-import { SKIN_MAX_COUNT, SKIN_MAX_SIZE } from '~~/shared/constants/skin';
+import { SKIN_MAX_COUNT, SKIN_MAX_SIZE, SKIN_MAX_WIDTH, SKIN_WIDTH_STEP } from '~~/shared/constants/skin';
 import { BYTES_IN_KB } from '~/assets/ts/constants/common';
 import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 import { EContentColumn } from '~/assets/ts/enums/content';
@@ -102,6 +102,8 @@ export const CHARACTER_DETAILS = {
     skinsSuccess: 'Скины сохранены',
     skinsError: 'Не удалось сохранить скины',
     skinDeleteError: 'Не удалось удалить скин',
+    skinActivateSuccess: 'Активный скин изменён — он появится в игре при следующем заходе',
+    skinActivateError: 'Не удалось сделать скин активным',
 };
 
 export const CHARACTER_ADMIN = {
@@ -121,6 +123,8 @@ export const CHARACTER_EDIT = {
     error: 'Не удалось сохранить изменения',
     invalid: 'Заполните форму до конца',
     skinError: 'Не удалось удалить скин',
+    skinActivateSuccess: 'Активный скин изменён — он появится в игре при следующем заходе',
+    skinActivateError: 'Не удалось сделать скин активным',
 };
 
 export const CHARACTER_FORM_GENERAL = {
@@ -148,8 +152,8 @@ export const CHARACTER_FORM_STATES = {
 
 export const CHARACTER_FORM_SKINS = {
     title: 'Скины персонажа',
-    description: `Можно загрузить до ${SKIN_MAX_COUNT} скинов.`,
-    uploadDescription: `Можно загрузить несколько файлов: PNG до ${SKIN_MAX_SIZE / BYTES_IN_KB} КБ каждый`,
+    description: `Можно загрузить до ${SKIN_MAX_COUNT} скинов. В игре будет активный — его можно сменить в любой момент.`,
+    uploadDescription: `Можно загрузить несколько файлов: PNG до ${SKIN_MAX_SIZE / BYTES_IN_KB} КБ каждый, ширина кратна ${SKIN_WIDTH_STEP} и не больше ${SKIN_MAX_WIDTH} px, высота равна ширине или вдвое меньше`,
     sliderTitle: 'Загруженные скины',
 };
 

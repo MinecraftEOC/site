@@ -1,10 +1,11 @@
+import type { TCharacterRow } from '~~/server/common/@types/character';
 import type { ICharacterResponse } from '~~/shared/@types/response';
 
 import { randomUUID } from 'node:crypto';
 
 import { Prisma } from '~~/generated/prisma/client';
 import { DiscordLinkStatus, UserRole } from '~~/generated/prisma/enums';
-import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
+import { CHARACTER_ERRORS } from '~~/server/common/constants/character';
 import { SKIN_ERRORS } from '~~/server/common/constants/skin';
 import { USER_ERRORS } from '~~/server/common/constants/user';
 import { CHARACTER_RETIRED_STATUSES } from '~~/shared/constants/character';
@@ -14,7 +15,8 @@ import { sharedCharacterSchema } from '~~/shared/schemas/character';
 /**
  * `POST /api/character` — создание персонажа (`multipart/form-data` с полями
  * и файлами скинов). Живой персонаж у пользователя может быть только один,
- * а сам аккаунт должен быть привязан к Discord.
+ * а сам аккаунт должен быть привязан к Discord. Активным становится выбранный
+ * скин, а если выбора нет — первый.
  *
  * @throws 401 если запрос не авторизован.
  * @throws 400 при некорректных полях или невалидных файлах скинов.
@@ -35,6 +37,8 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
     } else if (skinBuffers.length === 0) {
         throw createError({ statusCode: 400, message: SKIN_ERRORS.NO_SKINS });
     }
+
+    const activeIndex = getActiveSkinIndex(parts, skinBuffers.length) ?? 0;
 
     const alive = await prisma.character.findFirst({
         where: { userId, status: { notIn: CHARACTER_RETIRED_STATUSES } },
@@ -61,24 +65,30 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         throw createError({ statusCode: 403, message: CHARACTER_ERRORS.DISCORD_NOT_LINKED });
     }
 
+    const uuid = randomUUID();
     const hashes = await saveSkinFiles(skinBuffers);
+    const activeHash = hashes[activeIndex];
+
+    let created: TCharacterRow;
 
     try {
-        const created = await prisma.character.create({
-            data: {
-                uuid: randomUUID(),
-                username,
-                password: user.password,
-                biography,
-                states,
-                startingItems,
-                userId,
-                skins: { create: hashes.map(hash => ({ hash })) },
-            },
-            select: CHARACTER_PUBLIC_SELECT,
-        });
+        created = await prisma.$transaction(async (tx) => {
+            const { id } = await tx.character.create({
+                data: {
+                    uuid,
+                    username,
+                    password: user.password,
+                    biography,
+                    states,
+                    startingItems,
+                    userId,
+                    skins: { create: hashes.map(hash => ({ hash })) },
+                },
+                select: { id: true },
+            });
 
-        return toCharacterResponse(created);
+            return selectCharacterWithActiveSkin(tx, id, activeHash);
+        });
     } catch (error) {
         await deleteSkinFiles(hashes);
 
@@ -87,4 +97,10 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
         }
         throw error;
     }
+
+    if (activeHash) {
+        await linkActiveSkin(uuid, activeHash);
+    }
+
+    return toCharacterResponse(created);
 });

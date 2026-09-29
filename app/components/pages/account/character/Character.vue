@@ -25,9 +25,10 @@ const props = defineProps<IProps>();
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
 
-const { addSkins, deleteSkin } = useCharacterApi();
+const { addSkins, deleteSkin, setActiveSkin } = useCharacterApi();
 
 const files = ref<File[]>([]);
+const activeFile = ref<File | null>(null);
 const isSaving = ref(false);
 
 const canManageSkins = computed(() => SKIN_MANAGEABLE_STATUSES.includes(props.character.status));
@@ -36,10 +37,11 @@ async function saveSkins() {
     isSaving.value = true;
 
     try {
-        await addSkins(props.character.id, files.value);
+        await addSkins(props.character.id, files.value, activeFile.value);
         await userStore.fetchMe();
 
         files.value = [];
+        activeFile.value = null;
 
         notificationStore.add(CHARACTER_DETAILS.skinsSuccess);
     } catch (error) {
@@ -55,6 +57,17 @@ async function removeSkin(skin: ISkinHashItem) {
         await userStore.fetchMe();
     } catch (error) {
         notificationStore.add(CHARACTER_DETAILS.skinDeleteError, getApiErrorMessage(error), ENotificationType.Error);
+    }
+}
+
+async function activateSkin(skin: ISkinHashItem) {
+    try {
+        await setActiveSkin(props.character.id, { skinId: skin.id });
+        await userStore.fetchMe();
+
+        notificationStore.add(CHARACTER_DETAILS.skinActivateSuccess);
+    } catch (error) {
+        notificationStore.add(CHARACTER_DETAILS.skinActivateError, getApiErrorMessage(error), ENotificationType.Error);
     }
 }
 </script>
@@ -75,8 +88,11 @@ async function removeSkin(skin: ISkinHashItem) {
             <div v-if="canManageSkins" :class="$style.skins">
                 <CharacterFormSkins
                     v-model:files="files"
+                    v-model:active-file="activeFile"
                     :skins="character.skins"
+                    :active-skin-id="character.activeSkinId"
                     @remove-skin="removeSkin"
+                    @activate-skin="activateSkin"
                 />
 
                 <VButton

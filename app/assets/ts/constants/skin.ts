@@ -27,6 +27,12 @@ export const SKIN_ACCEPT = 'image/png';
 /** Пометка на превью скина, который ещё не отправлен на сервер. */
 export const SKIN_NEW_LABEL = 'NEW';
 
+/** Пометка на превью активного скина — того, что уходит в игру. */
+export const SKIN_ACTIVE_LABEL = 'В игре';
+
+/** Подпись кнопки выбора активного скина на превью. */
+export const SKIN_ACTIVATE_LABEL = 'Сделать активным';
+
 /** Отступ между превью в слайдере скинов, px. */
 export const SKINS_SLIDER_SPACE_BETWEEN = 16;
 

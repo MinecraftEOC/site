@@ -91,6 +91,7 @@ watch(() => props.character, () => {
             <CharacterSkins
                 v-if="character.skins.length"
                 :skins="character.skins"
+                :active-skin-id="character.activeSkinId"
             />
 
             <CharacterAdminComment

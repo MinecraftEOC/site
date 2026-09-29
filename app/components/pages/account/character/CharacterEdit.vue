@@ -29,7 +29,7 @@ const props = defineProps<IProps>();
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
 
-const { update, deleteSkin } = useCharacterApi();
+const { update, deleteSkin, setActiveSkin } = useCharacterApi();
 
 const title = computed(() => `${CHARACTER_EDIT.title} ${props.character.username}`);
 const reviewComment = computed(() => props.character.status === CharacterStatus.RETURNED ? props.character.reviewComment : '');
@@ -56,13 +56,16 @@ const [skills] = defineField('states.skills');
 const [startingItems] = defineField('startingItems');
 const [skins] = defineField('skins');
 
+const activeSkin = ref<File | null>(null);
+
 const onSubmit = handleSubmit(
     async (values) => {
         try {
-            await update(props.character.id, values);
+            await update(props.character.id, values, activeSkin.value);
             await userStore.fetchMe();
 
             skins.value = [];
+            activeSkin.value = null;
 
             notificationStore.add(CHARACTER_EDIT.success);
         } catch (error) {
@@ -80,6 +83,17 @@ async function removeSkin(skin: ISkinHashItem) {
         await userStore.fetchMe();
     } catch (error) {
         notificationStore.add(CHARACTER_EDIT.skinError, getApiErrorMessage(error), ENotificationType.Error);
+    }
+}
+
+async function activateSkin(skin: ISkinHashItem) {
+    try {
+        await setActiveSkin(props.character.id, { skinId: skin.id });
+        await userStore.fetchMe();
+
+        notificationStore.add(CHARACTER_EDIT.skinActivateSuccess);
+    } catch (error) {
+        notificationStore.add(CHARACTER_EDIT.skinActivateError, getApiErrorMessage(error), ENotificationType.Error);
     }
 }
 </script>
@@ -109,8 +123,11 @@ async function removeSkin(skin: ISkinHashItem) {
 
                 <CharacterFormSkins
                     v-model:files="skins"
+                    v-model:active-file="activeSkin"
                     :skins="character.skins"
+                    :active-skin-id="character.activeSkinId"
                     @remove-skin="removeSkin"
+                    @activate-skin="activateSkin"
                 />
 
                 <VButton
