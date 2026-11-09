@@ -39,6 +39,11 @@ const ADMIN_MENU: IMenuSection = {
             icon: 'file-pen-line',
             to: ACCOUNT_ROUTES.adminContent,
         },
+        {
+            title: 'Логи',
+            icon: 'file-search',
+            to: ACCOUNT_ROUTES.adminLogs,
+        },
     ],
 };
 
@@ -129,7 +134,6 @@ const adminCharacterItem = computed<IMenuItem | null>(() => {
     return { title: character.username, icon: CHARACTER_DETAILS_ICON, to: route.path, child: true };
 });
 
-/** Подпункты меню в виде «адрес родительского пункта → сам подпункт» */
 const childItems = computed(() => {
     const items = new Map<string, IMenuItem>();
 

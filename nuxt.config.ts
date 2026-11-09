@@ -5,6 +5,10 @@ export default defineNuxtConfig({
         enabled: true,
     },
 
+    devServer: {
+        host: '127.0.0.1',
+    },
+
     modules: [
         '@nuxt/eslint',
         '@nuxt/fonts',
@@ -76,5 +80,8 @@ export default defineNuxtConfig({
         serverApiToken: '',
         minecraftHost: '127.0.0.1',
         minecraftPort: 25565,
+        logsApiBaseUrl: '',
+        logsApiToken: '',
+        logsApiTimeoutMs: 8000,
     },
 });

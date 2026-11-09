@@ -1,5 +1,10 @@
 import type { DiscordLinkStatus, UserRole } from '~~/generated/prisma/client';
 import type { IContentAdminEntry, IContentEntry, IContentItem } from '~~/shared/@types/content';
+import type {
+    ILogCategoriesResponse as ILogCategoriesPayload,
+    ILogEntriesResponse as ILogEntriesPayload,
+    ILogFilesResponse as ILogFilesPayload,
+} from '~~/shared/@types/logging';
 import type { ICharacter, IDiscordAccount, IServerCharacter } from '~~/shared/@types/user';
 
 /** Ответ `GET /api/user` — пользователь по id. */
@@ -82,3 +87,12 @@ export interface IStatusResponse {
     /** Версия ядра из ответа сервера. */
     version: string | null;
 }
+
+/** Ответ `GET /api/admin/logs/categories` — список категорий серверных журналов. */
+export interface ILogCategoriesResponse extends ILogCategoriesPayload {}
+
+/** Ответ `GET /api/admin/logs/files` — список файлов выбранной категории журналов. */
+export interface ILogFilesResponse extends ILogFilesPayload {}
+
+/** Ответ `GET /api/admin/logs/entries` — порция записей выбранного файла журнала. */
+export interface ILogEntriesResponse extends ILogEntriesPayload {}
