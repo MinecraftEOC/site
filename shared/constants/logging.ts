@@ -1,4 +1,11 @@
-import { ELogCategory, ELogCheckOutcome, ELogCheckType, ELogLevel, ELogOrder } from '~~/shared/enums/logging';
+import {
+    ELogCategory,
+    ELogCheckOutcome,
+    ELogCheckType,
+    ELogCombatAction,
+    ELogLevel,
+    ELogOrder,
+} from '~~/shared/enums/logging';
 
 /** Размер порции записей или файлов по умолчанию. */
 export const LOGS_DEFAULT_LIMIT = 100;
@@ -143,8 +150,22 @@ export const LOG_CHECK_TYPE_LABEL: Record<ELogCheckType, string> = {
     [ELogCheckType.CombatDefense]: 'Защита в бою',
 };
 
+/** Человекочитаемые названия боевых действий (`fields.action` в `combat.*`). */
+export const LOG_COMBAT_ACTION_LABEL: Record<ELogCombatAction, string> = {
+    [ELogCombatAction.Attack]: 'Атака',
+    [ELogCombatAction.EquipmentChange]: 'Смена снаряжения',
+    [ELogCombatAction.FullDefense]: 'Глухая защита',
+    [ELogCombatAction.Potion]: 'Зелье',
+    [ELogCombatAction.None]: 'Без действия',
+};
+
 /** Русские подписи известных полей `logfmt` для раскрытия карточки записи. */
 export const LOG_FIELD_LABELS: Readonly<Record<string, string>> = {
+    v: 'Версия формата',
+    run: 'ID запуска',
+    seq: 'Номер записи',
+    first_at: 'Первое появление',
+    last_at: 'Последнее появление',
     message: 'Сообщение',
     category: 'Исходная категория',
     player: 'Игрок',
@@ -163,8 +184,8 @@ export const LOG_FIELD_LABELS: Readonly<Record<string, string>> = {
     roll: 'Исходный кубик (d20)',
     param: 'Параметр',
     skill: 'Навык',
-    difficulty: 'Сложность / встречный итог',
-    modifier: 'Поправка',
+    difficulty: 'Сложность / встречная проверка',
+    modifier: 'Модификатор',
     bonus: 'Бонус',
     advantage: 'Преимущество',
     disadvantage: 'Помеха',
@@ -174,8 +195,11 @@ export const LOG_FIELD_LABELS: Readonly<Record<string, string>> = {
     combat: 'UUID боя',
     round: 'Раунд',
     turn_id: 'Ход',
-    action_id: 'Действие',
+    action: 'Действие',
+    action_id: 'ID действия',
     effect_id: 'Эффект',
+    movement_distance: 'Дистанция перемещения',
+    movement_spent: 'Затрачено перемещения',
     source: 'Источник',
     operation: 'Операция',
     reason: 'Причина',
@@ -201,4 +225,23 @@ export const LOG_FIELD_LABELS: Readonly<Record<string, string>> = {
     dialogue_id: 'Диалог',
     checkpoint_id: 'Точка диалога',
     order_id: 'Заказ',
+    table_id: 'ID таблицы крафта/торговли',
 };
+
+/** Ключи технических (служебных) полей записи журнала, выносимых в сворачиваемую группу. */
+export const LOG_TECHNICAL_FIELD_KEYS: readonly string[] = [
+    'v',
+    'run',
+    'seq',
+    'category',
+    'first_at',
+    'last_at',
+    'operation',
+    'player_uuid',
+    'actor_uuid',
+    'target_uuid',
+    'combat',
+    'turn_id',
+    'action_id',
+    'effect_id',
+];

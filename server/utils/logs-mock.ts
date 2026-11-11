@@ -12,7 +12,7 @@ import { Buffer } from 'node:buffer';
 
 import { LOGS_ERRORS } from '~~/server/common/constants/logging';
 import { LOG_CATEGORY_LABEL, LOG_CATEGORY_ORDER } from '~~/shared/constants/logging';
-import { ELogCategory, ELogOrder } from '~~/shared/enums/logging';
+import { ELogCategory, ELogCombatAction, ELogOrder } from '~~/shared/enums/logging';
 
 /** Внутреннее представление мокового файла журнала для локальной разработки. */
 interface IMockLogFile {
@@ -44,6 +44,9 @@ const MOCK_LOG_FILES: readonly IMockLogFile[] = [
             '2026-04-19T20:18:49.901+07:00 ERROR locks.pick.state_corrupted category=locks player="Лео де Бонарт" player_uuid=4f5e6d7c-8b9a-4c1d-2e3f-4a5b6c7d8e9f item_id=lockpick_steel stage=tumbler_3 error_name=StateReadError error_message="Отсутствует ключ difficulty в NBT замка двери [142, 68, -319]" message="Ошибка чтения параметров замка при взломе" stack="StateReadError: Отсутствует ключ difficulty в NBT замка двери [142, 68, -319]\\n    at readLockState (scripts/locks/lock_state.js:87:15)\\n    at handleLockpickAttempt (scripts/locks/pick.js:41:20)"',
             `2026-04-19T21:40:15.220+07:00 ERROR damage.apply.overflow category=damage combat=${COMBAT_UUID_DOCKS} round=5 actor="Капитан стражи" target="Маркус Фогель" damage=18 calculated=18 applied=12 hp_before=12 hp_after=0 error_name=ConditionSyncError error_message="Не удалось записать статус тяжёлого ранения в хранилище организации" message="Сбой синхронизации ранения после критического удара"`,
             '2026-04-19T22:01:09.004+07:00 ERROR states.save.failed category=states player="Ингрид Хольм" operation=write_faction_reputation organization_id=guild_merchants reason="Превышен лимит вложенности JSON-объекта состояния" message="Не удалось сохранить состояние игрока"',
+            '2026-04-19T22:11:22.139+07:00 ERROR script.failed.repeated v=1 run="c843726b-ad35-4ede-8ae0-83a7f9d5db28" seq=221 category="system" count=3 error_message="\\"EocHudApi\\" is not defined" error_name="ReferenceError" first_at="2026-04-19T22:11:18.100+07:00" last_at="2026-04-19T22:11:22.139+07:00" operation="main" player="Kiras" player_uuid="bda71d53-e4e9-47a4-a6c6-7cfd0c08acab" source="handlers/player/handlePlayerWatchCraftBlock.ts"',
+            '2026-04-19T22:11:23.137+07:00 ERROR script.failed v=1 run="c843726b-ad35-4ede-8ae0-83a7f9d5db28" seq=223 category="system" error_message="\\"EocHudApi\\" is not defined" error_name="ReferenceError" operation="main" player="Kiras" player_uuid="bda71d53-e4e9-47a4-a6c6-7cfd0c08acab" source="handlers/player/handlePlayerWatchCraftBlock.ts"',
+            '2026-04-19T22:11:27.139+07:00 ERROR script.failed.repeated v=1 run="c843726b-ad35-4ede-8ae0-83a7f9d5db28" seq=225 category="system" count=4 error_message="\\"EocHudApi\\" is not defined" error_name="ReferenceError" first_at="2026-04-19T22:11:23.137+07:00" last_at="2026-04-19T22:11:27.139+07:00" operation="main" player="Kiras" player_uuid="bda71d53-e4e9-47a4-a6c6-7cfd0c08acab" source="handlers/player/handlePlayerWatchCraftBlock.ts"',
         ],
     },
     {
@@ -78,9 +81,13 @@ const MOCK_LOG_FILES: readonly IMockLogFile[] = [
         combatUuid: COMBAT_UUID_TAVERN,
         lines: [
             `2026-04-19T18:58:10.050+07:00 INFO combat.started category=combat combat=${COMBAT_UUID_TAVERN} round=1 actor="Рено де Гри" target="Корсар с пристани" source="Таверна «Старый якорь»" message="Начата боевая сцена в таверне"`,
-            `2026-04-19T18:59:04.112+07:00 INFO skill.check.resolved category=combat combat=${COMBAT_UUID_TAVERN} round=1 turn_id=11 actor="Рено де Гри" target="Корсар с пристани" check_name="Атака рапирой" check_type=combat_attack outcome=success outcome_name="Успех" success=true roll=18 param=9 skill=8 modifier=0 bonus=2 result=28 difficulty=21 message="Успешный выпад рапирой"`,
+            `2026-04-19T18:58:20.100+07:00 INFO combat.turn.started category=combat combat=${COMBAT_UUID_TAVERN} round=1 turn_id=11 actor="Рено де Гри" message="Начат ход"`,
+            `2026-04-19T18:58:42.400+07:00 INFO combat.action.resolved category=combat combat=${COMBAT_UUID_TAVERN} round=1 turn_id=11 action="смена снаряжения" action_id=392f14c6-754d-4032-be20-0ad93c0e8b95 actor="Рено де Гри" message="Выполнено действие"`,
+            `2026-04-19T18:59:04.112+07:00 INFO skill.check.resolved category=combat combat=${COMBAT_UUID_TAVERN} round=1 turn_id=11 actor="Рено де Гри" target="Корсар с пристани" check_name="Атака" check_type=combat_attack skill_key=sword outcome=success outcome_name="Успех" success=true roll=18 param=9 skill=8 modifier=0 bonus=2 result=28 difficulty=21 message="Проверка навыка"`,
+            `2026-04-19T18:59:04.500+07:00 INFO combat.action.resolved category=combat combat=${COMBAT_UUID_TAVERN} round=1 turn_id=11 action="атака" actor="Рено де Гри" target="Корсар с пристани" message="Выполнено действие"`,
             `2026-04-19T18:59:05.300+07:00 INFO combat.damage.dealt category=combat combat=${COMBAT_UUID_TAVERN} round=1 turn_id=11 actor="Рено де Гри" target="Корсар с пристани" damage=9 calculated=11 applied=9 hp_before=24 hp_after=15 message="Нанесён колющий урон противнику"`,
-            `2026-04-19T19:01:28.650+07:00 INFO skill.check.resolved category=combat combat=${COMBAT_UUID_TAVERN} round=2 turn_id=12 actor="Корсар с пристани" target="Рено де Гри" check_name="Защита уклонением" check_type=combat_defense outcome=tie outcome_name="Ничья" success=true roll=12 param=9 skill=5 modifier=0 bonus=0 result=19 difficulty=19 message="Уклонение от контратаки корсара"`,
+            `2026-04-19T19:01:28.650+07:00 INFO skill.check.resolved category=combat combat=${COMBAT_UUID_TAVERN} round=2 turn_id=12 actor="Корсар с пристани" target="Рено де Гри" check_name="Уклонение" check_type=combat_defense skill_key=evasion outcome=tie outcome_name="Ничья" success=true roll=12 param=9 skill=5 modifier=0 bonus=0 result=19 difficulty=19 message="Проверка навыка"`,
+            `2026-04-19T19:02:10.000+07:00 INFO combat.turn.finished category=combat combat=${COMBAT_UUID_TAVERN} round=2 turn_id=12 action=null actor="Корсар с пристани" reason="истекло время или участник отключился" message="Ход завершён"`,
             `2026-04-19T19:05:33.482+07:00 ERROR combat.turn.invalid_action category=combat combat=${COMBAT_UUID_TAVERN} round=3 turn_id=14 actor="Рено де Гри" target="Корсар с пристани" action_id=parry_riposte reason="Недостаточно очков действий для ответного выпада" message="Попытка выполнить действие вне очереди хода"`,
             `2026-04-19T19:08:14.920+07:00 INFO combat.finished category=combat combat=${COMBAT_UUID_TAVERN} round=4 actor="Рено де Гри" target="Корсар с пристани" status=victory duration_ms=604870 message="Бой завершён победой инициатора"`,
         ],
@@ -375,6 +382,23 @@ export function getMockLogEntries(query: TLogEntriesQuery): ILogEntriesResponse 
 
         if (query.outcome && entry.fields.outcome !== query.outcome) {
             return false;
+        }
+
+        if (query.action) {
+            if (!entry.event?.startsWith('combat.')) {
+                return false;
+            }
+
+            if (query.action === ELogCombatAction.None) {
+                if (!('action' in entry.fields) || entry.fields.action !== null) {
+                    return false;
+                }
+            } else if (
+                typeof entry.fields.action !== 'string'
+                || entry.fields.action.trim().toLowerCase() !== query.action
+            ) {
+                return false;
+            }
         }
 
         if (qLower && !entry.raw.toLowerCase().includes(qLower)) {

@@ -16,9 +16,13 @@ interface IProps {
     category: ELogCategory;
     /** Имя текущего открытого файла */
     fileName: string;
+    /** Вложенный режим отображения внутри группы ошибок */
+    nested?: boolean;
 }
 
-const props = defineProps<IProps>();
+const props = withDefaults(defineProps<IProps>(), {
+    nested: false,
+});
 
 const emits = defineEmits<{
     openCombat: [combatUuid: string];
@@ -28,11 +32,13 @@ const style = useCssModule();
 const notificationStore = useNotificationStore();
 
 const isDetailsOpen = ref(false);
+const isTechParamsOpen = ref(false);
 
 const classList = computed(() => [
     props.entry.parseError ? style._invalid : '',
     props.entry.level === ELogLevel.Error ? style._error : '',
     props.entry.level === ELogLevel.Warn ? style._warn : '',
+    props.nested ? style._nested : '',
 ]);
 
 const levelBadgeColor = computed<EBadgeColor>(() => {
@@ -107,7 +113,8 @@ const checkTypeBadge = computed<string | null>(() => {
         return null;
     }
 
-    return `${getLogCheckTypeTitle(ct)} (${ct})`;
+    const checkTitle = getLogCheckTypeTitle(ct);
+    return checkTitle === ct ? ct : `${checkTitle} (${ct})`;
 });
 
 const checkMetrics = computed(() => {
@@ -117,7 +124,7 @@ const checkMetrics = computed(() => {
         ['roll', 'd20'],
         ['param', 'Параметр'],
         ['skill', 'Навык'],
-        ['modifier', 'Поправка'],
+        ['modifier', 'Модификатор'],
         ['bonus', 'Бонус'],
         ['result', 'Итог'],
         ['total', 'Итог'],
@@ -147,13 +154,19 @@ const combatUuid = computed<string | null>(() => {
     return typeof val === 'string' && val.trim() ? val.trim() : null;
 });
 
+const roundBadge = computed<string | null>(() => {
+    const val = props.entry.fields.round;
+    if (val === undefined || val === null || String(val).trim() === '') {
+        return null;
+    }
+
+    return String(val);
+});
+
 const combatMetrics = computed(() => {
     const f = props.entry.fields;
     const items: Array<{ label: string; value: string }> = [];
     const defs: ReadonlyArray<[string, string]> = [
-        ['round', 'Раунд'],
-        ['turn_id', 'Ход'],
-        ['action_id', 'Действие'],
         ['damage', 'Урон'],
         ['applied', 'Применено'],
         ['hp_before', 'HP до'],
@@ -189,7 +202,30 @@ const fieldEntries = computed(() => {
         label: getLogFieldLabel(key),
         value: formatLogFieldValue(value),
         isMultiline: key === 'stack' || key === 'details' || (typeof value === 'string' && value.includes('\n')),
+        isTechnical: isTechnicalLogField(key),
     }));
+});
+
+const mainFieldEntries = computed(() => {
+    return fieldEntries.value.filter(field => !field.isTechnical);
+});
+
+const technicalFieldEntries = computed(() => {
+    return fieldEntries.value.filter(field => field.isTechnical);
+});
+
+const totalTechnicalCount = computed(() => {
+    const baseCount = props.entry.timestamp ? 2 : 1;
+    return baseCount + technicalFieldEntries.value.length;
+});
+
+const repeatedCountBadge = computed<number | null>(() => {
+    const countVal = props.entry.fields.count;
+    if (typeof countVal === 'number' && countVal > 1) {
+        return countVal;
+    }
+
+    return null;
 });
 
 const showOpenCombatButton = computed(() => {
@@ -241,6 +277,22 @@ function onOpenCombatClick() {
                 <span v-if="entry.event" :class="$style.event">
                     {{ entry.event }}
                 </span>
+
+                <VBadge
+                    v-if="roundBadge"
+                    :color="EBadgeColor.Neutral"
+                    :size="ESize.Small"
+                >
+                    Раунд {{ roundBadge }}
+                </VBadge>
+
+                <VBadge
+                    v-if="repeatedCountBadge"
+                    :color="EBadgeColor.Warning"
+                    :size="ESize.Small"
+                >
+                    ×{{ repeatedCountBadge }}
+                </VBadge>
             </div>
 
             <span :class="$style.offset">
@@ -264,39 +316,49 @@ function onOpenCombatClick() {
         </div>
 
         <div v-if="isCheckEntry" :class="$style.summaryBox">
-            <div :class="$style.summaryBadges">
-                <VBadge :color="checkOutcomeBadgeColor" :size="ESize.Small">
-                    {{ checkOutcomeTitle }}
-                </VBadge>
+            <div :class="$style.summaryMain">
+                <div :class="$style.summaryBadges">
+                    <VBadge :color="checkOutcomeBadgeColor" :size="ESize.Small">
+                        {{ checkOutcomeTitle }}
+                    </VBadge>
 
-                <VBadge
-                    v-if="checkTypeBadge"
-                    :color="EBadgeColor.Neutral"
-                    :size="ESize.Small"
-                >
-                    {{ checkTypeBadge }}
-                </VBadge>
+                    <VBadge
+                        v-if="checkTypeBadge"
+                        :color="EBadgeColor.Neutral"
+                        :size="ESize.Small"
+                    >
+                        {{ checkTypeBadge }}
+                    </VBadge>
+                </div>
+
+                <div v-if="checkMetrics.length" :class="$style.metrics">
+                    <span
+                        v-for="metric in checkMetrics"
+                        :key="metric.label"
+                        :class="$style.metricItem"
+                    >
+                        <span :class="$style.metricLabel">{{ metric.label }}:</span>
+                        <span :class="$style.metricValue">{{ metric.value }}</span>
+                    </span>
+                </div>
             </div>
 
-            <div v-if="checkMetrics.length" :class="$style.metrics">
-                <span
-                    v-for="metric in checkMetrics"
-                    :key="metric.label"
-                    :class="$style.metricItem"
-                >
-                    <span :class="$style.metricLabel">{{ metric.label }}:</span>
-                    <span :class="$style.metricValue">{{ metric.value }}</span>
-                </span>
-            </div>
+            <VButton
+                v-if="category === ELogCategory.Checks && showOpenCombatButton"
+                :size="ESize.Small"
+                :color="EColor.Secondary"
+                icon="swords"
+                @click="onOpenCombatClick"
+            >
+                {{ LOGS_ADMIN.openCombatButton }}
+            </VButton>
         </div>
 
-        <div v-if="combatUuid || combatMetrics.length" :class="$style.combatBox">
-            <div :class="$style.combatInfo">
-                <span v-if="combatUuid" :class="$style.metricItem">
-                    <span :class="$style.metricLabel">{{ LOGS_ADMIN.combatUuidLabel }}:</span>
-                    <span :class="$style.metricValue">{{ combatUuid }}</span>
-                </span>
-
+        <div
+            v-if="category !== ELogCategory.Checks && (combatMetrics.length || showOpenCombatButton)"
+            :class="$style.combatBox"
+        >
+            <div v-if="combatMetrics.length" :class="$style.combatInfo">
                 <span
                     v-for="metric in combatMetrics"
                     :key="metric.label"
@@ -350,27 +412,9 @@ function onOpenCombatClick() {
         </div>
 
         <div v-if="isDetailsOpen" :class="$style.details">
-            <dl :class="$style.fieldsGrid">
-                <div :class="$style.fieldRow">
-                    <dt :class="$style.fieldTerm">
-                        {{ LOGS_ADMIN.fileFieldLabel }}
-                    </dt>
-                    <dd :class="$style.fieldValue">
-                        {{ category }}/{{ fileName }} ({{ LOGS_ADMIN.byteOffsetLabel }}: {{ entry.byteOffset }})
-                    </dd>
-                </div>
-
-                <div v-if="entry.timestamp" :class="$style.fieldRow">
-                    <dt :class="$style.fieldTerm">
-                        {{ LOGS_ADMIN.originalTimestampLabel }}
-                    </dt>
-                    <dd :class="$style.fieldValue">
-                        {{ entry.timestamp }}
-                    </dd>
-                </div>
-
+            <dl v-if="mainFieldEntries.length" :class="$style.fieldsGrid">
                 <div
-                    v-for="field in fieldEntries"
+                    v-for="field in mainFieldEntries"
                     :key="field.key"
                     :class="$style.fieldRow"
                 >
@@ -383,6 +427,57 @@ function onOpenCombatClick() {
                     </dd>
                 </div>
             </dl>
+
+            <div :class="$style.techSection">
+                <button
+                    type="button"
+                    :class="$style.techToggleButton"
+                    @click="isTechParamsOpen = !isTechParamsOpen"
+                >
+                    <VIcon
+                        :name="isTechParamsOpen ? 'chevron-up' : 'chevron-down'"
+                        :size="15"
+                    />
+                    <span>
+                        {{ isTechParamsOpen ? LOGS_ADMIN.techParamsToggleClose : LOGS_ADMIN.techParamsToggleOpen }}
+                        ({{ totalTechnicalCount }})
+                    </span>
+                </button>
+
+                <dl v-if="isTechParamsOpen" :class="[$style.fieldsGrid, $style.techFieldsGrid]">
+                    <div :class="$style.fieldRow">
+                        <dt :class="$style.fieldTerm">
+                            {{ LOGS_ADMIN.fileFieldLabel }}
+                        </dt>
+                        <dd :class="$style.fieldValue">
+                            {{ category }}/{{ fileName }} ({{ LOGS_ADMIN.byteOffsetLabel }}: {{ entry.byteOffset }})
+                        </dd>
+                    </div>
+
+                    <div v-if="entry.timestamp" :class="$style.fieldRow">
+                        <dt :class="$style.fieldTerm">
+                            {{ LOGS_ADMIN.originalTimestampLabel }}
+                        </dt>
+                        <dd :class="$style.fieldValue">
+                            {{ formattedTime }}
+                        </dd>
+                    </div>
+
+                    <div
+                        v-for="field in technicalFieldEntries"
+                        :key="field.key"
+                        :class="$style.fieldRow"
+                    >
+                        <dt :class="$style.fieldTerm">
+                            {{ field.label }}
+                        </dt>
+                        <dd :class="$style.fieldValue">
+                            <pre v-if="field.isMultiline" :class="$style.codeBlock">{{ field.value }}</pre>
+                            <span v-else>{{ field.value }}</span>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
 
             <div :class="$style.rawSection">
                 <div :class="$style.rawHeader">
@@ -422,6 +517,11 @@ function onOpenCombatClick() {
     &._warn,
     &._invalid {
         border-left-color: $warning;
+    }
+
+    &._nested {
+        padding: $space-12 $space-16;
+        background-color: $surface;
     }
 
     @include respond-to(mobile) {
@@ -499,11 +599,19 @@ function onOpenCombatClick() {
     display: flex;
     flex-wrap: wrap;
     gap: $space-12;
+    justify-content: space-between;
     align-items: center;
     padding: $space-10 $space-12;
     border: 1px solid $border-subtle;
     border-radius: $radius-8;
     background-color: $surface;
+}
+
+.summaryMain {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-12;
+    align-items: center;
 }
 
 .summaryBadges {
@@ -638,6 +746,42 @@ function onOpenCombatClick() {
 
     color: $text-primary;
     overflow-wrap: anywhere;
+}
+
+.techSection {
+    display: flex;
+    flex-direction: column;
+    gap: $space-12;
+    padding-top: $space-8;
+    border-top: 1px dashed $border-subtle;
+}
+
+.techToggleButton {
+    @include l3;
+
+    display: inline-flex;
+    gap: $space-4;
+    align-items: center;
+    align-self: flex-start;
+    padding: $space-4 $space-8;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-8;
+    background-color: $surface;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: border-color $default-transition, color $default-transition;
+
+    @include hover {
+        border-color: $border;
+        color: $text-primary;
+    }
+}
+
+.techFieldsGrid {
+    padding: $space-10 $space-12;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-8;
+    background-color: $surface;
 }
 
 .rawSection {

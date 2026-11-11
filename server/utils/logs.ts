@@ -5,6 +5,7 @@ import type { ILogCategoriesResponse, ILogEntriesResponse, ILogFilesResponse } f
 import type { TLogCategoriesQuery, TLogEntriesQuery, TLogFilesQuery } from '~~/shared/schemas/logging';
 
 import { LOGS_DEFAULT_TIMEOUT_MS, LOGS_ERRORS, LOGS_NO_STORE_HEADER } from '~~/server/common/constants/logging';
+import { ELogCombatAction } from '~~/shared/enums/logging';
 import {
     sharedLogCategoriesResponseSchema,
     sharedLogEntriesResponseSchema,
@@ -229,7 +230,7 @@ export async function fetchLogEntries(query: TLogEntriesQuery): Promise<ILogEntr
         return getMockLogEntries(query);
     }
 
-    return requestLogsUpstream(
+    const response = await requestLogsUpstream(
         'entries',
         {
             category: query.category,
@@ -242,7 +243,28 @@ export async function fetchLogEntries(query: TLogEntriesQuery): Promise<ILogEntr
             event: query.event,
             checkType: query.checkType,
             outcome: query.outcome,
+            action: query.action,
         },
         sharedLogEntriesResponseSchema,
     );
+
+    if (!query.action) {
+        return response;
+    }
+
+    return {
+        ...response,
+        items: response.items.filter((entry) => {
+            if (!entry.event?.startsWith('combat.')) {
+                return false;
+            }
+
+            if (query.action === ELogCombatAction.None) {
+                return 'action' in entry.fields && entry.fields.action === null;
+            }
+
+            return typeof entry.fields.action === 'string'
+                && entry.fields.action.trim().toLowerCase() === query.action;
+        }),
+    };
 }

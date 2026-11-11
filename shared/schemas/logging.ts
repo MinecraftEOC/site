@@ -12,7 +12,7 @@ import {
     LOGS_MAX_LIMIT,
     LOGS_SEARCH_MAX_LENGTH,
 } from '~~/shared/constants/logging';
-import { ELogCategory, ELogCheckOutcome, ELogLevel, ELogOrder } from '~~/shared/enums/logging';
+import { ELogCategory, ELogCheckOutcome, ELogCombatAction, ELogLevel, ELogOrder } from '~~/shared/enums/logging';
 
 /** Тексты ошибок валидации запросов к серверным журналам. */
 export const LOGS_QUERY_ERRORS = {
@@ -24,6 +24,7 @@ export const LOGS_QUERY_ERRORS = {
     ORDER_INVALID: 'Недопустимый порядок сортировки записей',
     LEVEL_INVALID: 'Указан неизвестный уровень записи',
     OUTCOME_INVALID: 'Указан неизвестный исход проверки',
+    ACTION_INVALID: 'Указано неизвестное боевое действие',
     EVENT_INVALID: 'Недопустимое значение фильтра события',
     CHECK_TYPE_INVALID: 'Недопустимое значение типа проверки',
     SEARCH_TOO_LONG: `Поисковый запрос не должен превышать ${LOGS_SEARCH_MAX_LENGTH} символов`,
@@ -152,6 +153,10 @@ export const sharedLogEntriesQuerySchema = z
         outcome: z
             .preprocess(val => (val === '' ? undefined : val), z.nativeEnum(ELogCheckOutcome, {
                 invalid_type_error: LOGS_QUERY_ERRORS.OUTCOME_INVALID,
+            }).optional()),
+        action: z
+            .preprocess(val => (val === '' ? undefined : val), z.nativeEnum(ELogCombatAction, {
+                invalid_type_error: LOGS_QUERY_ERRORS.ACTION_INVALID,
             }).optional()),
     })
     .superRefine((data, ctx) => {

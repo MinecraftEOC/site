@@ -59,6 +59,22 @@ export interface ILogEntryItem {
     rawTruncated: boolean;
 }
 
+/** Сгруппированный набор одинаковых записей об ошибке одного игрока. */
+export interface ILogEntryGroup {
+    /** Уникальный ключ группы в рамках текущей порции записей. */
+    key: string;
+    /** Головная (первая в текущем порядке сортировки) запись группы. */
+    primaryEntry: ILogEntryItem;
+    /** Все записи журнала, попавшие в эту группу. */
+    entries: ILogEntryItem[];
+    /** Суммарное количество срабатываний с учётом поля `count` у повторяющихся ошибок. */
+    totalOccurrences: number;
+    /** Самая ранняя метка времени в группе (с учётом `first_at`) или `null`. */
+    earliestTimestamp: string | null;
+    /** Самая поздняя метка времени в группе (с учётом `last_at`) или `null`. */
+    latestTimestamp: string | null;
+}
+
 /** Ответ со списком категорий журналов. */
 export interface ILogCategoriesResponse {
     /** Список всех известных категорий журналов. */

@@ -3,10 +3,11 @@ import type { ISwitcherItem } from '~/@types/switcher';
 import {
     LOG_CHECK_OUTCOME_LABEL,
     LOG_CHECK_TYPE_LABEL,
+    LOG_COMBAT_ACTION_LABEL,
     LOG_LEVEL_LABEL,
     LOG_ORDER_LABEL,
 } from '~~/shared/constants/logging';
-import { ELogCheckOutcome, ELogCheckType, ELogLevel, ELogOrder } from '~~/shared/enums/logging';
+import { ELogCheckOutcome, ELogCheckType, ELogCombatAction, ELogLevel, ELogOrder } from '~~/shared/enums/logging';
 import { EBadgeColor } from '~/assets/ts/enums/common';
 
 /** Задержка перед отправкой поискового запроса по тексту и имени файла, мс. */
@@ -70,4 +71,14 @@ export const LOG_OUTCOME_OPTIONS: ReadonlyArray<{ label: string; value: '' | ELo
     { label: LOG_CHECK_OUTCOME_LABEL[ELogCheckOutcome.Failure], value: ELogCheckOutcome.Failure },
     { label: LOG_CHECK_OUTCOME_LABEL[ELogCheckOutcome.Tie], value: ELogCheckOutcome.Tie },
     { label: LOG_CHECK_OUTCOME_LABEL[ELogCheckOutcome.Value], value: ELogCheckOutcome.Value },
+];
+
+/** Варианты фильтра по действию в бою (`fields.action` в `combat.*`). */
+export const LOG_COMBAT_ACTION_OPTIONS: ReadonlyArray<{ label: string; value: '' | ELogCombatAction }> = [
+    { label: 'Все действия', value: '' },
+    { label: LOG_COMBAT_ACTION_LABEL[ELogCombatAction.Attack], value: ELogCombatAction.Attack },
+    { label: LOG_COMBAT_ACTION_LABEL[ELogCombatAction.EquipmentChange], value: ELogCombatAction.EquipmentChange },
+    { label: LOG_COMBAT_ACTION_LABEL[ELogCombatAction.FullDefense], value: ELogCombatAction.FullDefense },
+    { label: LOG_COMBAT_ACTION_LABEL[ELogCombatAction.Potion], value: ELogCombatAction.Potion },
+    { label: LOG_COMBAT_ACTION_LABEL[ELogCombatAction.None], value: ELogCombatAction.None },
 ];

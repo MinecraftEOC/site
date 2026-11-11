@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ELogCheckOutcome, ELogCheckType, ELogLevel } from '~~/shared/enums/logging';
+import type { ELogCheckOutcome, ELogCheckType, ELogCombatAction, ELogLevel } from '~~/shared/enums/logging';
 import type { ITagItem } from '~/@types/tags';
 
 import { LOGS_EVENT_MAX_LENGTH, LOGS_SEARCH_MAX_LENGTH } from '~~/shared/constants/logging';
@@ -7,6 +7,7 @@ import { ELogOrder } from '~~/shared/enums/logging';
 import { LOGS_ADMIN } from '~/assets/ts/constants/content/account';
 import {
     LOG_CHECK_TYPE_OPTIONS,
+    LOG_COMBAT_ACTION_OPTIONS,
     LOG_LEVEL_OPTIONS,
     LOG_ORDER_ITEMS,
     LOG_OUTCOME_OPTIONS,
@@ -16,10 +17,13 @@ import { ESize } from '~/assets/ts/enums/common';
 interface IProps {
     /** Показывать ли дополнительные фильтры проверок навыков (`checkType`, `outcome`) */
     isChecksCategory?: boolean;
+    /** Показывать ли фильтр боевых действий (`action`) для категории `combat` */
+    isCombatCategory?: boolean;
 }
 
 withDefaults(defineProps<IProps>(), {
     isChecksCategory: false,
+    isCombatCategory: false,
 });
 
 const emits = defineEmits<{
@@ -32,6 +36,7 @@ const level = defineModel<'' | ELogLevel>('level', { default: '' });
 const order = defineModel<ELogOrder>('order', { default: ELogOrder.Desc });
 const checkType = defineModel<'' | ELogCheckType>('checkType', { default: '' });
 const outcome = defineModel<'' | ELogCheckOutcome>('outcome', { default: '' });
+const action = defineModel<'' | ELogCombatAction>('action', { default: '' });
 
 const levelTagItems = computed<ITagItem[]>(() => LOG_LEVEL_OPTIONS.map(opt => ({
     label: opt.label,
@@ -88,39 +93,34 @@ function onLevelTagChange(val: string | string[] | null): void {
             </div>
 
             <div v-if="isChecksCategory" :class="$style.checksSelects">
-                <label :class="$style.selectField">
-                    <span :class="$style.label">{{ LOGS_ADMIN.checkTypeLabel }}</span>
-                    <select
-                        v-model="checkType"
-                        :class="$style.nativeSelect"
-                        @change="emits('change')"
-                    >
-                        <option
-                            v-for="opt in LOG_CHECK_TYPE_OPTIONS"
-                            :key="opt.value"
-                            :value="opt.value"
-                        >
-                            {{ opt.label }}
-                        </option>
-                    </select>
-                </label>
+                <VSelect
+                    v-model="checkType"
+                    :label="LOGS_ADMIN.checkTypeLabel"
+                    :items="LOG_CHECK_TYPE_OPTIONS"
+                    :size="ESize.Small"
+                    :class="$style.checkTypeSelect"
+                    @change="emits('change')"
+                />
 
-                <label :class="$style.selectField">
-                    <span :class="$style.label">{{ LOGS_ADMIN.outcomeLabel }}</span>
-                    <select
-                        v-model="outcome"
-                        :class="$style.nativeSelect"
-                        @change="emits('change')"
-                    >
-                        <option
-                            v-for="opt in LOG_OUTCOME_OPTIONS"
-                            :key="opt.value"
-                            :value="opt.value"
-                        >
-                            {{ opt.label }}
-                        </option>
-                    </select>
-                </label>
+                <VSelect
+                    v-model="outcome"
+                    :label="LOGS_ADMIN.outcomeLabel"
+                    :items="LOG_OUTCOME_OPTIONS"
+                    :size="ESize.Small"
+                    :class="$style.outcomeSelect"
+                    @change="emits('change')"
+                />
+            </div>
+
+            <div v-if="isCombatCategory" :class="$style.checksSelects">
+                <VSelect
+                    v-model="action"
+                    :label="LOGS_ADMIN.combatActionLabel"
+                    :items="LOG_COMBAT_ACTION_OPTIONS"
+                    :size="ESize.Small"
+                    :class="$style.combatActionSelect"
+                    @change="emits('change')"
+                />
             </div>
         </div>
     </div>
@@ -207,28 +207,36 @@ function onLevelTagChange(val: string | string[] | null): void {
     flex-wrap: wrap;
     gap: $space-12;
     align-items: flex-end;
+
+    @include respond-to(mobile) {
+        width: 100%;
+    }
 }
 
-.selectField {
-    display: flex;
-    flex-direction: column;
-    gap: $space-8;
+.checkTypeSelect {
+    min-width: rem(290);
+
+    @include respond-to(mobile) {
+        width: 100%;
+        min-width: 0;
+    }
 }
 
-.nativeSelect {
-    @include t3;
+.outcomeSelect {
+    min-width: rem(210);
 
-    height: $space-32;
-    padding: 0 $space-12;
-    border: 1px solid $input-border;
-    border-radius: $radius-4;
-    background-color: $input-bg;
-    color: $input-text;
-    cursor: pointer;
+    @include respond-to(mobile) {
+        width: 100%;
+        min-width: 0;
+    }
+}
 
-    &:focus {
-        border-color: $focus-ring;
-        outline: none;
+.combatActionSelect {
+    min-width: rem(230);
+
+    @include respond-to(mobile) {
+        width: 100%;
+        min-width: 0;
     }
 }
 </style>
