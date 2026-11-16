@@ -1,0 +1,14 @@
+{
+  "vue-nuxt": {
+    "commands": {
+      "install": "npm install",
+      "lint": "npx eslint {files}",
+      "format": "npx prettier --write {files}",
+      "test": "npx vitest run",
+      "build": "npx nuxt build",
+      "run": "npx nuxt dev"
+    },
+    "root": ".",
+    "actions": {}
+  }
+}

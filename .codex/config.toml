@@ -1,0 +1,13 @@
+# BEGIN AIKIT PLUGINS — managed by AIKit setup
+[plugins."aikit@aikit"]
+enabled = true
+
+[plugins."vue-nuxt@aikit"]
+enabled = true
+
+[plugins."nuxt-postgres@aikit"]
+enabled = true
+
+[plugins."devops@aikit"]
+enabled = true
+# END AIKIT PLUGINS
