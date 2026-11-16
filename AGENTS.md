@@ -1,0 +1,322 @@
+<!-- BEGIN AIKIT — managed by AIKit installer, edits inside this block are overwritten -->
+# AIKit — Базовые правила команды
+
+## Контекст
+Мы разрабатываем продукты AIKit. Репозитории объединены в общую группу.
+Этот файл — базовый слой правил, общий для всех проектов.
+Профиль проекта (vue-nuxt и т.д.) расширяет эти правила.
+
+---
+
+## Язык
+
+- **Код, имена файлов, комментарии** — English
+- **Коммиты, MR описания, задачи** — Russian
+- **Общение с пользователем** — Russian
+
+---
+
+## Git-workflow
+
+### Ветки — скилл `git-branch` (Conventional Branch)
+```
+main                  — стабильная версия, изменения только через PR/MR с ревью
+develop               — интеграционная ветка (если используется)
+<type>/<description>  — feat/, fix/, hotfix/, release/, chore/, docs/, refactor/, test/, ci/, build/, perf/, style/
+                        например feat/oauth-login, fix/issue-42-empty-list-crash, release/v1.4.0
+```
+
+### Коммиты — скилл `git-commit` (Conventional Commits)
+```
+feat(auth): добавлена авторизация через OAuth
+fix: исправлено падение при пустом списке
+build(deps): обновлены зависимости
+```
+
+- Формат `<type>[(scope)][!]: <description>`, описание на русском
+- Никакого соавторства: без `Co-Authored-By` и приписок `Generated with ...`
+- Одна задача — один коммит
+- Не коммитить сломанный код в develop/main
+
+### Merge Requests
+- Описание: что сделано и зачем (не как)
+- Минимальный diff — не рефакторить попутно
+- Указывать связанный issue: `Closes #42`
+
+---
+
+## Принципы работы с кодом
+
+- **Минимум изменений** — трогаем только то, что нужно для задачи
+- **Не рефакторить попутно** — отдельная задача, отдельный MR
+- **Без over-engineering** — не добавлять абстракции под гипотетические требования
+- **Без принудительного разыменования** (`!` в TypeScript и Swift, `!!` в Kotlin) — явная обработка null и опционалов
+- **Без магических чисел** — именованные константы
+- Код должен быть читаем без комментариев; комментарии — только там, где логика неочевидна
+
+---
+
+## Безопасность
+
+- Никаких секретов, токенов, паролей в коде или конфигах
+- Секреты — только через переменные окружения или защищённые хранилища
+- Не коммитить `.env`-файлы с реальными значениями
+
+---
+
+## Взаимодействие с агентом
+
+- Перед изменением файла — прочитай его
+- Не создавай новые файлы если можно отредактировать существующий
+- Не добавляй docstrings/комментарии к коду, который не менялся
+- Перед destructive-операциями (удаление файлов, reset, force push) — спросить подтверждение
+- Если задача неясна — уточни, не угадывай
+
+### Windows
+- Windows PowerShell 5.1 читает файлы без BOM в кодировке системы, и русский текст превращается в мусор: читай текстовые файлы инструментом чтения файлов runtime или `Get-Content -Raw -Encoding UTF8 <файл>`
+- Вывод в файл через `>` в Windows PowerShell 5.1 пишется в UTF-16: если файл читает другой инструмент (патч для `git apply` и т. п.), пусть его пишет сама команда (`git diff --output=<файл>`)
+- Команда падает с «running scripts is disabled on this system» (ExecutionPolicy запрещает `npx.ps1`, `npm.ps1`) — вызови `.cmd`-вариант той же команды (`npx.cmd vitest run`, `npm.cmd install`) или выполни её в Git Bash. Это касается и команд профиля из `.aikit/profiles.json` (`npx eslint …`): в файле они записаны для всех систем, `.cmd` подставляешь ты при запуске. ExecutionPolicy системы не меняй
+
+---
+
+## Развитие агентной системы
+
+Базовые скиллы доступны в любом проекте. Ниже указаны их имена; способ вызова определяется инструкцией текущего runtime. Скилл также может сработать по описанию:
+
+### Создание и расширение
+- `create-agent` — создать нового агента через структурированное интервью (6 фаз)
+- `create-skill` — создать новый скилл (`<name>/SKILL.md`) через интервью (4 фазы)
+
+### Анализ и планирование
+- `analyze-mvp` — проанализировать идею фичи перед разработкой
+- `implement-mvp` — перевести MVP-документ в технический план по платформам (API-контракт, scope, порядок реализации)
+
+### Git
+- `git-branch` — именование веток (применяется автоматически)
+- `git-commit` — формат коммитов, без соавторства (применяется автоматически)
+
+### Релиз и качество
+- `security-check` — аудит безопасности (OWASP, секреты, авторизация; + security-специалист профиля, если есть)
+- `coverage-check` — покрытие тестами и что покрыть первым (quality-специалист профиля)
+- `tech-debt` — аудит технического долга с приоритетами P1/P2/P3 (quality-специалист профиля)
+
+### Тексты и дизайн
+- `write-ui-texts` — написать или проверить тексты интерфейса (кнопки, ошибки, пустые состояния)
+
+### Кросс-проектная координация
+- `cross-check` — как изменение API или контракта влияет на другую сторону: backend и его клиенты
+
+### Оркестрация
+- `implement-feature <задача>` — реализовать фичу цепочкой агентов профиля: architect → coder → tester + reviewer; агентов и команды проверки берёт из `.aikit/profiles.json`. `--tdd` — сначала падающие тесты, `--no-test` и `--no-review` — без тестировщика и без ревьюера (можно вместе)
+- `fix-bug <баг>` — воспроизвести баг, написать тест, который его ловит, исправить и проверить; `--no-test` и `--no-review` — без теста на баг и без ревьюера
+- `check-feature <фича>` — запустить приложение командой `run` профиля и проверить фичу в браузере или запросами
+
+### Память проекта
+- `capture-memory` — зафиксировать командную память после задачи: решения, паттерны, коррекции агентов в `.aikit/memory/` (общая для команды, хранится в git; личное — во встроенной памяти runtime)
+- `memory-status` — показать, что накоплено в `.aikit/memory/`, и открытые memory-PR
+- `optimize-memory` — сжать INDEX, объединить дубли, убрать устаревшее (запускать при предупреждении от `memory-status`)
+
+### Модели агентов
+- `set-model <агент> <модель>` — сменить модель агента в проекте: уровень (`opus`, `sonnet`, `haiku`) или модель для конкретного runtime
+
+Новые агенты и скиллы добавляются в репозиторий AIKit через PR.
+
+---
+
+# Vue Nuxt Profile
+
+Профиль для приложений на Vue 3 и Nuxt 3/4. Подходит для UI со своим Nitro API, с внешним API и для проектов без серверных эндпоинтов.
+
+---
+
+## Стек
+
+- **Vue 3** + **Nuxt 3 или 4** — SSR, SSG, file-based routing, server routes
+- Версию Node.js и пакетный менеджер бери из проекта. Команды запускай из контракта профиля.
+- **TypeScript** — обязателен для нового кода
+- **Composition API** + **`<script setup lang="ts">`**
+- **Pinia** — глобальное клиентское состояние
+- **VueUse** — composables и утилиты, не писать велосипед
+- **useFetch / useAsyncData** — загрузка данных в Nuxt
+- **Nitro server routes** — собственный API или BFF, если они предусмотрены проектом
+- **Vitest** + **@vue/test-utils** — unit/component тесты
+- **Playwright** — E2E и визуальная проверка
+- **Figma MCP** — сверка реализации с макетами и UI kit контекст
+- **ESLint + Prettier** — стиль и форматирование
+
+---
+
+## Архитектура
+
+### Типичная структура проекта
+
+Перед правкой проверь версию Nuxt, `nuxt.config.*` и соседние файлы. Пути UI в примерах относительны к фактическому `srcDir`: обычно это корень приложения в Nuxt 3 и `app/` в Nuxt 4. Учитывай настройки директорий, режим совместимости и существующую структуру. Пути Nitro определяй отдельно по `serverDir` и существующим серверным файлам. Общие контракты размещай там, где их хранит проект, например в `shared/`, если установленная версия и настройки его поддерживают.
+
+```text
+app.vue
+pages/
+  index.vue
+  account/
+    index.vue
+components/
+  base/
+  feature/
+layouts/
+composables/
+  useAuth.ts
+  useFilters.ts
+stores/
+  auth.ts
+  notifications.ts
+middleware/
+plugins/
+utils/
+types/
+nuxt.config.ts
+server/
+  api/
+    notifications/
+      index.get.ts
+      [id].patch.ts
+  utils/
+tests/
+  unit/
+  components/
+  e2e/
+```
+
+### Слои
+
+```text
+Page → Feature Components → Composables / Store → API Client / useFetch → Nitro API или внешний API
+```
+
+### Правила распределения логики
+
+- `pages/` — композиция экрана и SEO, без тяжёлой бизнес-логики
+- `components/` — переиспользуемый UI и feature-части экрана
+- `layouts/` — app shell, общая навигация, shared wrappers, не конкретная page-логика
+- `app.vue` — корневой composition layer приложения, глобальные wrappers и startup UI
+- `nuxt.config.*` — runtime config, модули, aliases, SSR/build switches, integration boundaries
+- `composables/` — локальная reusable-логика, работа с query params, form flows, VueUse
+- `stores/` — cross-page состояние, кэш, optimistic update, auth/session
+- `middleware/` — route guards, auth gates, redirects, navigation policies
+- `plugins/` — интеграции Nuxt app level, provide/inject, client/server scoped setup
+- `server/api/` — HTTP-граница Nitro: валидация входа, авторизация, вызов серверной логики и формирование ответа. Переиспользуй существующие сервисы и утилиты.
+- При внешнем API (например, Django) используй его контракт и существующий клиент проекта. Добавляй Nitro-прокси, когда нужна серверная граница для секретов, SSR, агрегации или совместимости.
+- Общие схемы и типы для UI и Nitro должны работать в обоих окружениях. Подключения к БД, серверные зависимости и секреты остаются в серверном коде и приватном runtime config.
+
+### Динамическая экспертиза агентов
+
+- Если задача затрагивает `pages/**/*.vue` — агент обязан включить режим page/Nuxt: SSR, `useAsyncData`, SEO, route params, hydration
+- Если задача затрагивает `components/**/*.vue` — агент обязан включить режим component API: props, emits, slots, `data-test`, переиспользуемость
+- Если задача затрагивает design review, Figma или UI kit — агент обязан включить режим design bridge: reuse существующих компонентов, tokens, states, visual
+  consistency
+- Если задача затрагивает `layouts/**/*.vue` — агент обязан включить режим layout/app shell: shared navigation, slot boundaries, global UI composition
+- Если задача затрагивает `app.vue` — агент обязан включить режим root app shell: providers, wrappers, startup behavior, hydration safety
+- Если задача затрагивает `nuxt.config.*` — агент обязан включить режим Nuxt config: modules, runtime config, aliases, SSR/build impact
+- Если задача затрагивает `composables/use*.ts` — агент обязан включить режим composable: reactivity, VueUse reuse, watch/computed hygiene, SSR-safe side
+  effects
+- Если задача затрагивает `stores/*.ts` — агент обязан включить режим Pinia: ownership of state, actions, optimistic updates, persistence
+- Если задача затрагивает `middleware/**/*.ts` — агент обязан включить режим route middleware: redirect loops, auth boundaries, SSR/client navigation safety
+- Если задача затрагивает `plugins/**/*.ts` — агент обязан включить режим Nuxt plugin: runtime injection, client/server scoping, side-effect hygiene
+- Если задача затрагивает Nitro — агент проверяет валидацию, серверную авторизацию, контракт ответа и границу с хранилищем или внешним API. Для прокси отдельно проверяет пересылку cookies и заголовков.
+- Если задача затрагивает `vitest/playwright/eslint config` — агент обязан включить режим tooling config: test stability, aliases, environment consistency
+
+Агент не должен требовать отдельного выбора "узкого специалиста", если тип файлов уже делает нужный режим очевидным.
+
+---
+
+## Правила кода
+
+### Обязательно
+
+- Только `script setup` + TypeScript в новом Vue-коде
+- Props и emits типизированы через `defineProps` / `defineEmits`
+- Сложную UI-логику выносить в composables, не в шаблон
+- Для глобального состояния использовать Pinia, не event bus
+- Перед написанием своего composable проверять есть ли решение во VueUse
+- Для page data использовать `useAsyncData` / `useFetch` с явным key
+- Ошибки и loading-состояния должны быть явными
+- Переиспользуемые компоненты должны иметь понятный API: props, slots, emits
+
+### Запрещено
+
+- Options API в новом коде
+- `any` без реальной причины
+- Хардкод API URL внутри компонентов
+- Логика авторизации прямо в page/component, если это должно жить в store/composable
+- Дублирование fetch-логики в нескольких местах
+- Прямые обращения к `window` / `document` без проверки client-only контекста
+
+### Nuxt-специфика
+
+```vue
+<script setup lang="ts">
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+
+const { data, pending, error, refresh } = await useAsyncData(
+  () => `profile:${route.params.id}`,
+  () => $fetch(`/api/profile/${route.params.id}`),
+);
+</script>
+```
+
+- Для SSR-safe кода учитывать `import.meta.client` / `import.meta.server`
+- SEO задавать через `useSeoMeta`
+- Query params синхронизировать аккуратно, без циклических watch
+- Для форм предпочитать schema-first подход (например Zod), если он уже есть в проекте
+
+---
+
+## Именование
+
+| Что          | Правило                        | Пример                                    |
+| ------------ | ------------------------------ | ----------------------------------------- |
+| Page         | kebab-case по роуту            | `pages/orders/[id].vue`                   |
+| Component    | PascalCase                     | `OrderCard.vue`, `NotificationsPanel.vue` |
+| Composable   | `use<Name>`                    | `useAuth.ts`, `usePropertyFilters.ts`     |
+| Store        | `<name>.ts` + `use<Name>Store` | `auth.ts`, `useAuthStore`                 |
+| Type         | PascalCase                     | `NotificationItem`, `ProfileResponse`     |
+| Server route | REST + method suffix           | `server/api/orders/index.get.ts`          |
+
+---
+
+## Тесты
+
+- **Vitest** — composables, stores, utils, component logic и серверная логика
+- **Nitro/API** — проверять валидацию, авторизацию и контракт ответа. Если поведение зависит от реального хранилища, использовать изолированное тестовое окружение проекта.
+- **@vue/test-utils** — props, emits, slots, conditional rendering
+- **Playwright** — happy path, формы, навигация, SSR/CSR flows
+- Тестировать поведение, а не внутреннюю реализацию
+
+---
+
+## Доступные скиллы
+
+- `new-page` — создать новую Nuxt page с загрузкой данных и SEO
+- `new-component` — создать Vue-компонент с типизированными props/slots/emits
+- `new-composable` — создать composable с корректной реактивностью и использованием VueUse
+- `new-middleware` — создать route middleware для auth, redirect или navigation policy
+- `new-plugin` — создать Nuxt plugin для интеграции app-level зависимостей
+- `new-server-route` — создать Nitro-эндпоинт собственного API или BFF
+- `new-store` — создать Pinia store для состояния фичи
+- `add-tests` — написать Vitest/VTU тесты для существующего кода
+- `design-review` — проверить реализацию на соответствие UI kit, токенам и Figma
+
+---
+
+## Работа в Codex
+
+- Правила проекта — `AGENTS.md`. Скиллы вызывай по доступному в сессии имени через `$name` или по описанию; задачу и флаги бери из сообщения пользователя.
+- При установке адаптером скиллы находятся в `.agents/skills/`; при установке плагинами — в каталогах установленных плагинов. Используй путь из списка доступных скиллов.
+- Агенты проекта — `.codex/agents/*.toml`. Имена из `.aikit/profiles.json` используй без префикса плагина. Локальный агент `aikit-maintainer` также запускается без префикса.
+- Настройки модели агента — `model` и `model_reasoning_effort` в его TOML. Переопределения проекта — поле `codex` в `.aikit/models.json`; после изменения применяй их через `scripts/agent_models.py apply --runtime codex` из кита или его копии в `.aikit/`. Уровни `opus`, `sonnet`, `haiku` — совместимые обозначения AIKit, а не идентификаторы моделей Codex.
+- Для единого обновления плагинов и агентов используй скилл `update-agents --with-plugins` по явному запросу пользователя. Если плагины уже обновлены, `update-agents` без флага пересобирает только агентов. Новые определения проверяй в новой сессии.
+- `.codex/config.toml` и агенты проекта требуют доверия к проекту. Хуки требуют отдельного одобрения; их выполнение проверяй по отметкам `aikit_hook.py --status`.
+- Готовность проверяй через `setup --check` или `scripts/codex-doctor.py` (копия адаптера — `.aikit/scripts/codex-doctor.py`). Проверка читает конфигурацию и отдельную историю Codex; неизвестное одобрение хуков и соединение MCP не считай успешной проверкой.
+- Используй инструменты, предоставленные текущей сессией Codex. При недоступном агенте или инструменте сообщи об ограничении; не выдумывай успешный запуск.
+- Контракты профилей — `.aikit/profiles.json`, командная память — `.aikit/memory/`. Для запросов к пользователю используй доступный инструмент уточнения или чат.
+<!-- END AIKIT -->

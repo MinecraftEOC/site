@@ -5,6 +5,8 @@ import { LOGS_FILE_SEARCH_MAX_LENGTH } from '~~/shared/constants/logging';
 import { LOGS_ADMIN } from '~/assets/ts/constants/content/account';
 import { ESize } from '~/assets/ts/enums/common';
 
+import LogsAdminFileCopyButton from './LogsAdminFileCopyButton.vue';
+
 interface IProps {
     /** Список файлов текущей категории */
     files: ILogFileItem[];
@@ -70,10 +72,11 @@ function getFileItemClassList(file: ILogFileItem): string[] {
             <li
                 v-for="file in files"
                 :key="file.name"
+                :class="[$style.fileItem, getFileItemClassList(file)]"
             >
                 <button
                     type="button"
-                    :class="[$style.fileButton, getFileItemClassList(file)]"
+                    :class="$style.fileButton"
                     @click="emits('select', file)"
                 >
                     <div :class="$style.fileRowTop">
@@ -82,7 +85,7 @@ function getFileItemClassList(file: ILogFileItem): string[] {
                             :size="14"
                             :class="$style.fileIcon"
                         />
-                        <span :class="$style.fileName">{{ file.name }}</span>
+                        <span :class="$style.fileName" :title="file.name">{{ file.name }}</span>
                     </div>
 
                     <div :class="$style.fileRowMeta">
@@ -91,6 +94,8 @@ function getFileItemClassList(file: ILogFileItem): string[] {
                         <span>{{ formatLogFileDate(file.modifiedAt) }}</span>
                     </div>
                 </button>
+
+                <LogsAdminFileCopyButton :file="file" />
             </li>
         </ul>
     </aside>
@@ -157,17 +162,13 @@ function getFileItemClassList(file: ILogFileItem): string[] {
     }
 }
 
-.fileButton {
+.fileItem {
     display: flex;
-    flex-direction: column;
-    gap: $space-4;
-    width: 100%;
-    padding: $space-10 $space-12;
+    align-items: center;
+    padding-right: $space-8;
     border: 1px solid $border-subtle;
     border-radius: $radius-8;
     background-color: $surface;
-    text-align: left;
-    cursor: pointer;
     transition: all $default-transition;
 
     @include hover {
@@ -179,6 +180,19 @@ function getFileItemClassList(file: ILogFileItem): string[] {
         border-color: $border-focus;
         background-color: $tag-selected-bg;
     }
+}
+
+.fileButton {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: $space-4;
+    align-self: stretch;
+    min-width: 0;
+    padding: $space-10 $space-8 $space-10 $space-12;
+    border-radius: $radius-8;
+    text-align: left;
+    cursor: pointer;
 }
 
 .fileRowTop {

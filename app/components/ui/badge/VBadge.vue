@@ -49,29 +49,6 @@ const classList = computed(() => [
         padding: 0 $space-12;
     }
 
-    &.--color-neutral {
-        background-color: $badge-neutral-bg;
-        color: $badge-neutral-text;
-    }
-
-    &.--color-success {
-        background-color: $success-bg;
-        color: $success-fg;
-    }
-
-    &.--color-warning {
-        background-color: $warning-bg;
-        color: $warning-fg;
-    }
-
-    &.--color-danger {
-        background-color: $danger-bg;
-        color: $danger-fg;
-    }
-
-    &.--color-info {
-        background-color: $info-bg;
-        color: $info-fg;
-    }
+    @include badge-colors;
 }
 </style>

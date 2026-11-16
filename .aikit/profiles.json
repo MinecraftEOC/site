@@ -1,0 +1,67 @@
+{
+  "about": "Контракты профилей AIKit: агенты по ролям, специалисты, команды, папка профиля. root — папка профиля в проекте: команды запускаются в ней, path_signals считаются от неё. commands, actions и root можно менять под проект — обновление кита их не затрёт; остальные поля обновляются из кита. {files} в команде — изменённые файлы относительно root. actions — кнопки панели AIKit Deck: label и argv (программа и аргументы, без shell), запуск в root.",
+  "profiles": {
+    "vue-nuxt": {
+      "profile": "vue-nuxt",
+      "label": "Vue Nuxt",
+      "role": "web",
+      "stack": "Vue 3, Nuxt 3 and 4, Nitro, Pinia, VueUse",
+      "agents": {
+        "architect": "vue-architect",
+        "coder": "vue-coder",
+        "tester": "vue-tester",
+        "reviewer": "vue-reviewer"
+      },
+      "specialists": {
+        "design-bridge": {
+          "agent": "vue-design-bridge",
+          "when": "задача идёт от макета Figma или нужна сверка с UI kit и дизайн-токенами"
+        },
+        "quality": {
+          "agent": "vue-quality-analyst",
+          "when": "нужна оценка покрытия тестами или технического долга (/coverage-check, /tech-debt)"
+        }
+      },
+      "commands": {
+        "install": "npm install",
+        "lint": "npx eslint {files}",
+        "format": "npx prettier --write {files}",
+        "test": "npx vitest run",
+        "build": "npx nuxt build",
+        "run": "npx nuxt dev"
+      },
+      "code_extensions": [
+        ".vue",
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs"
+      ],
+      "root_markers": [
+        "nuxt.config.ts",
+        "nuxt.config.js",
+        "nuxt.config.mjs"
+      ],
+      "path_signals": [
+        "app/",
+        "pages/",
+        "components/",
+        "composables/",
+        "stores/",
+        "server/",
+        "shared/",
+        "middleware/",
+        "plugins/",
+        "layouts/",
+        "app.vue",
+        "nuxt.config.",
+        "vitest.config.",
+        "playwright.config.",
+        "eslint.config."
+      ],
+      "root": "."
+    }
+  }
+}

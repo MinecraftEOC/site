@@ -1,6 +1,20 @@
 @use 'sass:map';
 @use './variables' as *;
 
+@mixin badge-colors {
+    @each $name, $background, $foreground in
+        ('neutral', $badge-neutral-bg, $badge-neutral-text),
+        ('success', $success-bg, $success-fg),
+        ('warning', $warning-bg, $warning-fg),
+        ('danger', $danger-bg, $danger-fg),
+        ('info', $info-bg, $info-fg) {
+        &.--color-#{$name} {
+            background-color: $background;
+            color: $foreground;
+        }
+    }
+}
+
 @mixin respond-to($name) {
     $max: map.get($breakpoints, $name);
 

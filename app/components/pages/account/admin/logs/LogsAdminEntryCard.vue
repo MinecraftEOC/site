@@ -2,7 +2,6 @@
 import type { ILogEntryItem } from '~~/shared/@types/logging';
 import type { ELogCheckOutcome } from '~~/shared/enums/logging';
 
-import { LOG_CATEGORY_LABEL } from '~~/shared/constants/logging';
 import { ELogCategory, ELogLevel } from '~~/shared/enums/logging';
 import { LOGS_ADMIN } from '~/assets/ts/constants/content/account';
 import { COPY_NOTIFICATION } from '~/assets/ts/constants/content/common';
@@ -52,8 +51,6 @@ const levelBadgeColor = computed<EBadgeColor>(() => {
 const levelLabel = computed(() => props.entry.level ?? 'СТРОКА');
 
 const formattedTime = computed(() => formatLogTimestamp(props.entry.timestamp));
-
-const categoryLabel = computed(() => LOG_CATEGORY_LABEL[props.category]);
 
 const originCategoryLabel = computed<string | null>(() => {
     const rawCat = props.entry.fields.category;
@@ -107,36 +104,26 @@ const checkOutcomeBadgeColor = computed<EBadgeColor>(() => {
 
 const checkOutcomeTitle = computed(() => getLogCheckOutcomeTitle(props.entry));
 
-const checkTypeBadge = computed<string | null>(() => {
-    const ct = props.entry.fields.check_type;
-    if (typeof ct !== 'string' || !ct) {
-        return null;
-    }
-
-    const checkTitle = getLogCheckTypeTitle(ct);
-    return checkTitle === ct ? ct : `${checkTitle} (${ct})`;
-});
-
 const checkMetrics = computed(() => {
     const f = props.entry.fields;
-    const items: Array<{ label: string; value: string }> = [];
-    const metricDefs: ReadonlyArray<[string, string]> = [
-        ['roll', 'd20'],
+    const items: Array<{ label: string; value: string; emphasized?: boolean }> = [];
+    const metricDefs: ReadonlyArray<[key: string, label: string, emphasized?: boolean]> = [
+        ['roll', 'Кубик'],
         ['param', 'Параметр'],
         ['skill', 'Навык'],
         ['modifier', 'Модификатор'],
         ['bonus', 'Бонус'],
-        ['result', 'Итог'],
-        ['total', 'Итог'],
-        ['difficulty', 'Сложность'],
+        ['result', 'Итог', true],
+        ['total', 'Итог', true],
+        ['difficulty', 'Сложность', true],
     ];
 
     const seenLabels = new Set<string>();
-    for (const [key, label] of metricDefs) {
+    for (const [key, label, emphasized] of metricDefs) {
         const val = f[key];
         if (val !== undefined && val !== null && !seenLabels.has(label)) {
             seenLabels.add(label);
-            items.push({ label, value: String(val) });
+            items.push({ label, value: String(val), emphasized });
         }
     }
 
@@ -262,10 +249,6 @@ function onOpenCombatClick() {
                     {{ levelLabel }}
                 </VBadge>
 
-                <VBadge :color="EBadgeColor.Neutral" :size="ESize.Small">
-                    {{ categoryLabel }}
-                </VBadge>
-
                 <VBadge
                     v-if="originCategoryLabel"
                     :color="EBadgeColor.Info"
@@ -273,10 +256,6 @@ function onOpenCombatClick() {
                 >
                     {{ originCategoryLabel }}
                 </VBadge>
-
-                <span v-if="entry.event" :class="$style.event">
-                    {{ entry.event }}
-                </span>
 
                 <VBadge
                     v-if="roundBadge"
@@ -317,25 +296,15 @@ function onOpenCombatClick() {
 
         <div v-if="isCheckEntry" :class="$style.summaryBox">
             <div :class="$style.summaryMain">
-                <div :class="$style.summaryBadges">
-                    <VBadge :color="checkOutcomeBadgeColor" :size="ESize.Small">
-                        {{ checkOutcomeTitle }}
-                    </VBadge>
-
-                    <VBadge
-                        v-if="checkTypeBadge"
-                        :color="EBadgeColor.Neutral"
-                        :size="ESize.Small"
-                    >
-                        {{ checkTypeBadge }}
-                    </VBadge>
-                </div>
+                <VBadge :color="checkOutcomeBadgeColor" :size="ESize.Small">
+                    {{ checkOutcomeTitle }}
+                </VBadge>
 
                 <div v-if="checkMetrics.length" :class="$style.metrics">
                     <span
                         v-for="metric in checkMetrics"
                         :key="metric.label"
-                        :class="$style.metricItem"
+                        :class="[$style.metricItem, { [$style._emphasized]: metric.emphasized }]"
                     >
                         <span :class="$style.metricLabel">{{ metric.label }}:</span>
                         <span :class="$style.metricValue">{{ metric.value }}</span>
@@ -380,7 +349,7 @@ function onOpenCombatClick() {
             </VButton>
         </div>
 
-        <div v-if="errorReasonSummary" :class="$style.reasonBox">
+        <div v-if="errorReasonSummary" :class="[$style.reasonBox, $style[`--color-${levelBadgeColor}`]]">
             {{ errorReasonSummary }}
         </div>
 
@@ -550,15 +519,6 @@ function onOpenCombatClick() {
     color: $text-secondary;
 }
 
-.event {
-    @include mono2;
-
-    padding: $space-2 $space-8;
-    border-radius: $radius-4;
-    background-color: $surface-sunken;
-    color: $text-primary;
-}
-
 .offset {
     @include mono3;
 
@@ -614,13 +574,6 @@ function onOpenCombatClick() {
     align-items: center;
 }
 
-.summaryBadges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-8;
-    align-items: center;
-}
-
 .metrics {
     display: flex;
     flex-wrap: wrap;
@@ -644,6 +597,18 @@ function onOpenCombatClick() {
     @include mono2;
 
     color: $text-primary;
+}
+
+.metricItem._emphasized {
+    padding: $space-2 $space-8;
+    border-radius: $radius-4;
+    background-color: $surface-sunken;
+
+    .metricLabel,
+    .metricValue {
+        color: $text-primary;
+        font-weight: $fw-bold;
+    }
 }
 
 .combatBox {
@@ -670,9 +635,9 @@ function onOpenCombatClick() {
 
     padding: $space-8 $space-12;
     border-radius: $radius-8;
-    background-color: $danger-bg;
-    color: $danger-fg;
     overflow-wrap: anywhere;
+
+    @include badge-colors;
 }
 
 .parseWarning {

@@ -1,0 +1,34 @@
+{
+  "runtimes": [
+    "codex"
+  ],
+  "profiles": [
+    "vue-nuxt"
+  ],
+  "packs": [
+    "nuxt-postgres",
+    "devops"
+  ],
+  "codex_agents": [
+    "agent-builder",
+    "cross-project-analyst",
+    "memory-optimizer",
+    "memory-writer",
+    "mvp-analyst",
+    "security-auditor",
+    "skill-builder",
+    "tech-planner",
+    "ux-writer",
+    "vue-architect",
+    "vue-coder",
+    "vue-design-bridge",
+    "vue-quality-analyst",
+    "vue-reviewer",
+    "vue-tester",
+    "devops-engineer"
+  ],
+  "project_versions": {
+    "codex": "1.3.0"
+  },
+  "codex_agents_version": "1.3.0"
+}
