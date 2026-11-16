@@ -19,6 +19,8 @@ interface IProps {
     isChecksCategory?: boolean;
     /** Показывать ли фильтр боевых действий (`action`) для категории `combat` */
     isCombatCategory?: boolean;
+    /** Скрывает порядок сортировки в хронологии */
+    hideOrder?: boolean;
 }
 
 withDefaults(defineProps<IProps>(), {
@@ -37,6 +39,7 @@ const order = defineModel<ELogOrder>('order', { default: ELogOrder.Desc });
 const checkType = defineModel<'' | ELogCheckType>('checkType', { default: '' });
 const outcome = defineModel<'' | ELogCheckOutcome>('outcome', { default: '' });
 const action = defineModel<'' | ELogCombatAction>('action', { default: '' });
+const hideTurnPauses = defineModel<boolean>('hideTurnPauses', { default: true });
 
 const levelTagItems = computed<ITagItem[]>(() => LOG_LEVEL_OPTIONS.map(opt => ({
     label: opt.label,
@@ -70,7 +73,7 @@ function onLevelTagChange(val: string | string[] | null): void {
                 :class="$style.eventField"
             />
 
-            <div :class="$style.orderField">
+            <div v-if="!hideOrder" :class="$style.orderField">
                 <span :class="$style.label">{{ LOGS_ADMIN.orderLabel }}</span>
                 <VSwitcher
                     v-model="order"
@@ -121,6 +124,10 @@ function onLevelTagChange(val: string | string[] | null): void {
                     :class="$style.combatActionSelect"
                     @change="emits('change')"
                 />
+
+                <VCheckbox v-model="hideTurnPauses" :class="$style.turnPauseFilter">
+                    {{ LOGS_ADMIN.hideTurnPauses }}
+                </VCheckbox>
             </div>
         </div>
     </div>
@@ -194,6 +201,7 @@ function onLevelTagChange(val: string | string[] | null): void {
     display: flex;
     flex-direction: column;
     gap: $space-8;
+    min-width: 0;
 }
 
 .label {
@@ -238,5 +246,10 @@ function onLevelTagChange(val: string | string[] | null): void {
         width: 100%;
         min-width: 0;
     }
+}
+
+.turnPauseFilter {
+    justify-content: center;
+    min-height: $space-32;
 }
 </style>

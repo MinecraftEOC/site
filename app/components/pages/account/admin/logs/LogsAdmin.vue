@@ -22,6 +22,7 @@ import { EColor, ENotificationType, ESize } from '~/assets/ts/enums/common';
 
 import AccountEmptyState from '~/components/pages/account/AccountEmptyState.vue';
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
+import LogsAdminCombatTimeline from '~/components/pages/account/admin/logs/LogsAdminCombatTimeline.vue';
 import LogsAdminEntryCard from '~/components/pages/account/admin/logs/LogsAdminEntryCard.vue';
 import LogsAdminErrorGroupCard from '~/components/pages/account/admin/logs/LogsAdminErrorGroupCard.vue';
 import LogsAdminFilesSidebar from '~/components/pages/account/admin/logs/LogsAdminFilesSidebar.vue';
@@ -43,12 +44,22 @@ const router = useRouter();
 const notificationStore = useNotificationStore();
 const userStore = useUserStore();
 
+type TLogView = 'list' | 'timeline';
+
+const viewItems: ISwitcherItem<TLogView>[] = [
+    { label: LOGS_ADMIN.listView, value: 'list' },
+    { label: LOGS_ADMIN.timelineView, value: 'timeline' },
+];
+
 const categories = ref<ILogCategoryItem[]>([]);
 const activeCategory = ref<ELogCategory>(ELogCategory.Errors);
 const files = ref<ILogFileItem[]>([]);
 const totalFiles = ref(0);
 const selectedFile = ref<ILogFileItem | null>(null);
 const entries = ref<ILogEntryItem[]>([]);
+const view = ref<TLogView>('list');
+const timelineStalled = ref(false);
+const timelineCursors = new Set<string>();
 
 const fileSearch = ref('');
 const debouncedFileSearch = ref('');
@@ -61,9 +72,11 @@ const orderFilter = ref<ELogOrder>(ELogOrder.Desc);
 const checkTypeFilter = ref<'' | ELogCheckType>('');
 const outcomeFilter = ref<'' | ELogCheckOutcome>('');
 const actionFilter = ref<'' | ELogCombatAction>('');
+const hideTurnPauses = ref(true);
 
 let hasInitialQueryCategory = false;
 let initialTargetFileName = '';
+let initialTimeline = false;
 let isReadyForQuerySync = false;
 
 const cursorStack = ref<Array<string | null>>([null]);
@@ -105,6 +118,36 @@ const activeCategoryMeta = computed<ILogCategoryItem | null>(() => {
 const isChecksCategory = computed(() => activeCategory.value === ELogCategory.Checks);
 const isCombatCategory = computed(() => activeCategory.value === ELogCategory.Combat);
 const isErrorsCategory = computed(() => activeCategory.value === ELogCategory.Errors);
+const canShowTimeline = computed(() => isCombatCategory.value && Boolean(selectedFile.value));
+const isTimeline = computed(() => canShowTimeline.value && view.value === 'timeline');
+const visibleEntries = computed(() => {
+    if (!isCombatCategory.value || !hideTurnPauses.value) {
+        return entries.value;
+    }
+
+    return entries.value.filter(({ event }) => {
+        const code = normalizeLogEventCode(event);
+        return code !== 'combat.turn.paused' && code !== 'combat.turn.resumed';
+    });
+});
+
+const relatedCombatActions = computed(() => getCombatActionGroups(isCombatCategory.value ? visibleEntries.value : []));
+const displayedEntries = computed(() => {
+    if (!relatedCombatActions.value.size) {
+        return visibleEntries.value;
+    }
+
+    const relatedOffsets = new Set([...relatedCombatActions.value.values()].flatMap(group => group.map(entry => entry.byteOffset)));
+    return visibleEntries.value.filter(entry => !relatedOffsets.has(entry.byteOffset));
+});
+
+const timelineHasFilters = computed(() => Boolean(
+    levelFilter.value
+    || debouncedSearchQuery.value
+    || debouncedEventFilter.value
+    || actionFilter.value
+    || visibleEntries.value.length !== entries.value.length,
+));
 
 const errorGroups = computed<ILogEntryGroup[]>(() => {
     if (!isErrorsCategory.value) {
@@ -117,12 +160,13 @@ const errorGroups = computed<ILogEntryGroup[]>(() => {
 const hasActiveFilters = computed(() => {
     return Boolean(
         levelFilter.value
-        || orderFilter.value !== ELogOrder.Desc
+        || (!isTimeline.value && orderFilter.value !== ELogOrder.Desc)
         || searchQuery.value.trim()
         || eventFilter.value.trim()
         || checkTypeFilter.value
         || outcomeFilter.value
-        || actionFilter.value,
+        || actionFilter.value
+        || (isCombatCategory.value && !hideTurnPauses.value),
     );
 });
 
@@ -149,6 +193,8 @@ function initFromRouteQuery(): void {
     if (qFile) {
         initialTargetFileName = qFile;
     }
+    initialTimeline = Boolean(qFile && isCombatCategory.value && getSingleQueryParam(route.query.view) === 'timeline');
+    hideTurnPauses.value = !isCombatCategory.value || getSingleQueryParam(route.query.showTurnPauses) !== '1';
 
     const qFileSearch = getSingleQueryParam(route.query.fileSearch);
     if (qFileSearch) {
@@ -206,6 +252,9 @@ function syncRouteQuery(): void {
     if (selectedFile.value?.name) {
         nextQuery.file = selectedFile.value.name;
     }
+    if (isTimeline.value) {
+        nextQuery.view = 'timeline';
+    }
 
     if (debouncedFileSearch.value) {
         nextQuery.fileSearch = debouncedFileSearch.value;
@@ -239,6 +288,10 @@ function syncRouteQuery(): void {
         nextQuery.action = actionFilter.value;
     }
 
+    if (isCombatCategory.value && !hideTurnPauses.value) {
+        nextQuery.showTurnPauses = '1';
+    }
+
     const currentKeys = Object.keys(route.query);
     const nextKeys = Object.keys(nextQuery);
     const isSame = currentKeys.length === nextKeys.length
@@ -266,8 +319,13 @@ function abortAllRequests(): void {
     categoriesAbort = null;
     filesAbort?.abort();
     filesAbort = null;
+    abortEntries();
+}
+
+function abortEntries(): void {
     entriesAbort?.abort();
     entriesAbort = null;
+    isEntriesLoading.value = false;
 }
 
 function clearLogsState(): void {
@@ -277,12 +335,8 @@ function clearLogsState(): void {
     files.value = [];
     totalFiles.value = 0;
     selectedFile.value = null;
-    entries.value = [];
-    cursorStack.value = [null];
-    currentPageIndex.value = 0;
-    nextCursor.value = null;
-    hasMore.value = false;
-    scanLimited.value = false;
+    view.value = 'list';
+    resetPagination();
     scannedBytes.value = 0;
     categoriesError.value = '';
     filesError.value = '';
@@ -299,6 +353,10 @@ function isAbortError(error: unknown): boolean {
 }
 
 function resetPagination(): void {
+    abortEntries();
+    entries.value = [];
+    timelineCursors.clear();
+    timelineStalled.value = false;
     cursorStack.value = [null];
     currentPageIndex.value = 0;
     nextCursor.value = null;
@@ -315,6 +373,7 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
     entriesAbort?.abort();
     const controller = new AbortController();
     entriesAbort = controller;
+    const timeline = isTimeline.value;
 
     isEntriesLoading.value = true;
     entriesError.value = '';
@@ -325,7 +384,7 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
                 category: activeCategory.value,
                 file: selectedFile.value.name,
                 limit: LOGS_DEFAULT_LIMIT,
-                order: orderFilter.value,
+                order: timeline ? ELogOrder.Asc : orderFilter.value,
                 cursor: cursor ?? undefined,
                 level: levelFilter.value || undefined,
                 q: debouncedSearchQuery.value || undefined,
@@ -341,9 +400,22 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
             return;
         }
 
-        entries.value = response.items;
-        nextCursor.value = response.nextCursor;
-        hasMore.value = response.hasMore;
+        if (timeline) {
+            const byOffset = new Map(entries.value.map(entry => [entry.byteOffset, entry]));
+            for (const entry of response.items) {
+                byOffset.set(entry.byteOffset, entry);
+            }
+            entries.value = [...byOffset.values()];
+            if (cursor !== null) {
+                timelineCursors.add(cursor);
+            }
+            timelineStalled.value = response.hasMore
+                && (!response.nextCursor || timelineCursors.has(response.nextCursor));
+        } else {
+            entries.value = response.items;
+        }
+        nextCursor.value = timelineStalled.value ? null : response.nextCursor;
+        hasMore.value = response.hasMore && !timelineStalled.value;
         scanLimited.value = response.scanLimited;
         scannedBytes.value = response.scannedBytes;
     } catch (error) {
@@ -352,7 +424,9 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
         }
 
         entriesError.value = getApiErrorMessage(error, LOGS_ADMIN.loadErrorTitle);
-        entries.value = [];
+        if (!timeline) {
+            entries.value = [];
+        }
     } finally {
         if (entriesAbort === controller) {
             isEntriesLoading.value = false;
@@ -362,7 +436,7 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
 
 async function loadFiles(options: { refresh?: boolean; targetFileName?: string } = {}): Promise<void> {
     filesAbort?.abort();
-    entriesAbort?.abort();
+    abortEntries();
     const controller = new AbortController();
     filesAbort = controller;
 
@@ -400,8 +474,11 @@ async function loadFiles(options: { refresh?: boolean; targetFileName?: string }
 
         if (!response.items.length) {
             selectedFile.value = null;
-            entries.value = [];
+            view.value = 'list';
+            initialTimeline = false;
+            initialTargetFileName = '';
             resetPagination();
+            syncRouteQuery();
             return;
         }
 
@@ -412,6 +489,10 @@ async function loadFiles(options: { refresh?: boolean; targetFileName?: string }
             : undefined;
 
         selectedFile.value = matched ?? response.items[0] ?? null;
+        if (initialTimeline) {
+            view.value = matched && canShowTimeline.value ? 'timeline' : 'list';
+            initialTimeline = false;
+        }
         isReadyForQuerySync = true;
         syncRouteQuery();
         resetPagination();
@@ -425,7 +506,7 @@ async function loadFiles(options: { refresh?: boolean; targetFileName?: string }
         files.value = [];
         totalFiles.value = 0;
         selectedFile.value = null;
-        entries.value = [];
+        resetPagination();
     } finally {
         if (filesAbort === controller) {
             isFilesLoading.value = false;
@@ -459,6 +540,9 @@ async function loadCategories(refresh = false): Promise<void> {
         }
 
         await loadFiles({ refresh });
+        if (categoriesAbort !== controller) {
+            return;
+        }
         isReadyForQuerySync = true;
         syncRouteQuery();
     } catch (error) {
@@ -475,6 +559,8 @@ async function loadCategories(refresh = false): Promise<void> {
 }
 
 function onSelectCategory(nextCategory: ELogCategory): void {
+    initialTimeline = false;
+    initialTargetFileName = '';
     activeCategory.value = nextCategory;
     fileSearch.value = '';
     debouncedFileSearch.value = '';
@@ -485,12 +571,34 @@ function onSelectCategory(nextCategory: ELogCategory): void {
 
     if (nextCategory !== ELogCategory.Combat) {
         actionFilter.value = '';
+        view.value = 'list';
     }
 
     selectedFile.value = null;
     syncRouteQuery();
     resetPagination();
     loadFiles();
+}
+
+function onViewChange(nextView: TLogView): void {
+    if (nextView === view.value || !canShowTimeline.value || isFilesLoading.value) {
+        return;
+    }
+
+    view.value = nextView;
+    onImmediateFilterChange();
+}
+
+function onTimelineLoadMore(): void {
+    if (!isEntriesLoading.value && !isFilesLoading.value && nextCursor.value && hasMore.value) {
+        loadEntries(nextCursor.value);
+    }
+}
+
+function onTimelineRetry(): void {
+    if (!isEntriesLoading.value && !isFilesLoading.value && entriesError.value) {
+        loadEntries(nextCursor.value);
+    }
 }
 
 function onSelectFile(file: ILogFileItem): void {
@@ -513,7 +621,9 @@ function onImmediateFilterChange(): void {
 function onResetFilters(): void {
     clearTimers();
     levelFilter.value = '';
-    orderFilter.value = ELogOrder.Desc;
+    if (!isTimeline.value) {
+        orderFilter.value = ELogOrder.Desc;
+    }
     searchQuery.value = '';
     debouncedSearchQuery.value = '';
     eventFilter.value = '';
@@ -521,6 +631,7 @@ function onResetFilters(): void {
     checkTypeFilter.value = '';
     outcomeFilter.value = '';
     actionFilter.value = '';
+    hideTurnPauses.value = true;
     syncRouteQuery();
     resetPagination();
     loadEntries(null);
@@ -574,6 +685,8 @@ async function onOpenCombatLog(combatUuid: string): Promise<void> {
         notificationStore.add(LOGS_ADMIN.combatFileNotFound, cleanUuid, ENotificationType.Warning);
     }
 }
+
+watch(hideTurnPauses, syncRouteQuery);
 
 watch(fileSearch, (val) => {
     if (fileSearchTimer) {
@@ -692,6 +805,17 @@ onBeforeUnmount(() => {
             />
 
             <section :class="$style.mainPanel">
+                <div v-if="canShowTimeline">
+                    <VSwitcher
+                        :model-value="view"
+                        :items="viewItems"
+                        :size="ESize.Small"
+                        :disabled="isFilesLoading"
+                        data-test="log-view"
+                        @change="onViewChange"
+                    />
+                </div>
+
                 <LogsAdminFilters
                     v-model:search="searchQuery"
                     v-model:event="eventFilter"
@@ -700,101 +824,122 @@ onBeforeUnmount(() => {
                     v-model:check-type="checkTypeFilter"
                     v-model:outcome="outcomeFilter"
                     v-model:action="actionFilter"
+                    v-model:hide-turn-pauses="hideTurnPauses"
                     :is-checks-category="isChecksCategory"
                     :is-combat-category="isCombatCategory"
+                    :hide-order="isTimeline"
                     @change="onImmediateFilterChange"
                 />
 
-                <LogsAdminPaginationBar
-                    v-if="selectedFile"
-                    show-stats
-                    :page-index="currentPageIndex"
-                    :can-go-prev="canGoPrev"
-                    :can-go-next="canGoNext"
+                <LogsAdminCombatTimeline
+                    v-if="isTimeline && selectedFile"
+                    :key="selectedFile.name"
+                    :entries="entries"
+                    :visible-entries="displayedEntries"
+                    :related-actions="relatedCombatActions"
+                    :file-name="selectedFile.name"
+                    :filtered="timelineHasFilters"
+                    :has-more="hasMore && Boolean(nextCursor)"
                     :scan-limited="scanLimited"
-                    :entries-count="entries.length"
-                    :scanned-bytes="scannedBytes"
-                    @prev="onPrevPage"
-                    @next="onNextPage"
+                    :stalled="timelineStalled"
+                    :loading="isEntriesLoading || isFilesLoading"
+                    :error="entriesError"
+                    @load-more="onTimelineLoadMore"
+                    @retry="onTimelineRetry"
                 />
 
-                <div v-if="scanLimited" :class="$style.scanNotice">
-                    <VIcon name="info" :size="16" />
-                    <span>{{ LOGS_ADMIN.scanLimitedNotice }}</span>
-
-                    <VButton
-                        v-if="canGoNext"
-                        :size="ESize.Small"
-                        :color="EColor.Accent"
-                        @click="onNextPage"
-                    >
-                        {{ LOGS_ADMIN.continueScanButton }}
-                    </VButton>
-                </div>
-
-                <div v-if="entriesError" :class="$style.errorBanner">
-                    <VIcon name="circle-x" :size="18" />
-                    <span>{{ entriesError }}</span>
-                </div>
-
-                <div v-else-if="isEntriesLoading" :class="$style.loadingBox">
-                    {{ LOGS_ADMIN.loadingEntries }}
-                </div>
-
-                <AccountEmptyState
-                    v-else-if="!selectedFile"
-                    :icon="LOGS_ADMIN.noFileSelected.icon"
-                    :title="LOGS_ADMIN.noFileSelected.title"
-                    :description="LOGS_ADMIN.noFileSelected.description"
-                />
-
-                <AccountEmptyState
-                    v-else-if="!entries.length"
-                    :icon="LOGS_ADMIN.emptyEntries.icon"
-                    :title="LOGS_ADMIN.emptyEntries.title"
-                    :description="LOGS_ADMIN.emptyEntries.description"
-                />
-
-                <div v-else-if="isErrorsCategory" :class="$style.entriesList">
-                    <template v-for="group in errorGroups" :key="`${selectedFile.name}-${group.key}`">
-                        <LogsAdminErrorGroupCard
-                            v-if="group.entries.length > 1"
-                            :group="group"
-                            :category="activeCategory"
-                            :file-name="selectedFile.name"
-                            @open-combat="onOpenCombatLog"
-                        />
-
-                        <LogsAdminEntryCard
-                            v-else
-                            :entry="group.primaryEntry"
-                            :category="activeCategory"
-                            :file-name="selectedFile.name"
-                            @open-combat="onOpenCombatLog"
-                        />
-                    </template>
-                </div>
-
-                <div v-else :class="$style.entriesList">
-                    <LogsAdminEntryCard
-                        v-for="entry in entries"
-                        :key="`${selectedFile.name}-${entry.byteOffset}`"
-                        :entry="entry"
-                        :category="activeCategory"
-                        :file-name="selectedFile.name"
-                        @open-combat="onOpenCombatLog"
+                <template v-else>
+                    <LogsAdminPaginationBar
+                        v-if="selectedFile"
+                        show-stats
+                        :page-index="currentPageIndex"
+                        :can-go-prev="canGoPrev"
+                        :can-go-next="canGoNext"
+                        :scan-limited="scanLimited"
+                        :entries-count="displayedEntries.length"
+                        :scanned-bytes="scannedBytes"
+                        @prev="onPrevPage"
+                        @next="onNextPage"
                     />
-                </div>
 
-                <LogsAdminPaginationBar
-                    v-if="selectedFile && entries.length"
-                    :page-index="currentPageIndex"
-                    :can-go-prev="canGoPrev"
-                    :can-go-next="canGoNext"
-                    :scan-limited="scanLimited"
-                    @prev="onPrevPage"
-                    @next="onNextPage"
-                />
+                    <div v-if="scanLimited" :class="$style.scanNotice">
+                        <VIcon name="info" :size="16" />
+                        <span>{{ LOGS_ADMIN.scanLimitedNotice }}</span>
+
+                        <VButton
+                            v-if="canGoNext"
+                            :size="ESize.Small"
+                            :color="EColor.Accent"
+                            @click="onNextPage"
+                        >
+                            {{ LOGS_ADMIN.continueScanButton }}
+                        </VButton>
+                    </div>
+
+                    <div v-if="entriesError" :class="$style.errorBanner">
+                        <VIcon name="circle-x" :size="18" />
+                        <span>{{ entriesError }}</span>
+                    </div>
+
+                    <div v-else-if="isEntriesLoading" :class="$style.loadingBox">
+                        {{ LOGS_ADMIN.loadingEntries }}
+                    </div>
+
+                    <AccountEmptyState
+                        v-else-if="!selectedFile"
+                        :icon="LOGS_ADMIN.noFileSelected.icon"
+                        :title="LOGS_ADMIN.noFileSelected.title"
+                        :description="LOGS_ADMIN.noFileSelected.description"
+                    />
+
+                    <AccountEmptyState
+                        v-else-if="!displayedEntries.length"
+                        :icon="LOGS_ADMIN.emptyEntries.icon"
+                        :title="LOGS_ADMIN.emptyEntries.title"
+                        :description="entries.length ? LOGS_ADMIN.turnPausesHidden : LOGS_ADMIN.emptyEntries.description"
+                    />
+
+                    <div v-else-if="isErrorsCategory" :class="$style.entriesList">
+                        <template v-for="group in errorGroups" :key="`${selectedFile.name}-${group.key}`">
+                            <LogsAdminErrorGroupCard
+                                v-if="group.entries.length > 1"
+                                :group="group"
+                                :category="activeCategory"
+                                :file-name="selectedFile.name"
+                            />
+
+                            <LogsAdminEntryCard
+                                v-else
+                                :entry="group.primaryEntry"
+                                :category="activeCategory"
+                                :file-name="selectedFile.name"
+                                @open-combat="onOpenCombatLog"
+                            />
+                        </template>
+                    </div>
+
+                    <div v-else :class="$style.entriesList">
+                        <LogsAdminEntryCard
+                            v-for="entry in displayedEntries"
+                            :key="`${selectedFile.name}-${entry.byteOffset}`"
+                            :entry="entry"
+                            :related-entries="relatedCombatActions.get(entry.byteOffset)"
+                            :category="activeCategory"
+                            :file-name="selectedFile.name"
+                            @open-combat="onOpenCombatLog"
+                        />
+                    </div>
+
+                    <LogsAdminPaginationBar
+                        v-if="selectedFile && displayedEntries.length"
+                        :page-index="currentPageIndex"
+                        :can-go-prev="canGoPrev"
+                        :can-go-next="canGoNext"
+                        :scan-limited="scanLimited"
+                        @prev="onPrevPage"
+                        @next="onNextPage"
+                    />
+                </template>
             </section>
         </div>
     </AccountPageTemplate>
@@ -832,7 +977,7 @@ onBeforeUnmount(() => {
     align-items: start;
 
     @include respond-to(tablet) {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ILogEntryItem } from '~~/shared/@types/logging';
+import type { ILogEntryItem, TLogFieldValue } from '~~/shared/@types/logging';
 import type { ELogCheckOutcome } from '~~/shared/enums/logging';
 
 import { ELogCategory, ELogLevel } from '~~/shared/enums/logging';
@@ -17,10 +17,15 @@ interface IProps {
     fileName: string;
     /** Вложенный режим отображения внутри группы ошибок */
     nested?: boolean;
+    /** Краткое представление записи в хронологии боя */
+    compact?: boolean;
+    /** Остальные записи того же боевого действия. */
+    relatedEntries?: ILogEntryItem[];
 }
 
 const props = withDefaults(defineProps<IProps>(), {
     nested: false,
+    relatedEntries: () => [],
 });
 
 const emits = defineEmits<{
@@ -38,6 +43,7 @@ const classList = computed(() => [
     props.entry.level === ELogLevel.Error ? style._error : '',
     props.entry.level === ELogLevel.Warn ? style._warn : '',
     props.nested ? style._nested : '',
+    props.compact ? style._compact : '',
 ]);
 
 const levelBadgeColor = computed<EBadgeColor>(() => {
@@ -52,9 +58,47 @@ const levelLabel = computed(() => props.entry.level ?? 'СТРОКА');
 
 const formattedTime = computed(() => formatLogTimestamp(props.entry.timestamp));
 
+const equipmentReadinessColors = new Map<string, EBadgeColor>([
+    ['готов', EBadgeColor.Success],
+    ['не готов', EBadgeColor.Warning],
+]);
+
+const isEquipmentChange = computed(() => normalizeLogEventCode(props.entry.event) === 'combat.equipment.changed');
+
+const equipmentChanges = computed(() => {
+    if (!isEquipmentChange.value) {
+        return [];
+    }
+
+    return [...props.relatedEntries, props.entry].flatMap((entry) => {
+        if (normalizeLogEventCode(entry.event) !== 'combat.equipment.changed') {
+            return [];
+        }
+
+        const { fields } = entry;
+        const category = getLogEquipmentCategory(entry);
+        const hand = getFieldText(fields.hand);
+        const item = getFieldText(fields.item_name) || getFieldText(fields.item_id);
+        const previousItem = getFieldText(fields.previous_item_name) || getFieldText(fields.previous_item_id);
+        const readiness = category ? getFieldText(fields.readiness) : '';
+        return hand || category || item || previousItem
+            ? [{ offset: entry.byteOffset, category, hand, item, previousItem, readiness }]
+            : [];
+    });
+});
+
+const equipmentCategory = computed(() => {
+    const categories = equipmentChanges.value.flatMap(change => change.category ? [change.category] : []);
+    return [...new Set(categories)].join(', ') || null;
+});
+
+function getFieldText(value: TLogFieldValue | undefined): string {
+    return typeof value === 'string' ? value.trim() : '';
+}
+
 const originCategoryLabel = computed<string | null>(() => {
     const rawCat = props.entry.fields.category;
-    if (typeof rawCat !== 'string' || !rawCat || rawCat === props.category) {
+    if (equipmentCategory.value || typeof rawCat !== 'string' || !rawCat || rawCat === props.category) {
         return null;
     }
 
@@ -64,17 +108,28 @@ const originCategoryLabel = computed<string | null>(() => {
 const title = computed(() => getLogEntryTitle(props.entry, LOGS_ADMIN.unparsedTitle));
 
 const participants = computed(() => {
-    const result: Array<{ label: string; value: string }> = [];
-    const pairs: ReadonlyArray<[string, string]> = [
-        ['player', 'Игрок'],
-        ['actor', 'Инициатор'],
-        ['target', 'Цель'],
+    const { event, fields } = props.entry;
+    const action = props.relatedEntries.find(entry => entry.event === 'combat.action.resolved');
+    const declaration = props.relatedEntries.find(entry => entry.event === 'combat.attack.started');
+    const actor = getFieldText(fields.actor) || getFieldText(action?.fields.actor) || getFieldText(declaration?.fields.actor);
+    let target = getFieldText(fields.target);
+    if (!target && normalizeLogEventCode(event) === 'combat.attack.resolved') {
+        const targetId = getFieldText(fields.target_uuid);
+        const declaredTargetId = getFieldText(declaration?.fields.target_uuid);
+        const sameTarget = !targetId || !declaredTargetId || targetId === declaredTargetId;
+        target = (sameTarget ? getFieldText(declaration?.fields.target) : '') || targetId;
+    }
+
+    const result: Array<{ key: string; label: string; value: string }> = [];
+    const pairs: ReadonlyArray<[string, string, string]> = [
+        ['player', 'Игрок', getFieldText(fields.player)],
+        ['actor', 'Инициатор', actor],
+        ['target', 'Цель', target],
     ];
 
-    for (const [key, label] of pairs) {
-        const val = props.entry.fields[key];
-        if (val !== undefined && val !== null && String(val).trim()) {
-            result.push({ label, value: String(val) });
+    for (const [key, label, value] of pairs) {
+        if (value) {
+            result.push({ key, label, value });
         }
     }
 
@@ -170,6 +225,18 @@ const combatMetrics = computed(() => {
     return items;
 });
 
+const attackSummary = computed(() => {
+    const { event, fields } = props.entry;
+    if (normalizeLogEventCode(event) !== 'combat.attack.resolved') {
+        return null;
+    }
+
+    const hit = typeof fields.hit === 'boolean' ? fields.hit : null;
+    const bodyPart = typeof fields.body_part === 'string' ? fields.body_part.trim() : '';
+    const weapon = typeof fields.weapon === 'string' ? formatLogFieldValue(fields.weapon, 'weapon') : '';
+    return hit !== null || bodyPart || weapon ? { hit, bodyPart, weapon } : null;
+});
+
 const errorReasonSummary = computed<string | null>(() => {
     const f = props.entry.fields;
     if (typeof f.error_message === 'string' && f.error_message) {
@@ -184,13 +251,28 @@ const errorReasonSummary = computed<string | null>(() => {
 });
 
 const fieldEntries = computed(() => {
-    return Object.entries(props.entry.fields).map(([key, value]) => ({
-        key,
-        label: getLogFieldLabel(key),
-        value: formatLogFieldValue(value),
-        isMultiline: key === 'stack' || key === 'details' || (typeof value === 'string' && value.includes('\n')),
-        isTechnical: isTechnicalLogField(key),
-    }));
+    const fields = { ...props.entry.fields };
+    if (equipmentChanges.value.length > 1 && equipmentCategory.value) {
+        fields.category = equipmentCategory.value;
+        const readiness = equipmentChanges.value
+            .flatMap(change => change.category && change.readiness ? [`${change.category}: ${change.readiness}`] : [])
+            .join(' · ');
+        if (readiness) {
+            fields.readiness = readiness;
+        }
+    }
+
+    return Object.entries(fields).map(([key, value]) => {
+        const isEquipmentCategory = key === 'category' && Boolean(equipmentCategory.value);
+
+        return {
+            key,
+            label: isEquipmentCategory ? 'Категория снаряжения (category)' : getLogFieldLabel(key),
+            value: formatLogFieldValue(value, key),
+            isMultiline: key === 'stack' || key === 'details' || (typeof value === 'string' && value.includes('\n')),
+            isTechnical: !isEquipmentCategory && isTechnicalLogField(key),
+        };
+    });
 });
 
 const mainFieldEntries = computed(() => {
@@ -223,9 +305,21 @@ const showOpenCombatButton = computed(() => {
     return !(props.category === ELogCategory.Combat && props.fileName.toLowerCase() === `${combatUuid.value.toLowerCase()}.log`);
 });
 
-async function onCopyRaw() {
+const rawLines = computed(() => {
+    return [
+        { title: LOGS_ADMIN.rawLineTitle, entry: props.entry },
+        ...props.relatedEntries.map(entry => ({
+            title: entry.event === 'combat.action.resolved'
+                ? LOGS_ADMIN.relatedActionRawTitle
+                : getLogEntryTitle(entry, LOGS_ADMIN.unparsedTitle),
+            entry,
+        })),
+    ];
+});
+
+async function onCopyRaw(raw: string) {
     try {
-        await navigator.clipboard.writeText(props.entry.raw);
+        await navigator.clipboard.writeText(raw);
         notificationStore.add(LOGS_ADMIN.rawLineCopied);
     } catch {
         notificationStore.add(COPY_NOTIFICATION.error, '', ENotificationType.Error);
@@ -258,7 +352,7 @@ function onOpenCombatClick() {
                 </VBadge>
 
                 <VBadge
-                    v-if="roundBadge"
+                    v-if="roundBadge && !compact"
                     :color="EBadgeColor.Neutral"
                     :size="ESize.Small"
                 >
@@ -286,15 +380,78 @@ function onOpenCombatClick() {
         <div v-if="participants.length" :class="$style.participants">
             <span
                 v-for="person in participants"
-                :key="person.label"
+                :key="person.key"
                 :class="$style.participant"
             >
                 <span :class="$style.participantLabel">{{ person.label }}:</span>
-                <span :class="$style.participantValue">{{ person.value }}</span>
+                <span :class="[$style.participantValue, { [$style._bold]: isEquipmentChange && person.key === 'actor' }]">
+                    {{ person.value }}
+                </span>
             </span>
         </div>
 
-        <div v-if="isCheckEntry" :class="$style.summaryBox">
+        <ul v-if="equipmentChanges.length" :class="$style.equipmentChanges">
+            <li
+                v-for="change in equipmentChanges"
+                :key="change.offset"
+                :class="$style.equipmentChange"
+            >
+                <strong v-if="change.hand || change.category" :class="$style.equipmentSlot">
+                    {{ change.hand || change.category }}
+                </strong>
+
+                <div v-if="change.item || change.previousItem" :class="$style.equipmentItems">
+                    <div :class="$style.equipmentBefore">
+                        <div :class="$style.equipmentItem">
+                            <span :class="$style.equipmentCaption">Было</span>
+                            <strong>{{ change.previousItem || 'пусто' }}</strong>
+                        </div>
+                        <VIcon
+                            name="arrow-right"
+                            :size="14"
+                            :class="$style.equipmentArrow"
+                            aria-hidden="true"
+                        />
+                    </div>
+                    <div :class="$style.equipmentItem">
+                        <span :class="$style.equipmentCaption">Стало</span>
+                        <strong>{{ change.item || 'пусто' }}</strong>
+                    </div>
+                </div>
+
+                <div v-if="change.readiness" :class="$style.equipmentReadiness">
+                    <span :class="$style.equipmentCaption">Готовность</span>
+                    <VBadge
+                        :color="equipmentReadinessColors.get(change.readiness) ?? EBadgeColor.Neutral"
+                        :size="ESize.Small"
+                    >
+                        {{ change.readiness }}
+                    </VBadge>
+                </div>
+            </li>
+        </ul>
+
+        <div v-if="attackSummary" :class="$style.combatInfo">
+            <VBadge
+                v-if="attackSummary.hit !== null"
+                :color="attackSummary.hit ? EBadgeColor.Success : EBadgeColor.Danger"
+                :size="ESize.Small"
+            >
+                {{ attackSummary.hit ? 'Попадание' : 'Промах' }}
+            </VBadge>
+
+            <span v-if="attackSummary.bodyPart" :class="$style.metricItem">
+                <span :class="$style.metricLabel">Часть тела:</span>
+                <span :class="$style.metricValue">{{ attackSummary.bodyPart }}</span>
+            </span>
+
+            <span v-if="attackSummary.weapon" :class="$style.metricItem">
+                <span :class="$style.metricLabel">Оружие:</span>
+                <span :class="$style.metricValue">{{ attackSummary.weapon }}</span>
+            </span>
+        </div>
+
+        <div v-if="isCheckEntry && !compact" :class="$style.summaryBox">
             <div :class="$style.summaryMain">
                 <VBadge :color="checkOutcomeBadgeColor" :size="ESize.Small">
                     {{ checkOutcomeTitle }}
@@ -324,7 +481,7 @@ function onOpenCombatClick() {
         </div>
 
         <div
-            v-if="category !== ELogCategory.Checks && (combatMetrics.length || showOpenCombatButton)"
+            v-if="!compact && category !== ELogCategory.Checks && (combatMetrics.length || showOpenCombatButton)"
             :class="$style.combatBox"
         >
             <div v-if="combatMetrics.length" :class="$style.combatInfo">
@@ -349,7 +506,7 @@ function onOpenCombatClick() {
             </VButton>
         </div>
 
-        <div v-if="errorReasonSummary" :class="[$style.reasonBox, $style[`--color-${levelBadgeColor}`]]">
+        <div v-if="errorReasonSummary && !compact" :class="[$style.reasonBox, $style[`--color-${levelBadgeColor}`]]">
             {{ errorReasonSummary }}
         </div>
 
@@ -370,6 +527,8 @@ function onOpenCombatClick() {
             <button
                 type="button"
                 :class="$style.detailsButton"
+                :aria-expanded="isDetailsOpen"
+                data-test="log-entry-details"
                 @click="isDetailsOpen = !isDetailsOpen"
             >
                 <VIcon
@@ -448,27 +607,36 @@ function onOpenCombatClick() {
                 </dl>
             </div>
 
-            <div :class="$style.rawSection">
+            <div
+                v-for="line in rawLines"
+                :key="line.entry.byteOffset"
+                :class="$style.rawSection"
+            >
                 <div :class="$style.rawHeader">
-                    <span :class="$style.rawTitle">{{ LOGS_ADMIN.rawLineTitle }}</span>
+                    <span :class="$style.rawTitle">{{ line.title }}</span>
 
                     <VButton
                         :size="ESize.Small"
                         :color="EColor.Secondary"
                         icon="copy"
-                        @click="onCopyRaw"
+                        @click="onCopyRaw(line.entry.raw)"
                     >
                         {{ LOGS_ADMIN.copyRawButton }}
                     </VButton>
                 </div>
 
-                <pre :class="$style.codeBlock">{{ entry.raw }}</pre>
+                <pre :class="$style.codeBlock">{{ line.entry.raw }}</pre>
             </div>
         </div>
     </article>
 </template>
 
 <style module lang="scss">
+.LogsAdminEntryCard._compact {
+    gap: $space-8;
+    padding: $space-8 $space-12;
+}
+
 .LogsAdminEntryCard {
     display: flex;
     flex-direction: column;
@@ -553,6 +721,11 @@ function onOpenCombatClick() {
 .participantValue {
     color: $text-primary;
     font-weight: $fw-medium;
+    overflow-wrap: anywhere;
+
+    &._bold {
+        font-weight: $fw-bold;
+    }
 }
 
 .summaryBox {
@@ -628,6 +801,85 @@ function onOpenCombatClick() {
     flex-wrap: wrap;
     gap: $space-12;
     align-items: center;
+}
+
+.equipmentChanges {
+    max-width: rem(760);
+    border: 1px solid $border-subtle;
+    border-radius: $radius-8;
+    background-color: $surface;
+}
+
+.equipmentChange {
+    @include t3;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr);
+    gap: $space-8 $space-16;
+    align-items: center;
+    padding: $space-10 $space-12;
+    overflow-wrap: anywhere;
+
+    & + & {
+        border-top: 1px solid $border-subtle;
+    }
+
+    @include respond-to(mobile) {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+    }
+}
+
+.equipmentItem,
+.equipmentReadiness {
+    display: flex;
+    flex-direction: column;
+}
+
+.equipmentSlot::first-letter {
+    text-transform: uppercase;
+}
+
+.equipmentItems {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column: 2;
+    gap: $space-8;
+    align-items: center;
+
+    @include respond-to(mobile) {
+        grid-row: 2;
+        grid-column: 1 / -1;
+    }
+}
+
+.equipmentBefore {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(max-content, 1fr);
+    gap: $space-8;
+    align-items: center;
+}
+
+.equipmentCaption {
+    @include t4;
+
+    color: $text-secondary;
+}
+
+.equipmentArrow {
+    justify-self: center;
+    color: $text-secondary;
+}
+
+.equipmentReadiness {
+    grid-column: 3;
+    gap: $space-2;
+    align-items: flex-start;
+
+    @include respond-to(mobile) {
+        grid-row: 1;
+        grid-column: 2;
+    }
 }
 
 .reasonBox {
