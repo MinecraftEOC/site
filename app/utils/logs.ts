@@ -1,5 +1,5 @@
 import type { ILogEntryGroup, ILogEntryItem, TLogFieldValue } from '~~/shared/@types/logging';
-import type { ELogCategory, ELogCheckType, ELogCombatAction } from '~~/shared/enums/logging';
+import type { ELogCategory, ELogCheckType } from '~~/shared/enums/logging';
 
 import {
     LOG_CATEGORY_LABEL,
@@ -9,7 +9,7 @@ import {
     LOG_FIELD_LABELS,
     LOG_TECHNICAL_FIELD_KEYS,
 } from '~~/shared/constants/logging';
-import { ELogCheckOutcome } from '~~/shared/enums/logging';
+import { ELogCheckOutcome, ELogCombatAction } from '~~/shared/enums/logging';
 import { BYTES_IN_KB } from '~/assets/ts/constants/common';
 import { LOGS_DISPLAY_TIMEZONE } from '~/assets/ts/constants/logs';
 
@@ -18,6 +18,11 @@ const BYTES_IN_MB = BYTES_IN_KB * 1024;
 const ISO_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$/;
 
 const TECHNICAL_FIELD_KEY_SET = new Set<string>(LOG_TECHNICAL_FIELD_KEYS);
+const COMBAT_ACTION_RESULT_EVENTS = new Map<TLogFieldValue, string>([
+    [ELogCombatAction.Attack, 'combat.attack.resolved'],
+    [ELogCombatAction.Potion, 'combat.potion.resolved'],
+    [ELogCombatAction.EquipmentChange, 'combat.equipment.changed'],
+]);
 
 const logDateTimeFormatter = new Intl.DateTimeFormat('ru-RU', {
     timeZone: LOGS_DISPLAY_TIMEZONE,
@@ -110,9 +115,10 @@ export function getLogFieldLabel(key: string): string {
  * ISO-строки даты и времени автоматически переводятся в понятный человеку формат.
  *
  * @param value Значение поля.
+ * @param key Ключ поля для форматирования значений со специальной разметкой.
  * @returns Текстовое представление значения.
  */
-export function formatLogFieldValue(value: TLogFieldValue): string {
+export function formatLogFieldValue(value: TLogFieldValue, key?: string): string {
     if (value === null) {
         return 'не определено (null)';
     }
@@ -125,8 +131,14 @@ export function formatLogFieldValue(value: TLogFieldValue): string {
         return 'нет';
     }
 
-    if (typeof value === 'string' && ISO_TIMESTAMP_REGEX.test(value)) {
-        return formatLogTimestamp(value);
+    if (typeof value === 'string') {
+        if (key === 'weapon') {
+            return value.replace(/§r/gi, '').trim();
+        }
+
+        if (ISO_TIMESTAMP_REGEX.test(value)) {
+            return formatLogTimestamp(value);
+        }
     }
 
     return String(value);
@@ -168,6 +180,77 @@ export function getLogOriginCategoryLabel(categoryCode: string): string {
     }
 
     return categoryCode;
+}
+
+/**
+ * Возвращает категорию снаряжения, записанную поверх категории журнала.
+ *
+ * @param entry Разобранная запись журнала.
+ * @returns Категория снаряжения или `null`.
+ */
+export function getLogEquipmentCategory(entry: ILogEntryItem): string | null {
+    const category = entry.fields.category;
+    if (normalizeLogEventCode(entry.event) !== 'combat.equipment.changed' || typeof category !== 'string') {
+        return null;
+    }
+
+    const value = category.trim();
+    return value && !Object.hasOwn(LOG_CATEGORY_LABEL, value) ? value : null;
+}
+
+/**
+ * Группирует результаты боевого действия с записью о выполнении или объявлении.
+ *
+ * @param entries Видимые записи одного файла боя.
+ * @returns Связанные записи по смещению результата, который остаётся в ленте.
+ */
+export function getCombatActionGroups(entries: readonly ILogEntryItem[]): Map<number, ILogEntryItem[]> {
+    const groups = new Map<number, ILogEntryItem[]>();
+    const byAction = new Map<string, { actions: ILogEntryItem[]; declarations: ILogEntryItem[]; results: ILogEntryItem[] }>();
+
+    for (const entry of entries) {
+        const { action, action_id: actionId } = entry.fields;
+        if (entry.parseError || typeof actionId !== 'string' || !actionId.trim()) {
+            continue;
+        }
+
+        const isAction = entry.event === 'combat.action.resolved';
+        const isDeclaration = entry.event === 'combat.attack.started';
+        const resultEvent = isDeclaration ? 'combat.attack.resolved' : entry.event;
+        const matchingResultEvent = isAction ? COMBAT_ACTION_RESULT_EVENTS.get(action ?? null) : resultEvent;
+        if (matchingResultEvent !== 'combat.attack.resolved'
+            && matchingResultEvent !== 'combat.potion.resolved'
+            && matchingResultEvent !== 'combat.equipment.changed') {
+            continue;
+        }
+
+        const key = `${matchingResultEvent}:${actionId.trim()}`;
+        const group = byAction.get(key) ?? { actions: [], declarations: [], results: [] };
+        const bucket = isDeclaration ? group.declarations : group.results;
+        (isAction ? group.actions : bucket).push(entry);
+        byAction.set(key, group);
+    }
+
+    for (const { actions, declarations, results } of byAction.values()) {
+        const isAttack = results[0]?.event === 'combat.attack.resolved';
+        const multipleResultsAllowed = results[0]?.event === 'combat.equipment.changed';
+        if (actions.length > 1 || (!isAttack && actions.length !== 1) || (!multipleResultsAllowed && results.length !== 1)) {
+            continue;
+        }
+
+        const [primary, ...relatedResults] = results.sort((a, b) => b.byteOffset - a.byteOffset);
+        if (primary) {
+            const relatedEntries = [...actions, ...relatedResults];
+            if (declarations.length === 1) {
+                relatedEntries.push(...declarations);
+            }
+            if (relatedEntries.length) {
+                groups.set(primary.byteOffset, relatedEntries.sort((a, b) => a.byteOffset - b.byteOffset));
+            }
+        }
+    }
+
+    return groups;
 }
 
 /**
@@ -245,7 +328,7 @@ function formatCombatActionTitle(rawAction: TLogFieldValue | undefined): string 
 
 /**
  * Возвращает заголовок карточки записи журнала по полям `check_name` + навык,
- * боевому действию и инициатору, `message` или `event`.
+ * боевому действию, `message` или `event`.
  *
  * @param entry Разобранная запись журнала.
  * @param fallback Заголовок для нераспознанной строки.
@@ -267,14 +350,12 @@ export function getLogEntryTitle(entry: ILogEntryItem, fallback: string): string
 
     if (entry.event?.startsWith('combat.')) {
         const baseTitle = message || entry.event;
-        const actionTitle = formatCombatActionTitle(entry.fields.action);
-        const actorName = typeof entry.fields.actor === 'string' && entry.fields.actor.trim()
-            ? entry.fields.actor.trim()
-            : typeof entry.fields.player === 'string' && entry.fields.player.trim()
-                ? entry.fields.player.trim()
-                : '';
+        if (normalizeLogEventCode(entry.event) === 'combat.equipment.changed') {
+            return baseTitle;
+        }
 
-        return [baseTitle, actionTitle, actorName].filter(Boolean).join(' · ');
+        const actionTitle = formatCombatActionTitle(entry.fields.action);
+        return actionTitle ? `${baseTitle} · ${actionTitle}` : baseTitle;
     }
 
     if (message) {
