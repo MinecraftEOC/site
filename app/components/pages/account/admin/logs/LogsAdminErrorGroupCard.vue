@@ -2,7 +2,6 @@
 import type { ILogEntryGroup } from '~~/shared/@types/logging';
 import type { ELogCategory } from '~~/shared/enums/logging';
 
-import { LOG_CATEGORY_LABEL } from '~~/shared/constants/logging';
 import { ELogLevel } from '~~/shared/enums/logging';
 import { LOGS_ADMIN } from '~/assets/ts/constants/content/account';
 import { LOG_LEVEL_BADGE_COLOR } from '~/assets/ts/constants/logs';
@@ -45,8 +44,6 @@ const levelBadgeColor = computed<EBadgeColor>(() => {
 });
 
 const levelLabel = computed(() => primaryEntry.value.level ?? ELogLevel.Error);
-
-const categoryLabel = computed(() => LOG_CATEGORY_LABEL[props.category]);
 
 const originCategoryLabel = computed<string | null>(() => {
     const rawCat = primaryEntry.value.fields.category;
@@ -133,10 +130,6 @@ function onOpenCombat(combatUuid: string): void {
                     {{ levelLabel }}
                 </VBadge>
 
-                <VBadge :color="EBadgeColor.Neutral" :size="ESize.Small">
-                    {{ categoryLabel }}
-                </VBadge>
-
                 <VBadge
                     v-if="originCategoryLabel"
                     :color="EBadgeColor.Info"
@@ -144,10 +137,6 @@ function onOpenCombat(combatUuid: string): void {
                 >
                     {{ originCategoryLabel }}
                 </VBadge>
-
-                <span v-if="baseEvent" :class="$style.event">
-                    {{ baseEvent }}
-                </span>
             </div>
 
             <div :class="$style.headRight">
@@ -180,7 +169,7 @@ function onOpenCombat(combatUuid: string): void {
             </span>
         </div>
 
-        <div v-if="errorReasonSummary" :class="$style.reasonBox">
+        <div v-if="errorReasonSummary" :class="[$style.reasonBox, $style[`--color-${levelBadgeColor}`]]">
             {{ errorReasonSummary }}
         </div>
 
@@ -263,15 +252,6 @@ function onOpenCombat(combatUuid: string): void {
     color: $text-secondary;
 }
 
-.event {
-    @include mono2;
-
-    padding: $space-2 $space-8;
-    border-radius: $radius-4;
-    background-color: $surface-sunken;
-    color: $text-primary;
-}
-
 .title {
     @include h5;
 
@@ -307,9 +287,9 @@ function onOpenCombat(combatUuid: string): void {
 
     padding: $space-8 $space-12;
     border-radius: $radius-8;
-    background-color: $danger-bg;
-    color: $danger-fg;
     overflow-wrap: anywhere;
+
+    @include badge-colors;
 }
 
 .footer {

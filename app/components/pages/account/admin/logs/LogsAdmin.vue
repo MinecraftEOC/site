@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ILogCategoryItem, ILogEntryFileMeta, ILogEntryGroup, ILogEntryItem, ILogFileItem } from '~~/shared/@types/logging';
+import type { ILogCategoryItem, ILogEntryGroup, ILogEntryItem, ILogFileItem } from '~~/shared/@types/logging';
 import type { ISwitcherItem } from '~/@types/switcher';
 
 import {
@@ -24,7 +24,6 @@ import AccountEmptyState from '~/components/pages/account/AccountEmptyState.vue'
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
 import LogsAdminEntryCard from '~/components/pages/account/admin/logs/LogsAdminEntryCard.vue';
 import LogsAdminErrorGroupCard from '~/components/pages/account/admin/logs/LogsAdminErrorGroupCard.vue';
-import LogsAdminFileHeader from '~/components/pages/account/admin/logs/LogsAdminFileHeader.vue';
 import LogsAdminFilesSidebar from '~/components/pages/account/admin/logs/LogsAdminFilesSidebar.vue';
 import LogsAdminFilters from '~/components/pages/account/admin/logs/LogsAdminFilters.vue';
 import LogsAdminPaginationBar from '~/components/pages/account/admin/logs/LogsAdminPaginationBar.vue';
@@ -49,7 +48,6 @@ const activeCategory = ref<ELogCategory>(ELogCategory.Errors);
 const files = ref<ILogFileItem[]>([]);
 const totalFiles = ref(0);
 const selectedFile = ref<ILogFileItem | null>(null);
-const currentFileMeta = ref<ILogEntryFileMeta | null>(null);
 const entries = ref<ILogEntryItem[]>([]);
 
 const fileSearch = ref('');
@@ -279,7 +277,6 @@ function clearLogsState(): void {
     files.value = [];
     totalFiles.value = 0;
     selectedFile.value = null;
-    currentFileMeta.value = null;
     entries.value = [];
     cursorStack.value = [null];
     currentPageIndex.value = 0;
@@ -312,7 +309,6 @@ function resetPagination(): void {
 async function loadEntries(cursor: string | null = null): Promise<void> {
     if (!selectedFile.value) {
         entries.value = [];
-        currentFileMeta.value = null;
         return;
     }
 
@@ -345,7 +341,6 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
             return;
         }
 
-        currentFileMeta.value = response.file;
         entries.value = response.items;
         nextCursor.value = response.nextCursor;
         hasMore.value = response.hasMore;
@@ -380,7 +375,6 @@ async function loadFiles(options: { refresh?: boolean; targetFileName?: string }
         totalFiles.value = 0;
         selectedFile.value = null;
         entries.value = [];
-        currentFileMeta.value = null;
         isFilesLoading.value = false;
         return;
     }
@@ -407,7 +401,6 @@ async function loadFiles(options: { refresh?: boolean; targetFileName?: string }
         if (!response.items.length) {
             selectedFile.value = null;
             entries.value = [];
-            currentFileMeta.value = null;
             resetPagination();
             return;
         }
@@ -699,13 +692,6 @@ onBeforeUnmount(() => {
             />
 
             <section :class="$style.mainPanel">
-                <LogsAdminFileHeader
-                    v-if="selectedFile"
-                    :category="activeCategory"
-                    :file="selectedFile"
-                    :file-meta="currentFileMeta"
-                />
-
                 <LogsAdminFilters
                     v-model:search="searchQuery"
                     v-model:event="eventFilter"
