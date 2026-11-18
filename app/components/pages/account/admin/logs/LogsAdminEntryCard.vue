@@ -33,6 +33,7 @@ const emits = defineEmits<{
 }>();
 
 const style = useCssModule();
+
 const notificationStore = useNotificationStore();
 
 const isDetailsOpen = ref(false);
@@ -54,13 +55,13 @@ const levelBadgeColor = computed<EBadgeColor>(() => {
     return LOG_LEVEL_BADGE_COLOR[props.entry.level];
 });
 
-const levelLabel = computed(() => props.entry.level ?? 'СТРОКА');
+const levelLabel = computed(() => props.entry.level ?? LOGS_ADMIN.lineLabel);
 
 const formattedTime = computed(() => formatLogTimestamp(props.entry.timestamp));
 
 const equipmentReadinessColors = new Map<string, EBadgeColor>([
-    ['готов', EBadgeColor.Success],
-    ['не готов', EBadgeColor.Warning],
+    [LOGS_ADMIN.readyLabel, EBadgeColor.Success],
+    [LOGS_ADMIN.notReadyLabel, EBadgeColor.Warning],
 ]);
 
 const isEquipmentChange = computed(() => normalizeLogEventCode(props.entry.event) === 'combat.equipment.changed');
@@ -88,7 +89,7 @@ const equipmentChanges = computed(() => {
 });
 
 const equipmentCategory = computed(() => {
-    const categories = equipmentChanges.value.flatMap(change => change.category ? [change.category] : []);
+    const categories = equipmentChanges.value.flatMap(change => (change.category ? [change.category] : []));
     return [...new Set(categories)].join(', ') || null;
 });
 
@@ -111,7 +112,8 @@ const participants = computed(() => {
     const { event, fields } = props.entry;
     const action = props.relatedEntries.find(entry => entry.event === 'combat.action.resolved');
     const declaration = props.relatedEntries.find(entry => entry.event === 'combat.attack.started');
-    const actor = getFieldText(fields.actor) || getFieldText(action?.fields.actor) || getFieldText(declaration?.fields.actor);
+    const actor
+        = getFieldText(fields.actor) || getFieldText(action?.fields.actor) || getFieldText(declaration?.fields.actor);
     let target = getFieldText(fields.target);
     if (!target && normalizeLogEventCode(event) === 'combat.attack.resolved') {
         const targetId = getFieldText(fields.target_uuid);
@@ -122,9 +124,9 @@ const participants = computed(() => {
 
     const result: Array<{ key: string; label: string; value: string }> = [];
     const pairs: ReadonlyArray<[string, string, string]> = [
-        ['player', 'Игрок', getFieldText(fields.player)],
-        ['actor', 'Инициатор', actor],
-        ['target', 'Цель', target],
+        ['player', LOGS_ADMIN.playerLabel, getFieldText(fields.player)],
+        ['actor', LOGS_ADMIN.actorLabel, actor],
+        ['target', LOGS_ADMIN.targetLabel, target],
     ];
 
     for (const [key, label, value] of pairs) {
@@ -163,14 +165,14 @@ const checkMetrics = computed(() => {
     const f = props.entry.fields;
     const items: Array<{ label: string; value: string; emphasized?: boolean }> = [];
     const metricDefs: ReadonlyArray<[key: string, label: string, emphasized?: boolean]> = [
-        ['roll', 'Кубик'],
-        ['param', 'Параметр'],
-        ['skill', 'Навык'],
-        ['modifier', 'Модификатор'],
-        ['bonus', 'Бонус'],
-        ['result', 'Итог', true],
-        ['total', 'Итог', true],
-        ['difficulty', 'Сложность', true],
+        ['roll', LOGS_ADMIN.rollLabel],
+        ['param', LOGS_ADMIN.paramLabel],
+        ['skill', LOGS_ADMIN.skillLabel],
+        ['modifier', LOGS_ADMIN.modifierLabel],
+        ['bonus', LOGS_ADMIN.bonusLabel],
+        ['result', LOGS_ADMIN.resultLabel, true],
+        ['total', LOGS_ADMIN.resultLabel, true],
+        ['difficulty', LOGS_ADMIN.difficultyLabel, true],
     ];
 
     const seenLabels = new Set<string>();
@@ -183,9 +185,9 @@ const checkMetrics = computed(() => {
     }
 
     if (f.advantage === true) {
-        items.push({ label: 'Режим', value: 'Преимущество' });
+        items.push({ label: LOGS_ADMIN.modeLabel, value: LOGS_ADMIN.advantageLabel });
     } else if (f.disadvantage === true) {
-        items.push({ label: 'Режим', value: 'Помеха' });
+        items.push({ label: LOGS_ADMIN.modeLabel, value: LOGS_ADMIN.disadvantageLabel });
     }
 
     return items;
@@ -209,10 +211,10 @@ const combatMetrics = computed(() => {
     const f = props.entry.fields;
     const items: Array<{ label: string; value: string }> = [];
     const defs: ReadonlyArray<[string, string]> = [
-        ['damage', 'Урон'],
-        ['applied', 'Применено'],
-        ['hp_before', 'HP до'],
-        ['hp_after', 'HP после'],
+        ['damage', LOGS_ADMIN.damageLabel],
+        ['applied', LOGS_ADMIN.appliedLabel],
+        ['hp_before', LOGS_ADMIN.hpBeforeLabel],
+        ['hp_after', LOGS_ADMIN.hpAfterLabel],
     ];
 
     for (const [key, label] of defs) {
@@ -255,7 +257,9 @@ const fieldEntries = computed(() => {
     if (equipmentChanges.value.length > 1 && equipmentCategory.value) {
         fields.category = equipmentCategory.value;
         const readiness = equipmentChanges.value
-            .flatMap(change => change.category && change.readiness ? [`${change.category}: ${change.readiness}`] : [])
+            .flatMap(change =>
+                change.category && change.readiness ? [`${change.category}: ${change.readiness}`] : [],
+            )
             .join(' · ');
         if (readiness) {
             fields.readiness = readiness;
@@ -267,7 +271,7 @@ const fieldEntries = computed(() => {
 
         return {
             key,
-            label: isEquipmentCategory ? 'Категория снаряжения (category)' : getLogFieldLabel(key),
+            label: isEquipmentCategory ? LOGS_ADMIN.equipmentCategoryLabel : getLogFieldLabel(key),
             value: formatLogFieldValue(value, key),
             isMultiline: key === 'stack' || key === 'details' || (typeof value === 'string' && value.includes('\n')),
             isTechnical: !isEquipmentCategory && isTechnicalLogField(key),
@@ -302,16 +306,20 @@ const showOpenCombatButton = computed(() => {
         return false;
     }
 
-    return !(props.category === ELogCategory.Combat && props.fileName.toLowerCase() === `${combatUuid.value.toLowerCase()}.log`);
+    return !(
+        props.category === ELogCategory.Combat
+        && props.fileName.toLowerCase() === `${combatUuid.value.toLowerCase()}.log`
+    );
 });
 
 const rawLines = computed(() => {
     return [
         { title: LOGS_ADMIN.rawLineTitle, entry: props.entry },
         ...props.relatedEntries.map(entry => ({
-            title: entry.event === 'combat.action.resolved'
-                ? LOGS_ADMIN.relatedActionRawTitle
-                : getLogEntryTitle(entry, LOGS_ADMIN.unparsedTitle),
+            title:
+                entry.event === 'combat.action.resolved'
+                    ? LOGS_ADMIN.relatedActionRawTitle
+                    : getLogEntryTitle(entry, LOGS_ADMIN.unparsedTitle),
             entry,
         })),
     ];
@@ -356,7 +364,7 @@ function onOpenCombatClick() {
                     :color="EBadgeColor.Neutral"
                     :size="ESize.Small"
                 >
-                    Раунд {{ roundBadge }}
+                    {{ LOGS_ADMIN.timelineRound }} {{ roundBadge }}
                 </VBadge>
 
                 <VBadge
@@ -368,9 +376,7 @@ function onOpenCombatClick() {
                 </VBadge>
             </div>
 
-            <span :class="$style.offset">
-                #{{ entry.byteOffset }}
-            </span>
+            <span :class="$style.offset">#{{ entry.byteOffset }}</span>
         </div>
 
         <h3 :class="$style.title">
@@ -384,7 +390,10 @@ function onOpenCombatClick() {
                 :class="$style.participant"
             >
                 <span :class="$style.participantLabel">{{ person.label }}:</span>
-                <span :class="[$style.participantValue, { [$style._bold]: isEquipmentChange && person.key === 'actor' }]">
+
+                <span
+                    :class="[$style.participantValue, { [$style._bold]: isEquipmentChange && person.key === 'actor' }]"
+                >
                     {{ person.value }}
                 </span>
             </span>
@@ -403,9 +412,11 @@ function onOpenCombatClick() {
                 <div v-if="change.item || change.previousItem" :class="$style.equipmentItems">
                     <div :class="$style.equipmentBefore">
                         <div :class="$style.equipmentItem">
-                            <span :class="$style.equipmentCaption">Было</span>
-                            <strong>{{ change.previousItem || 'пусто' }}</strong>
+                            <span :class="$style.equipmentCaption">{{ LOGS_ADMIN.equipmentBeforeLabel }}</span>
+
+                            <strong>{{ change.previousItem || LOGS_ADMIN.equipmentEmptyLabel }}</strong>
                         </div>
+
                         <VIcon
                             name="arrow-right"
                             :size="14"
@@ -413,14 +424,17 @@ function onOpenCombatClick() {
                             aria-hidden="true"
                         />
                     </div>
+
                     <div :class="$style.equipmentItem">
-                        <span :class="$style.equipmentCaption">Стало</span>
-                        <strong>{{ change.item || 'пусто' }}</strong>
+                        <span :class="$style.equipmentCaption">{{ LOGS_ADMIN.equipmentAfterLabel }}</span>
+
+                        <strong>{{ change.item || LOGS_ADMIN.equipmentEmptyLabel }}</strong>
                     </div>
                 </div>
 
                 <div v-if="change.readiness" :class="$style.equipmentReadiness">
-                    <span :class="$style.equipmentCaption">Готовность</span>
+                    <span :class="$style.equipmentCaption">{{ LOGS_ADMIN.equipmentReadinessLabel }}</span>
+
                     <VBadge
                         :color="equipmentReadinessColors.get(change.readiness) ?? EBadgeColor.Neutral"
                         :size="ESize.Small"
@@ -437,16 +451,18 @@ function onOpenCombatClick() {
                 :color="attackSummary.hit ? EBadgeColor.Success : EBadgeColor.Danger"
                 :size="ESize.Small"
             >
-                {{ attackSummary.hit ? 'Попадание' : 'Промах' }}
+                {{ attackSummary.hit ? LOGS_ADMIN.hitLabel : LOGS_ADMIN.missLabel }}
             </VBadge>
 
             <span v-if="attackSummary.bodyPart" :class="$style.metricItem">
-                <span :class="$style.metricLabel">Часть тела:</span>
+                <span :class="$style.metricLabel">{{ LOGS_ADMIN.bodyPartLabel }}</span>
+
                 <span :class="$style.metricValue">{{ attackSummary.bodyPart }}</span>
             </span>
 
             <span v-if="attackSummary.weapon" :class="$style.metricItem">
-                <span :class="$style.metricLabel">Оружие:</span>
+                <span :class="$style.metricLabel">{{ LOGS_ADMIN.weaponLabel }}</span>
+
                 <span :class="$style.metricValue">{{ attackSummary.weapon }}</span>
             </span>
         </div>
@@ -464,6 +480,7 @@ function onOpenCombatClick() {
                         :class="[$style.metricItem, { [$style._emphasized]: metric.emphasized }]"
                     >
                         <span :class="$style.metricLabel">{{ metric.label }}:</span>
+
                         <span :class="$style.metricValue">{{ metric.value }}</span>
                     </span>
                 </div>
@@ -491,6 +508,7 @@ function onOpenCombatClick() {
                     :class="$style.metricItem"
                 >
                     <span :class="$style.metricLabel">{{ metric.label }}:</span>
+
                     <span :class="$style.metricValue">{{ metric.value }}</span>
                 </span>
             </div>
@@ -514,9 +532,8 @@ function onOpenCombatClick() {
             <VIcon name="triangle-alert" :size="16" />
 
             <span>
-                <template v-if="entry.parseError">
-                    {{ LOGS_ADMIN.parseErrorPrefix }} {{ entry.parseError }}
-                </template>
+                <template v-if="entry.parseError">{{ LOGS_ADMIN.parseErrorPrefix }} {{ entry.parseError }}</template>
+
                 <template v-else>
                     {{ LOGS_ADMIN.truncatedNotice }}
                 </template>
@@ -531,10 +548,7 @@ function onOpenCombatClick() {
                 data-test="log-entry-details"
                 @click="isDetailsOpen = !isDetailsOpen"
             >
-                <VIcon
-                    :name="isDetailsOpen ? 'chevron-up' : 'chevron-down'"
-                    :size="16"
-                />
+                <VIcon :name="isDetailsOpen ? 'chevron-up' : 'chevron-down'" :size="16" />
                 {{ isDetailsOpen ? LOGS_ADMIN.detailsToggleClose : LOGS_ADMIN.detailsToggleOpen }}
             </button>
         </div>
@@ -549,8 +563,10 @@ function onOpenCombatClick() {
                     <dt :class="$style.fieldTerm">
                         {{ field.label }}
                     </dt>
+
                     <dd :class="$style.fieldValue">
                         <pre v-if="field.isMultiline" :class="$style.codeBlock">{{ field.value }}</pre>
+
                         <span v-else>{{ field.value }}</span>
                     </dd>
                 </div>
@@ -562,10 +578,8 @@ function onOpenCombatClick() {
                     :class="$style.techToggleButton"
                     @click="isTechParamsOpen = !isTechParamsOpen"
                 >
-                    <VIcon
-                        :name="isTechParamsOpen ? 'chevron-up' : 'chevron-down'"
-                        :size="15"
-                    />
+                    <VIcon :name="isTechParamsOpen ? 'chevron-up' : 'chevron-down'" :size="15" />
+
                     <span>
                         {{ isTechParamsOpen ? LOGS_ADMIN.techParamsToggleClose : LOGS_ADMIN.techParamsToggleOpen }}
                         ({{ totalTechnicalCount }})
@@ -577,6 +591,7 @@ function onOpenCombatClick() {
                         <dt :class="$style.fieldTerm">
                             {{ LOGS_ADMIN.fileFieldLabel }}
                         </dt>
+
                         <dd :class="$style.fieldValue">
                             {{ category }}/{{ fileName }} ({{ LOGS_ADMIN.byteOffsetLabel }}: {{ entry.byteOffset }})
                         </dd>
@@ -586,6 +601,7 @@ function onOpenCombatClick() {
                         <dt :class="$style.fieldTerm">
                             {{ LOGS_ADMIN.originalTimestampLabel }}
                         </dt>
+
                         <dd :class="$style.fieldValue">
                             {{ formattedTime }}
                         </dd>
@@ -599,8 +615,10 @@ function onOpenCombatClick() {
                         <dt :class="$style.fieldTerm">
                             {{ field.label }}
                         </dt>
+
                         <dd :class="$style.fieldValue">
                             <pre v-if="field.isMultiline" :class="$style.codeBlock">{{ field.value }}</pre>
+
                             <span v-else>{{ field.value }}</span>
                         </dd>
                     </div>
@@ -986,7 +1004,9 @@ function onOpenCombatClick() {
     background-color: $surface;
     color: $text-secondary;
     cursor: pointer;
-    transition: border-color $default-transition, color $default-transition;
+    transition:
+        border-color $default-transition,
+        color $default-transition;
 
     @include hover {
         border-color: $border;

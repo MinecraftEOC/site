@@ -172,3 +172,4 @@ bun.lockb
 .vscode
 
 /generated/prisma
+.playwright-mcp

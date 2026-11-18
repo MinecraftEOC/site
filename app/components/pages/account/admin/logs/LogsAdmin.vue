@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import type { IEconomyAnalytics } from '~~/shared/@types/economy';
 import type { ILogCategoryItem, ILogEntryGroup, ILogEntryItem, ILogFileItem } from '~~/shared/@types/logging';
+import type { TLogEntriesQuery } from '~~/shared/schemas/logging';
 import type { ISwitcherItem } from '~/@types/switcher';
-
+import { createEconomyFilterInputs, ECONOMY_FILTER_KEYS } from '~~/shared/constants/economy';
 import {
     LOG_CATEGORY_ICON,
     LOG_CATEGORY_LABEL,
     LOG_CATEGORY_ORDER,
     LOGS_DEFAULT_LIMIT,
 } from '~~/shared/constants/logging';
+
 import {
     ELogCategory,
     ELogCheckOutcome,
@@ -16,13 +19,17 @@ import {
     ELogLevel,
     ELogOrder,
 } from '~~/shared/enums/logging';
-import { LOGS_ADMIN } from '~/assets/ts/constants/content/account';
+import { sharedLogEntriesQuerySchema } from '~~/shared/schemas/logging';
+import { LOGS_ADMIN, LOGS_ECONOMY } from '~/assets/ts/constants/content/account';
 import { LOGS_SEARCH_DEBOUNCE_MS } from '~/assets/ts/constants/logs';
 import { EColor, ENotificationType, ESize } from '~/assets/ts/enums/common';
 
 import AccountEmptyState from '~/components/pages/account/AccountEmptyState.vue';
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
 import LogsAdminCombatTimeline from '~/components/pages/account/admin/logs/LogsAdminCombatTimeline.vue';
+import LogsAdminEconomyEntry from '~/components/pages/account/admin/logs/LogsAdminEconomyEntry.vue';
+import LogsAdminEconomyFilters from '~/components/pages/account/admin/logs/LogsAdminEconomyFilters.vue';
+import LogsAdminEconomyOverview from '~/components/pages/account/admin/logs/LogsAdminEconomyOverview.vue';
 import LogsAdminEntryCard from '~/components/pages/account/admin/logs/LogsAdminEntryCard.vue';
 import LogsAdminErrorGroupCard from '~/components/pages/account/admin/logs/LogsAdminErrorGroupCard.vue';
 import LogsAdminFilesSidebar from '~/components/pages/account/admin/logs/LogsAdminFilesSidebar.vue';
@@ -32,16 +39,25 @@ import LogsAdminPaginationBar from '~/components/pages/account/admin/logs/LogsAd
 import { useLogsApi } from '~/composables/api/useLogsApi';
 
 const VALID_CATEGORIES = new Set<string>(Object.values(ELogCategory));
+
 const VALID_LEVELS = new Set<string>(Object.values(ELogLevel));
+
 const VALID_ORDERS = new Set<string>(Object.values(ELogOrder));
+
 const VALID_CHECK_TYPES = new Set<string>(Object.values(ELogCheckType));
+
 const VALID_OUTCOMES = new Set<string>(Object.values(ELogCheckOutcome));
+
 const VALID_COMBAT_ACTIONS = new Set<string>(Object.values(ELogCombatAction));
 
-const { getCategories, getFiles, getEntries } = useLogsApi();
+const { getCategories, getFiles, getEntries, getEconomyAnalytics } = useLogsApi();
+
 const route = useRoute();
+
 const router = useRouter();
+
 const notificationStore = useNotificationStore();
+
 const userStore = useUserStore();
 
 type TLogView = 'list' | 'timeline';
@@ -59,6 +75,7 @@ const selectedFile = ref<ILogFileItem | null>(null);
 const entries = ref<ILogEntryItem[]>([]);
 const view = ref<TLogView>('list');
 const timelineStalled = ref(false);
+
 const timelineCursors = new Set<string>();
 
 const fileSearch = ref('');
@@ -73,10 +90,21 @@ const checkTypeFilter = ref<'' | ELogCheckType>('');
 const outcomeFilter = ref<'' | ELogCheckOutcome>('');
 const actionFilter = ref<'' | ELogCombatAction>('');
 const hideTurnPauses = ref(true);
+const economyFilters = ref(createEconomyFilterInputs());
+const appliedEconomyFilters = ref<Partial<TLogEntriesQuery>>({});
+const economyFilterError = ref('');
+const economyAnalytics = ref<IEconomyAnalytics | null>(null);
+const economyAnalyticsLoading = ref(false);
+const economyAnalyticsError = ref('');
+
+let economyAbort: AbortController | null = null;
 
 let hasInitialQueryCategory = false;
+
 let initialTargetFileName = '';
+
 let initialTimeline = false;
+
 let isReadyForQuerySync = false;
 
 const cursorStack = ref<Array<string | null>>([null]);
@@ -94,9 +122,13 @@ const filesError = ref('');
 const entriesError = ref('');
 
 let categoriesAbort: AbortController | null = null;
+
 let filesAbort: AbortController | null = null;
+
 let entriesAbort: AbortController | null = null;
+
 let fileSearchTimer: ReturnType<typeof setTimeout> | null = null;
+
 let entriesSearchTimer: ReturnType<typeof setTimeout> | null = null;
 
 const categorySwitcherItems = computed<ISwitcherItem<ELogCategory>[]>(() => {
@@ -116,10 +148,17 @@ const activeCategoryMeta = computed<ILogCategoryItem | null>(() => {
 });
 
 const isChecksCategory = computed(() => activeCategory.value === ELogCategory.Checks);
+
+const isEconomyCategory = computed(() => activeCategory.value === ELogCategory.Economy);
+
 const isCombatCategory = computed(() => activeCategory.value === ELogCategory.Combat);
+
 const isErrorsCategory = computed(() => activeCategory.value === ELogCategory.Errors);
+
 const canShowTimeline = computed(() => isCombatCategory.value && Boolean(selectedFile.value));
+
 const isTimeline = computed(() => canShowTimeline.value && view.value === 'timeline');
+
 const visibleEntries = computed(() => {
     if (!isCombatCategory.value || !hideTurnPauses.value) {
         return entries.value;
@@ -132,22 +171,27 @@ const visibleEntries = computed(() => {
 });
 
 const relatedCombatActions = computed(() => getCombatActionGroups(isCombatCategory.value ? visibleEntries.value : []));
+
 const displayedEntries = computed(() => {
     if (!relatedCombatActions.value.size) {
         return visibleEntries.value;
     }
 
-    const relatedOffsets = new Set([...relatedCombatActions.value.values()].flatMap(group => group.map(entry => entry.byteOffset)));
+    const relatedOffsets = new Set(
+        [...relatedCombatActions.value.values()].flatMap(group => group.map(entry => entry.byteOffset)),
+    );
     return visibleEntries.value.filter(entry => !relatedOffsets.has(entry.byteOffset));
 });
 
-const timelineHasFilters = computed(() => Boolean(
-    levelFilter.value
-    || debouncedSearchQuery.value
-    || debouncedEventFilter.value
-    || actionFilter.value
-    || visibleEntries.value.length !== entries.value.length,
-));
+const timelineHasFilters = computed(() =>
+    Boolean(
+        levelFilter.value
+        || debouncedSearchQuery.value
+        || debouncedEventFilter.value
+        || actionFilter.value
+        || visibleEntries.value.length !== entries.value.length,
+    ),
+);
 
 const errorGroups = computed<ILogEntryGroup[]>(() => {
     if (!isErrorsCategory.value) {
@@ -166,13 +210,18 @@ const hasActiveFilters = computed(() => {
         || checkTypeFilter.value
         || outcomeFilter.value
         || actionFilter.value
+        || (isEconomyCategory.value && ECONOMY_FILTER_KEYS.some(key => economyFilters.value[key].trim()))
         || (isCombatCategory.value && !hideTurnPauses.value),
     );
 });
 
 const canGoPrev = computed(() => !isEntriesLoading.value && currentPageIndex.value > 0);
+
 const canGoNext = computed(() => !isEntriesLoading.value && hasMore.value && Boolean(nextCursor.value));
-const isBusy = computed(() => isCategoriesLoading.value || isFilesLoading.value || isEntriesLoading.value);
+
+const isBusy = computed(
+    () => isCategoriesLoading.value || isFilesLoading.value || isEntriesLoading.value || economyAnalyticsLoading.value,
+);
 
 function getSingleQueryParam(val: string | Array<string | null> | null | undefined): string {
     if (Array.isArray(val)) {
@@ -189,6 +238,12 @@ function initFromRouteQuery(): void {
         hasInitialQueryCategory = true;
     }
 
+    if (isEconomyCategory.value) {
+        for (const key of ECONOMY_FILTER_KEYS) {
+            economyFilters.value[key] = getSingleQueryParam(route.query[key]);
+        }
+        validateEconomyFilters();
+    }
     const qFile = getSingleQueryParam(route.query.file);
     if (qFile) {
         initialTargetFileName = qFile;
@@ -292,10 +347,21 @@ function syncRouteQuery(): void {
         nextQuery.showTurnPauses = '1';
     }
 
+    if (isEconomyCategory.value) {
+        delete nextQuery.level;
+        delete nextQuery.event;
+        for (const key of ECONOMY_FILTER_KEYS) {
+            const value = appliedEconomyFilters.value[key];
+            if (value !== undefined) {
+                nextQuery[key] = String(value);
+            }
+        }
+    }
     const currentKeys = Object.keys(route.query);
     const nextKeys = Object.keys(nextQuery);
-    const isSame = currentKeys.length === nextKeys.length
-        && nextKeys.every(key => getSingleQueryParam(route.query[key]) === nextQuery[key]);
+    const isSame
+        = currentKeys.length === nextKeys.length
+            && nextKeys.every(key => getSingleQueryParam(route.query[key]) === nextQuery[key]);
 
     if (!isSame) {
         router.replace({ query: nextQuery });
@@ -315,6 +381,7 @@ function clearTimers(): void {
 }
 
 function abortAllRequests(): void {
+    abortEconomyAnalytics();
     categoriesAbort?.abort();
     categoriesAbort = null;
     filesAbort?.abort();
@@ -331,6 +398,8 @@ function abortEntries(): void {
 function clearLogsState(): void {
     clearTimers();
     abortAllRequests();
+    economyFilters.value = createEconomyFilterInputs();
+    appliedEconomyFilters.value = {};
     categories.value = [];
     files.value = [];
     totalFiles.value = 0;
@@ -386,9 +455,10 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
                 limit: LOGS_DEFAULT_LIMIT,
                 order: timeline ? ELogOrder.Asc : orderFilter.value,
                 cursor: cursor ?? undefined,
-                level: levelFilter.value || undefined,
+                ...(isEconomyCategory.value ? appliedEconomyFilters.value : {}),
+                level: !isEconomyCategory.value && levelFilter.value ? levelFilter.value : undefined,
                 q: debouncedSearchQuery.value || undefined,
-                event: debouncedEventFilter.value || undefined,
+                event: !isEconomyCategory.value && debouncedEventFilter.value ? debouncedEventFilter.value : undefined,
                 checkType: isChecksCategory.value && checkTypeFilter.value ? checkTypeFilter.value : undefined,
                 outcome: isChecksCategory.value && outcomeFilter.value ? outcomeFilter.value : undefined,
                 action: isCombatCategory.value && actionFilter.value ? actionFilter.value : undefined,
@@ -409,8 +479,8 @@ async function loadEntries(cursor: string | null = null): Promise<void> {
             if (cursor !== null) {
                 timelineCursors.add(cursor);
             }
-            timelineStalled.value = response.hasMore
-                && (!response.nextCursor || timelineCursors.has(response.nextCursor));
+            timelineStalled.value
+                = response.hasMore && (!response.nextCursor || timelineCursors.has(response.nextCursor));
         } else {
             entries.value = response.items;
         }
@@ -531,14 +601,18 @@ async function loadCategories(refresh = false): Promise<void> {
         categories.value = response.items;
 
         if (!refresh && !hasInitialQueryCategory) {
-            const preferred = response.items.find(item => item.id === activeCategory.value && item.hasFiles)
-                ?? response.items.find(item => item.hasFiles)
-                ?? response.items[0];
+            const preferred
+                = response.items.find(item => item.id === activeCategory.value && item.hasFiles)
+                    ?? response.items.find(item => item.hasFiles)
+                    ?? response.items[0];
             if (preferred) {
                 activeCategory.value = preferred.id;
             }
         }
 
+        if (isEconomyCategory.value) {
+            loadEconomyAnalytics();
+        }
         await loadFiles({ refresh });
         if (categoriesAbort !== controller) {
             return;
@@ -561,7 +635,18 @@ async function loadCategories(refresh = false): Promise<void> {
 function onSelectCategory(nextCategory: ELogCategory): void {
     initialTimeline = false;
     initialTargetFileName = '';
+    abortEconomyAnalytics();
+    economyFilters.value = createEconomyFilterInputs();
+    appliedEconomyFilters.value = {};
+    economyFilterError.value = '';
     activeCategory.value = nextCategory;
+    if (isEconomyCategory.value) {
+        clearTimers();
+        levelFilter.value = '';
+        eventFilter.value = '';
+        debouncedEventFilter.value = '';
+        loadEconomyAnalytics();
+    }
     fileSearch.value = '';
     debouncedFileSearch.value = '';
     if (nextCategory !== ELogCategory.Checks) {
@@ -619,6 +704,9 @@ function onImmediateFilterChange(): void {
 }
 
 function onResetFilters(): void {
+    economyFilters.value = createEconomyFilterInputs();
+    appliedEconomyFilters.value = {};
+    economyFilterError.value = '';
     clearTimers();
     levelFilter.value = '';
     if (!isTimeline.value) {
@@ -670,6 +758,7 @@ async function onOpenCombatLog(combatUuid: string): Promise<void> {
     const targetFileName = `${cleanUuid}.log`;
 
     clearTimers();
+    abortEconomyAnalytics();
     activeCategory.value = ELogCategory.Combat;
     fileSearch.value = cleanUuid;
     debouncedFileSearch.value = cleanUuid;
@@ -683,6 +772,67 @@ async function onOpenCombatLog(combatUuid: string): Promise<void> {
 
     if (!files.value.some(item => item.name.toLowerCase() === targetFileName)) {
         notificationStore.add(LOGS_ADMIN.combatFileNotFound, cleanUuid, ENotificationType.Warning);
+    }
+}
+
+function validateEconomyFilters(): boolean {
+    const parsed = sharedLogEntriesQuerySchema.safeParse({
+        category: ELogCategory.Economy,
+        file: '2000-01-01.log',
+        ...economyFilters.value,
+    });
+    if (!parsed.success) {
+        economyFilterError.value = parsed.error.issues.map(issue => issue.message).join('. ');
+        return false;
+    }
+    economyFilterError.value = '';
+    appliedEconomyFilters.value = Object.fromEntries(ECONOMY_FILTER_KEYS.map(key => [key, parsed.data[key]]));
+    return true;
+}
+
+function onApplyEconomyFilters(): void {
+    if (!validateEconomyFilters()) {
+        return;
+    }
+    clearTimers();
+    debouncedSearchQuery.value = searchQuery.value.trim();
+    syncRouteQuery();
+    resetPagination();
+    loadEntries(null);
+}
+
+function abortEconomyAnalytics(): void {
+    economyAbort?.abort();
+    economyAbort = null;
+    economyAnalytics.value = null;
+    economyAnalyticsError.value = '';
+    economyAnalyticsLoading.value = false;
+}
+
+async function loadEconomyAnalytics(): Promise<void> {
+    if (!isEconomyCategory.value) {
+        return;
+    }
+    economyAbort?.abort();
+    const controller = new AbortController();
+    economyAbort = controller;
+    economyAnalyticsLoading.value = true;
+    economyAnalyticsError.value = '';
+    economyAnalytics.value = null;
+    try {
+        const data = await getEconomyAnalytics(controller.signal);
+        if (economyAbort === controller && isEconomyCategory.value) {
+            economyAnalytics.value = data;
+        }
+    } catch (error) {
+        if (economyAbort !== controller || isAbortError(error)) {
+            return;
+        }
+        economyAnalyticsError.value = getApiErrorMessage(error, LOGS_ECONOMY.overview.loadError);
+    } finally {
+        if (economyAbort === controller) {
+            economyAnalyticsLoading.value = false;
+        }
     }
 }
 
@@ -746,10 +896,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <AccountPageTemplate
-        :title="LOGS_ADMIN.title"
-        :description="LOGS_ADMIN.description"
-    >
+    <AccountPageTemplate :title="LOGS_ADMIN.title" :description="LOGS_ADMIN.description">
         <template #header-right>
             <div :class="$style.headerActions">
                 <VButton
@@ -781,8 +928,17 @@ onBeforeUnmount(() => {
             />
         </div>
 
+        <LogsAdminEconomyOverview
+            v-if="isEconomyCategory && !categoriesError"
+            :analytics="economyAnalytics"
+            :loading="economyAnalyticsLoading"
+            :error="economyAnalyticsError"
+            @retry="loadEconomyAnalytics"
+        />
+
         <div v-if="categoriesError" :class="$style.errorBanner">
             <VIcon name="circle-x" :size="18" />
+
             <span>{{ categoriesError }}</span>
         </div>
 
@@ -816,7 +972,18 @@ onBeforeUnmount(() => {
                     />
                 </div>
 
+                <LogsAdminEconomyFilters
+                    v-if="isEconomyCategory"
+                    v-model:filters="economyFilters"
+                    v-model:search="searchQuery"
+                    v-model:order="orderFilter"
+                    :error="economyFilterError"
+                    @apply="onApplyEconomyFilters"
+                    @order-change="onImmediateFilterChange"
+                />
+
                 <LogsAdminFilters
+                    v-else
                     v-model:search="searchQuery"
                     v-model:event="eventFilter"
                     v-model:level="levelFilter"
@@ -864,20 +1031,23 @@ onBeforeUnmount(() => {
 
                     <div v-if="scanLimited" :class="$style.scanNotice">
                         <VIcon name="info" :size="16" />
+
                         <span>{{ LOGS_ADMIN.scanLimitedNotice }}</span>
 
-                        <VButton
+                        <VPagination
                             v-if="canGoNext"
-                            :size="ESize.Small"
-                            :color="EColor.Accent"
-                            @click="onNextPage"
-                        >
-                            {{ LOGS_ADMIN.continueScanButton }}
-                        </VButton>
+                            :can-go-next="canGoNext"
+                            :show-prev="false"
+                            :next-color="EColor.Accent"
+                            :label="LOGS_ADMIN.paginationLabel"
+                            :next-label="LOGS_ADMIN.continueScanButton"
+                            @next="onNextPage"
+                        />
                     </div>
 
                     <div v-if="entriesError" :class="$style.errorBanner">
                         <VIcon name="circle-x" :size="18" />
+
                         <span>{{ entriesError }}</span>
                     </div>
 
@@ -896,8 +1066,19 @@ onBeforeUnmount(() => {
                         v-else-if="!displayedEntries.length"
                         :icon="LOGS_ADMIN.emptyEntries.icon"
                         :title="LOGS_ADMIN.emptyEntries.title"
-                        :description="entries.length ? LOGS_ADMIN.turnPausesHidden : LOGS_ADMIN.emptyEntries.description"
+                        :description="
+                            entries.length ? LOGS_ADMIN.turnPausesHidden : LOGS_ADMIN.emptyEntries.description
+                        "
                     />
+
+                    <div v-else-if="isEconomyCategory" :class="$style.entriesList">
+                        <LogsAdminEconomyEntry
+                            v-for="entry in displayedEntries"
+                            :key="`${selectedFile.name}-${entry.byteOffset}`"
+                            :entry="entry"
+                            :file-name="selectedFile.name"
+                        />
+                    </div>
 
                     <div v-else-if="isErrorsCategory" :class="$style.entriesList">
                         <template v-for="group in errorGroups" :key="`${selectedFile.name}-${group.key}`">

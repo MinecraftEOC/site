@@ -57,12 +57,8 @@ const originCategoryLabel = computed<string | null>(() => {
 const baseEvent = computed(() => normalizeLogEventCode(primaryEntry.value.event));
 
 const formattedTimeRange = computed(() => {
-    const earliest = props.group.earliestTimestamp
-        ? formatLogTimestamp(props.group.earliestTimestamp)
-        : null;
-    const latest = props.group.latestTimestamp
-        ? formatLogTimestamp(props.group.latestTimestamp)
-        : null;
+    const earliest = props.group.earliestTimestamp ? formatLogTimestamp(props.group.earliestTimestamp) : null;
+    const latest = props.group.latestTimestamp ? formatLogTimestamp(props.group.latestTimestamp) : null;
 
     if (earliest && latest && earliest !== latest) {
         return `${earliest} — ${latest}`;
@@ -83,10 +79,10 @@ const title = computed(() => {
 const summaryMetaItems = computed(() => {
     const result: Array<{ label: string; value: string }> = [];
     const pairs: ReadonlyArray<[string, string]> = [
-        ['player', 'Игрок'],
-        ['actor', 'Инициатор'],
-        ['target', 'Цель'],
-        ['source', 'Источник'],
+        ['player', LOGS_ADMIN.playerLabel],
+        ['actor', LOGS_ADMIN.actorLabel],
+        ['target', LOGS_ADMIN.targetLabel],
+        ['source', LOGS_ADMIN.sourceLabel],
     ];
 
     for (const [key, label] of pairs) {
@@ -102,11 +98,12 @@ const summaryMetaItems = computed(() => {
 const errorReasonSummary = computed<string | null>(() => {
     const f = primaryEntry.value.fields;
     const errName = typeof f.error_name === 'string' && f.error_name ? f.error_name : '';
-    const errMsg = typeof f.error_message === 'string' && f.error_message
-        ? f.error_message
-        : typeof f.reason === 'string' && f.reason
-            ? f.reason
-            : '';
+    const errMsg
+        = typeof f.error_message === 'string' && f.error_message
+            ? f.error_message
+            : typeof f.reason === 'string' && f.reason
+                ? f.reason
+                : '';
 
     if (errName && errMsg) {
         return `${errName}: ${errMsg}`;
@@ -165,6 +162,7 @@ function onOpenCombat(combatUuid: string): void {
                 :class="$style.participant"
             >
                 <span :class="$style.participantLabel">{{ item.label }}:</span>
+
                 <span :class="$style.participantValue">{{ item.value }}</span>
             </span>
         </div>
@@ -179,10 +177,8 @@ function onOpenCombat(combatUuid: string): void {
                 :class="$style.expandButton"
                 @click="isExpanded = !isExpanded"
             >
-                <VIcon
-                    :name="isExpanded ? 'chevron-up' : 'chevron-down'"
-                    :size="16"
-                />
+                <VIcon :name="isExpanded ? 'chevron-up' : 'chevron-down'" :size="16" />
+
                 <span>
                     {{ isExpanded ? LOGS_ADMIN.errorGroupToggleClose : LOGS_ADMIN.errorGroupToggleOpen }}
                     ({{ group.entries.length }})

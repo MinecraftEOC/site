@@ -1,5 +1,5 @@
 import { z } from 'zod';
-
+import { ECONOMY_FILTER_KEYS } from '~~/shared/constants/economy';
 import {
     hasControlCharacters,
     isSafeLogToken,
@@ -12,7 +12,9 @@ import {
     LOGS_MAX_LIMIT,
     LOGS_SEARCH_MAX_LENGTH,
 } from '~~/shared/constants/logging';
+
 import { ELogCategory, ELogCheckOutcome, ELogCombatAction, ELogLevel, ELogOrder } from '~~/shared/enums/logging';
+import { economyQueryFields } from '~~/shared/schemas/economy';
 
 /** Тексты ошибок валидации запросов к серверным журналам. */
 export const LOGS_QUERY_ERRORS = {
@@ -109,6 +111,7 @@ export const sharedLogFilesQuerySchema = z.object({
 /** Схема query-параметров `GET /api/admin/logs/entries`. */
 export const sharedLogEntriesQuerySchema = z
     .object({
+        ...economyQueryFields,
         category: categoryField,
         file: z
             .string({ required_error: LOGS_QUERY_ERRORS.FILE_REQUIRED })
@@ -160,6 +163,12 @@ export const sharedLogEntriesQuerySchema = z
             }).optional()),
     })
     .superRefine((data, ctx) => {
+        if (data.category !== ELogCategory.Economy && ECONOMY_FILTER_KEYS.some(key => data[key] !== undefined)) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['category'], message: 'Экономические фильтры допустимы только для категории economy' });
+        }
+        if (data.minAmount !== undefined && data.maxAmount !== undefined && data.minAmount > data.maxAmount) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['maxAmount'], message: 'Минимальная сумма не может превышать максимальную' });
+        }
         if (!isValidLogFilename(data.category, data.file)) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,

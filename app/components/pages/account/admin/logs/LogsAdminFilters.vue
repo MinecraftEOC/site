@@ -41,10 +41,12 @@ const outcome = defineModel<'' | ELogCheckOutcome>('outcome', { default: '' });
 const action = defineModel<'' | ELogCombatAction>('action', { default: '' });
 const hideTurnPauses = defineModel<boolean>('hideTurnPauses', { default: true });
 
-const levelTagItems = computed<ITagItem[]>(() => LOG_LEVEL_OPTIONS.map(opt => ({
-    label: opt.label,
-    value: opt.value,
-})));
+const levelTagItems = computed<ITagItem[]>(() =>
+    LOG_LEVEL_OPTIONS.map(opt => ({
+        label: opt.label,
+        value: opt.value,
+    })),
+);
 
 function onLevelTagChange(val: string | string[] | null): void {
     level.value = typeof val === 'string' ? (val as '' | ELogLevel) : '';
@@ -75,6 +77,7 @@ function onLevelTagChange(val: string | string[] | null): void {
 
             <div v-if="!hideOrder" :class="$style.orderField">
                 <span :class="$style.label">{{ LOGS_ADMIN.orderLabel }}</span>
+
                 <VSwitcher
                     v-model="order"
                     :items="LOG_ORDER_ITEMS"
@@ -87,6 +90,7 @@ function onLevelTagChange(val: string | string[] | null): void {
         <div :class="$style.secondRow">
             <div :class="$style.levelGroup">
                 <span :class="$style.label">{{ LOGS_ADMIN.levelLabel }}</span>
+
                 <VTags
                     :model-value="level"
                     :items="levelTagItems"

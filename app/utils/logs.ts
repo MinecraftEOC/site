@@ -1,5 +1,6 @@
 import type { ILogEntryGroup, ILogEntryItem, TLogFieldValue } from '~~/shared/@types/logging';
 import type { ELogCategory, ELogCheckType } from '~~/shared/enums/logging';
+import { ECONOMY_FLOW_LABELS, ECONOMY_OPERATION_LABELS, ECONOMY_OWNER_LABELS } from '~~/shared/constants/economy';
 
 import {
     LOG_CATEGORY_LABEL,
@@ -132,6 +133,10 @@ export function formatLogFieldValue(value: TLogFieldValue, key?: string): string
     }
 
     if (typeof value === 'string') {
+        const labels = key === 'flow_kind' ? ECONOMY_FLOW_LABELS : key === 'operation_type' ? ECONOMY_OPERATION_LABELS : ['from_type', 'to_type', 'owner_type'].includes(key ?? '') ? ECONOMY_OWNER_LABELS : null;
+        if (labels && Object.hasOwn(labels, value)) {
+            return `${labels[value]} (${value})`;
+        }
         if (key === 'weapon') {
             return value.replace(/§r/gi, '').trim();
         }

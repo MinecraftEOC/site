@@ -8,7 +8,7 @@ import type { SafeParseReturnType, ZodSchema } from 'zod';
  * @returns Провалидированные и типизированные данные.
  * @throws `400` с текстом первой ошибки схемы.
  */
-export function unwrapSafeParseOr400<T>(result: SafeParseReturnType<T, T>): T {
+export function unwrapSafeParseOr400<TInput, TOutput>(result: SafeParseReturnType<TInput, TOutput>): TOutput {
     if (!result.success) {
         throw createError({ statusCode: 400, message: result.error.issues[0]?.message });
     }

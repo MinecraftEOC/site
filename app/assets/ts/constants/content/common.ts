@@ -3,6 +3,12 @@ export const COPY_NOTIFICATION = {
     error: 'Не удалось скопировать',
 };
 
+export const PAGINATION = {
+    label: 'Пагинация',
+    prevLabel: 'Предыдущая страница',
+    nextLabel: 'Следующая страница',
+};
+
 export const SERVER_STATUS = {
     full: {
         online: 'Игроков онлайн:',

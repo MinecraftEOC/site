@@ -13,7 +13,8 @@ interface IProps {
 const props = defineProps<IProps>();
 
 const notificationStore = useNotificationStore();
-const copyLabel = computed(() => props.file.combatUuid ? LOGS_ADMIN.copyCombatUuid : LOGS_ADMIN.copyFileName);
+
+const copyLabel = computed(() => (props.file.combatUuid ? LOGS_ADMIN.copyCombatUuid : LOGS_ADMIN.copyFileName));
 
 async function onCopy() {
     const { combatUuid, name } = props.file;

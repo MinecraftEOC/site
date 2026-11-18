@@ -1,11 +1,13 @@
 import type { H3Event } from 'h3';
 import type { FetchError } from 'ofetch';
 import type { ZodSchema } from 'zod';
+import type { IEconomyAnalytics } from '~~/shared/@types/economy';
 import type { ILogCategoriesResponse, ILogEntriesResponse, ILogFilesResponse } from '~~/shared/@types/response';
 import type { TLogCategoriesQuery, TLogEntriesQuery, TLogFilesQuery } from '~~/shared/schemas/logging';
-
 import { LOGS_DEFAULT_TIMEOUT_MS, LOGS_ERRORS, LOGS_NO_STORE_HEADER } from '~~/server/common/constants/logging';
+
 import { ELogCombatAction } from '~~/shared/enums/logging';
+import { sharedEconomyAnalyticsSchema } from '~~/shared/schemas/economy';
 import {
     sharedLogCategoriesResponseSchema,
     sharedLogEntriesResponseSchema,
@@ -52,7 +54,7 @@ function extractUpstreamMessage(data: unknown, fallback: string): string {
  * @param error Перехваченная ошибка `$fetch`.
  * @throws HTTP-ошибка с безопасным статусом и русским сообщением.
  */
-function rethrowLogsUpstreamError(error: unknown): never {
+function rethrowLogsUpstreamError(error: unknown, missingMessage: string = LOGS_ERRORS.FILE_NOT_FOUND): never {
     const fetchErr = error as FetchError<{ detail?: string }>;
     const status = fetchErr?.response?.status ?? fetchErr?.statusCode;
 
@@ -66,7 +68,7 @@ function rethrowLogsUpstreamError(error: unknown): never {
     if (status === 404) {
         throw createError({
             statusCode: 404,
-            message: LOGS_ERRORS.FILE_NOT_FOUND,
+            message: missingMessage,
         });
     }
 
@@ -130,7 +132,7 @@ function rethrowLogsUpstreamError(error: unknown): never {
  * @throws `502`/`503`/`504` или прикладной код `400`/`404`/`409`/`429`.
  */
 async function requestLogsUpstream<T>(
-    endpoint: 'categories' | 'files' | 'entries',
+    endpoint: 'categories' | 'files' | 'entries' | 'economy/analytics',
     query: Record<string, string | number | boolean | undefined>,
     schema: ZodSchema<T>,
 ): Promise<T> {
@@ -163,7 +165,7 @@ async function requestLogsUpstream<T>(
             redirect: 'error',
         });
     } catch (error) {
-        rethrowLogsUpstreamError(error);
+        rethrowLogsUpstreamError(error, endpoint === 'economy/analytics' ? 'Снимок экономики пока не создан' : LOGS_ERRORS.FILE_NOT_FOUND);
     }
 
     const parsed = schema.safeParse(rawData);
@@ -244,6 +246,13 @@ export async function fetchLogEntries(query: TLogEntriesQuery): Promise<ILogEntr
             checkType: query.checkType,
             outcome: query.outcome,
             action: query.action,
+            flowKind: query.flowKind,
+            operationType: query.operationType,
+            sessionIndex: query.sessionIndex,
+            actor: query.actor,
+            account: query.account,
+            minAmount: query.minAmount,
+            maxAmount: query.maxAmount,
         },
         sharedLogEntriesResponseSchema,
     );
@@ -267,4 +276,11 @@ export async function fetchLogEntries(query: TLogEntriesQuery): Promise<ILogEntr
                 && entry.fields.action.trim().toLowerCase() === query.action;
         }),
     };
+}
+
+export async function fetchEconomyAnalytics(): Promise<IEconomyAnalytics> {
+    if (shouldUseLocalMock()) {
+        return sharedEconomyAnalyticsSchema.parse(MOCK_ECONOMY_ANALYTICS);
+    }
+    return requestLogsUpstream('economy/analytics', {}, sharedEconomyAnalyticsSchema);
 }
