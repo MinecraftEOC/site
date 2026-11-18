@@ -1,3 +1,4 @@
+import type { IEconomyAnalytics } from '~~/shared/@types/economy';
 import type {
     ILogCategoriesResponse,
     ILogEntriesResponse,
@@ -20,6 +21,9 @@ export function useLogsApi() {
     const { $api } = useNuxtApp();
 
     return {
+        getEconomyAnalytics: (signal?: AbortSignal) =>
+            $api<IEconomyAnalytics>(`${LOGS_BASE_PATH}/economy/analytics`, { signal, retry: 0 }),
+
         getCategories: (query?: Partial<TLogCategoriesQuery>, signal?: AbortSignal) =>
             $api<ILogCategoriesResponse>(`${LOGS_BASE_PATH}/categories`, {
                 query,

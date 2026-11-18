@@ -9,8 +9,10 @@ import type { ELogLevel } from '~~/shared/enums/logging';
 import type { TLogCategoriesQuery, TLogEntriesQuery, TLogFilesQuery } from '~~/shared/schemas/logging';
 
 import { Buffer } from 'node:buffer';
-
+import { createHash } from 'node:crypto';
 import { LOGS_ERRORS } from '~~/server/common/constants/logging';
+
+import { ECONOMY_FILTER_KEYS } from '~~/shared/constants/economy';
 import { LOG_CATEGORY_LABEL, LOG_CATEGORY_ORDER } from '~~/shared/constants/logging';
 import { ELogCategory, ELogCombatAction, ELogOrder } from '~~/shared/enums/logging';
 
@@ -33,6 +35,12 @@ const COMBAT_UUID_DOCKS = '018f0a9c-3d12-7a41-9c55-4b1e7f8a9012';
 
 /** Набор демонстрационных файлов журналов для локального просмотра без боевого сервера. */
 const MOCK_LOG_FILES: readonly IMockLogFile[] = [
+    ...MOCK_ECONOMY_FILES.map(file => ({
+        ...file,
+        category: ELogCategory.Economy,
+        modifiedAt: file.lines.at(-1)?.split(' ')[0] ?? '',
+        combatUuid: null,
+    })),
     {
         category: ELogCategory.Errors,
         name: '2026-11-08.001.log',
@@ -487,7 +495,40 @@ export function getMockLogEntries(query: TLogEntriesQuery): ILogEntriesResponse 
     const ordered = query.order === ELogOrder.Desc ? [...parsedEntries].reverse() : parsedEntries;
     const qLower = query.q?.toLowerCase();
 
+    const filterHash = createHash('sha256').update(JSON.stringify({
+        level: query.level,
+        q: query.q,
+        event: query.event,
+        checkType: query.checkType,
+        outcome: query.outcome,
+        action: query.action,
+        ...Object.fromEntries(ECONOMY_FILTER_KEYS.map(key => [key, query[key]])),
+    })).digest('hex');
     const filtered = ordered.filter((entry) => {
+        const fields = entry.fields;
+        if (query.flowKind && fields.flow_kind !== query.flowKind)
+            return false;
+        if (query.operationType && fields.operation_type !== query.operationType)
+            return false;
+        if (query.sessionIndex !== undefined && fields.session_index !== query.sessionIndex)
+            return false;
+        if (query.account && !['account', 'from_account', 'to_account'].some(key => fields[key] === query.account))
+            return false;
+        if (query.actor) {
+            const values = [fields.actor, fields.actor_uuid];
+            if (fields.owner_type === 'player')
+                values.push(fields.owner_name, fields.owner_id);
+            if (!values.some(value => typeof value === 'string' && value.toLowerCase().includes(query.actor?.toLowerCase() ?? '')))
+                return false;
+        }
+        if (query.minAmount !== undefined || query.maxAmount !== undefined) {
+            if (typeof fields.amount !== 'number' || !Number.isFinite(fields.amount))
+                return false;
+            if (query.minAmount !== undefined && fields.amount < query.minAmount)
+                return false;
+            if (query.maxAmount !== undefined && fields.amount > query.maxAmount)
+                return false;
+        }
         if (query.level && entry.level !== query.level) {
             return false;
         }
@@ -536,9 +577,11 @@ export function getMockLogEntries(query: TLogEntriesQuery): ILogEntriesResponse 
                 file?: string;
                 ord?: string;
                 idx?: number;
+                fh?: string;
             };
             if (
-                decoded.cat !== query.category
+                decoded.fh !== filterHash
+                || decoded.cat !== query.category
                 || decoded.file !== query.file
                 || decoded.ord !== query.order
                 || typeof decoded.idx !== 'number'
@@ -563,6 +606,7 @@ export function getMockLogEntries(query: TLogEntriesQuery): ILogEntriesResponse 
                     file: query.file,
                     ord: query.order,
                     idx: nextIndex,
+                    fh: filterHash,
                 }),
                 'utf-8',
             ).toString('base64url')

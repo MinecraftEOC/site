@@ -16,6 +16,8 @@ export enum ELogCategory {
     Checks = 'checks',
     /** Пошаговые журналы отдельных боёв. */
     Combat = 'combat',
+    /** Экономика сервера */
+    Economy = 'economy',
 }
 
 /** Уровень важности записи журнала. */

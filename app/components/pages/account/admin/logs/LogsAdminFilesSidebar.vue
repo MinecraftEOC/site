@@ -34,9 +34,7 @@ const search = defineModel<string>('search', { default: '' });
 const style = useCssModule();
 
 function getFileItemClassList(file: ILogFileItem): string[] {
-    return [
-        props.selectedFile?.name === file.name ? style._activeFile : '',
-    ];
+    return [props.selectedFile?.name === file.name ? style._activeFile : ''];
 }
 </script>
 
@@ -44,6 +42,7 @@ function getFileItemClassList(file: ILogFileItem): string[] {
     <aside :class="$style.LogsAdminFilesSidebar">
         <div :class="$style.header">
             <span :class="$style.title">{{ LOGS_ADMIN.filesTitle }}</span>
+
             <span :class="$style.count">{{ totalFiles }}</span>
         </div>
 
@@ -85,12 +84,15 @@ function getFileItemClassList(file: ILogFileItem): string[] {
                             :size="14"
                             :class="$style.fileIcon"
                         />
+
                         <span :class="$style.fileName" :title="file.name">{{ file.name }}</span>
                     </div>
 
                     <div :class="$style.fileRowMeta">
                         <span>{{ formatLogBytes(file.sizeBytes) }}</span>
+
                         <span>·</span>
+
                         <span>{{ formatLogFileDate(file.modifiedAt) }}</span>
                     </div>
                 </button>

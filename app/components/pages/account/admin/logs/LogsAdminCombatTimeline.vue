@@ -7,15 +7,25 @@ import { EColor, ESize } from '~/assets/ts/enums/common';
 import LogsAdminEntryCard from '~/components/pages/account/admin/logs/LogsAdminEntryCard.vue';
 
 interface IProps {
+    /** All entries loaded for the current combat log. */
     entries: ILogEntryItem[];
+    /** Entries remaining after the timeline display filters. */
     visibleEntries: ILogEntryItem[];
+    /** Related action entries indexed by their source byte offset. */
     relatedActions: ReadonlyMap<number, ILogEntryItem[]>;
+    /** Source filename displayed in entry details. */
     fileName: string;
+    /** Whether filters restrict the displayed timeline. */
     filtered: boolean;
+    /** Whether another batch can be loaded from the source. */
     hasMore: boolean;
+    /** Whether reading stopped at the scan budget. */
     scanLimited: boolean;
+    /** Whether repeated cursors prevented further loading. */
     stalled: boolean;
+    /** Whether a batch request is in progress. */
     loading: boolean;
+    /** User-facing error from the most recent batch request. */
     error: string;
 }
 
@@ -39,6 +49,7 @@ const emits = defineEmits<{
 }>();
 
 const timelineId = useId();
+
 const collapsedRounds = ref(new Set<string>());
 
 const participantNames = computed(() => {
@@ -54,7 +65,12 @@ const participantNames = computed(() => {
                 const participants: unknown = JSON.parse(value);
                 if (Array.isArray(participants)) {
                     for (const participant of participants as unknown[]) {
-                        if (participant && typeof participant === 'object' && 'uuid' in participant && 'name' in participant) {
+                        if (
+                            participant
+                            && typeof participant === 'object'
+                            && 'uuid' in participant
+                            && 'name' in participant
+                        ) {
                             addParticipantName(names, participant.uuid, participant.name);
                         }
                     }
@@ -162,9 +178,13 @@ function toggleRound(roundId: string) {
     <div :class="$style.timeline">
         <div :class="$style.status" aria-live="polite">
             <span>{{ LOGS_ADMIN.timelineLoaded }}: {{ entries.length }}</span>
+
             <span v-if="filtered">{{ LOGS_ADMIN.timelineFiltered }}</span>
+
             <span v-if="hasMore && !scanLimited">{{ LOGS_ADMIN.timelineIncomplete }}</span>
+
             <span v-if="scanLimited">{{ LOGS_ADMIN.scanLimitedNotice }}</span>
+
             <span v-if="stalled">{{ LOGS_ADMIN.timelineStalled }}</span>
         </div>
 
@@ -189,6 +209,7 @@ function toggleRound(roundId: string) {
                     />
                 </button>
             </h3>
+
             <div
                 v-show="round.id === null || !collapsedRounds.has(round.id)"
                 :id="`${timelineId}-round-${round.offset}`"
@@ -202,6 +223,7 @@ function toggleRound(roundId: string) {
                     <h4 v-if="round.id !== null && turn.id !== null" :class="$style.turnTitle">
                         {{ getTurnTitle(round.id, turn.id) }}
                     </h4>
+
                     <LogsAdminEntryCard
                         v-for="entry in turn.entries"
                         :key="entry.byteOffset"
@@ -216,15 +238,18 @@ function toggleRound(roundId: string) {
         </div>
 
         <span v-if="loading" role="status">{{ LOGS_ADMIN.loadingEntries }}</span>
+
         <span v-else-if="!visibleEntries.length && entries.length && !error">
             {{ LOGS_ADMIN.turnPausesHidden }}
         </span>
+
         <span v-else-if="!entries.length && !hasMore && !stalled && !error">
             {{ LOGS_ADMIN.emptyEntries.title }}
         </span>
 
         <div v-if="error" :class="$style.status">
             <span role="alert">{{ error }}</span>
+
             <VButton
                 :size="ESize.Small"
                 :color="EColor.Secondary"
@@ -236,17 +261,18 @@ function toggleRound(roundId: string) {
             </VButton>
         </div>
 
-        <VButton
+        <VPagination
             v-else-if="hasMore"
-            :size="ESize.Small"
-            :color="EColor.Secondary"
             :class="$style.loadMore"
-            :disabled="loading"
+            :can-go-next="!loading"
+            :show-prev="false"
+            :label="LOGS_ADMIN.timelinePaginationLabel"
+            :next-label="scanLimited ? LOGS_ADMIN.continueScanButton : LOGS_ADMIN.timelineLoadMore"
             data-test="timeline-load-more"
-            @click="emits('loadMore')"
+            @next="emits('loadMore')"
         >
             {{ scanLimited ? LOGS_ADMIN.continueScanButton : LOGS_ADMIN.timelineLoadMore }}
-        </VButton>
+        </VPagination>
     </div>
 </template>
 

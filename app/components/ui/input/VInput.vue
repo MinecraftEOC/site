@@ -115,7 +115,7 @@ const iconSize = computed(() => {
     &.--size-small {
         .native {
             height: $space-32;
-            padding: $space-2 $space-4;
+            padding: $space-2 $space-10;
         }
 
         &._withIcon {
@@ -128,7 +128,7 @@ const iconSize = computed(() => {
     &.--size-medium {
         .native {
             height: $space-40;
-            padding: $space-4;
+            padding: $space-4 $space-12;
         }
 
         &._withIcon {
@@ -181,7 +181,7 @@ const iconSize = computed(() => {
 .icon {
     position: absolute;
     top: calc(50% - 0.1rem);
-    left: $space-12;
+    left: $space-10;
     color: $text-muted;
     transform: translateY(-50%);
 }

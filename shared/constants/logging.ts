@@ -67,6 +67,7 @@ export const LOG_CATEGORY_ORDER: readonly ELogCategory[] = [
     ELogCategory.Errors,
     ELogCategory.Checks,
     ELogCategory.Combat,
+    ELogCategory.Economy,
     ELogCategory.Damage,
     ELogCategory.States,
     ELogCategory.Locks,
@@ -84,6 +85,7 @@ export const LOG_CATEGORY_LABEL: Record<ELogCategory, string> = {
     [ELogCategory.Api]: 'API',
     [ELogCategory.Checks]: 'Проверки навыков',
     [ELogCategory.Combat]: 'Бои',
+    [ELogCategory.Economy]: 'Экономика',
 };
 
 /** Иконки категорий журналов для отображения на вкладках. */
@@ -91,6 +93,7 @@ export const LOG_CATEGORY_ICON: Record<ELogCategory, string> = {
     [ELogCategory.Errors]: 'triangle-alert',
     [ELogCategory.Checks]: 'dices',
     [ELogCategory.Combat]: 'swords',
+    [ELogCategory.Economy]: 'coins',
     [ELogCategory.Damage]: 'heart-crack',
     [ELogCategory.States]: 'database',
     [ELogCategory.Locks]: 'key-round',
@@ -235,6 +238,29 @@ export const LOG_FIELD_LABELS: Readonly<Record<string, string>> = {
     checkpoint_id: 'Точка диалога',
     order_id: 'Заказ',
     table_id: 'ID таблицы крафта/торговли',
+    session_index: 'Игровая сессия',
+    flow_kind: 'Движение денег',
+    operation_type: 'Тип операции',
+    amount: 'Сумма операции, мед. кр.',
+    signed_amount: 'Изменение денежной массы, мед. кр.',
+    silver: 'Серебряных крон в сумме операции',
+    copper: 'Остаток медных крон в сумме операции',
+    total_money: 'Всего денег после операции, мед. кр.',
+    bank_total: 'На счетах после операции, мед. кр.',
+    cash_total: 'Наличных после операции, мед. кр.',
+    from_type: 'Тип источника',
+    from_account: 'Счёт списания',
+    to_type: 'Тип получателя',
+    to_account: 'Счёт зачисления',
+    item_count: 'Количество предметов',
+    challenge_id: 'ID городского вызова',
+    address: 'Адрес недвижимости',
+    account: 'Изменённый счёт',
+    owner_type: 'Тип владельца счёта',
+    owner_id: 'ID владельца счёта',
+    owner_name: 'Ник владельца счёта',
+    balance_before: 'Баланс счёта до правки, мед. кр.',
+    balance_after: 'Баланс счёта после правки, мед. кр.',
 };
 
 /** Ключи технических (служебных) полей записи журнала, выносимых в сворачиваемую группу. */

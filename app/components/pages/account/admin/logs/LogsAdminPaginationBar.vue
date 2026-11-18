@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LOGS_ADMIN } from '~/assets/ts/constants/content/account';
-import { EColor, ESize } from '~/assets/ts/enums/common';
+import { EColor } from '~/assets/ts/enums/common';
 
 interface IProps {
     /** Номер текущей порции (начиная с 0) */
@@ -31,13 +31,18 @@ const emits = defineEmits<{
     next: [];
 }>();
 
-const nextButtonColor = computed(() => props.scanLimited ? EColor.Accent : EColor.Secondary);
-const nextButtonLabel = computed(() => props.scanLimited ? LOGS_ADMIN.continueScanButton : LOGS_ADMIN.nextPageButton);
+const style = useCssModule();
+
+const classList = computed(() => (props.showStats ? style.statusBar : style.bottomPagination));
+
+const nextButtonColor = computed(() => (props.scanLimited ? EColor.Accent : EColor.Secondary));
+
+const nextButtonLabel = computed(() => (props.scanLimited ? LOGS_ADMIN.continueScanButton : LOGS_ADMIN.nextPageButton));
 </script>
 
 <template>
-    <div v-if="showStats" :class="$style.statusBar">
-        <div :class="$style.statusCounts">
+    <div :class="classList">
+        <div v-if="showStats" :class="$style.statusCounts">
             <span>
                 {{ LOGS_ADMIN.entriesCountPrefix }}
                 <strong :class="$style.monoValue">{{ entriesCount }}</strong>
@@ -49,62 +54,20 @@ const nextButtonLabel = computed(() => props.scanLimited ? LOGS_ADMIN.continueSc
                 {{ LOGS_ADMIN.scannedBytesPrefix }}
                 <strong :class="$style.monoValue">{{ formatLogBytes(scannedBytes) }}</strong>
             </span>
-
-            <span>·</span>
-
-            <span>
-                {{ LOGS_ADMIN.pagePrefix }}
-                <strong :class="$style.monoValue">{{ pageIndex + 1 }}</strong>
-            </span>
         </div>
 
-        <div :class="$style.controls">
-            <VButton
-                :size="ESize.Small"
-                :color="EColor.Secondary"
-                icon="chevron-left"
-                :disabled="!canGoPrev"
-                @click="emits('prev')"
-            >
-                {{ LOGS_ADMIN.prevPageButton }}
-            </VButton>
-
-            <VButton
-                :size="ESize.Small"
-                :color="nextButtonColor"
-                icon="chevron-right"
-                :disabled="!canGoNext"
-                @click="emits('next')"
-            >
-                {{ nextButtonLabel }}
-            </VButton>
-        </div>
-    </div>
-
-    <div v-else :class="$style.bottomPagination">
-        <VButton
-            :size="ESize.Small"
-            :color="EColor.Secondary"
-            icon="chevron-left"
-            :disabled="!canGoPrev"
-            @click="emits('prev')"
+        <VPagination
+            :can-go-prev="canGoPrev"
+            :can-go-next="canGoNext"
+            :label="LOGS_ADMIN.paginationLabel"
+            :prev-label="LOGS_ADMIN.prevPageButton"
+            :next-label="nextButtonLabel"
+            :next-color="nextButtonColor"
+            @prev="emits('prev')"
+            @next="emits('next')"
         >
-            {{ LOGS_ADMIN.prevPageButton }}
-        </VButton>
-
-        <span :class="$style.pageLabel">
             {{ LOGS_ADMIN.pagePrefix }} {{ pageIndex + 1 }}
-        </span>
-
-        <VButton
-            :size="ESize.Small"
-            :color="nextButtonColor"
-            icon="chevron-right"
-            :disabled="!canGoNext"
-            @click="emits('next')"
-        >
-            {{ nextButtonLabel }}
-        </VButton>
+        </VPagination>
     </div>
 </template>
 
@@ -137,23 +100,7 @@ const nextButtonLabel = computed(() => props.scanLimited ? LOGS_ADMIN.continueSc
     color: $text-primary;
 }
 
-.controls {
-    display: flex;
-    gap: $space-8;
-    align-items: center;
-}
-
 .bottomPagination {
-    display: flex;
-    gap: $space-16;
-    justify-content: center;
-    align-items: center;
     padding-top: $space-8;
-}
-
-.pageLabel {
-    @include l2;
-
-    color: $text-secondary;
 }
 </style>
