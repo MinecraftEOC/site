@@ -1,5 +1,6 @@
 import type { CharacterStatus } from '~~/generated/prisma/enums';
-import type { ICharacter, IUser } from '~~/shared/@types/user';
+import type { ICharacterAdminResponse, IUserAdminResponse } from '~~/shared/@types/response';
+import type { IUser } from '~~/shared/@types/user';
 import type { IUsersRow } from '~/@types/user';
 
 import { DiscordLinkStatus } from '~~/generated/prisma/enums';
@@ -13,7 +14,7 @@ import { ESortDirection, EUsersColumn } from '~/assets/ts/enums/user';
  * @param characters Персонажи пользователя.
  * @returns Новый отсортированный массив.
  */
-export function sortCharacters(characters: ICharacter[]): ICharacter[] {
+export function sortCharacters(characters: ICharacterAdminResponse[]): ICharacterAdminResponse[] {
     return [...characters].sort((a, b) => {
         const weight = getStatusWeight(a.status) - getStatusWeight(b.status);
 
@@ -40,9 +41,9 @@ export function isDiscordLinked(user: IUser): boolean {
  *
  * @param user Пользователь со всеми персонажами.
  * @param query Запрос в нижнем регистре и без пробелов по краям.
- * @returns `true`, если запрос пуст либо нашёлся в email, нике Discord или имени персонажа.
+ * @returns Whether the query is empty or matches email, Discord, character name or UUID.
  */
-export function matchesUserSearch(user: IUser, query: string): boolean {
+export function matchesUserSearch(user: IUserAdminResponse, query: string): boolean {
     if (!query) {
         return true;
     }
@@ -50,7 +51,7 @@ export function matchesUserSearch(user: IUser, query: string): boolean {
     const fields = [
         user.email,
         user.discordAccount?.username ?? '',
-        ...user.characters.map(character => character.username),
+        ...user.characters.flatMap(character => [character.username, character.uuid]),
     ];
 
     return fields.some(field => field.toLowerCase().includes(query));

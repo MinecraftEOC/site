@@ -1,4 +1,5 @@
 export const COPY_NOTIFICATION = {
+    label: 'Скопировать',
     success: 'Скопировано в буфер обмена',
     error: 'Не удалось скопировать',
 };

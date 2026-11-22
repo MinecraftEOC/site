@@ -1,4 +1,4 @@
-import type { IUserResponse } from '~~/shared/@types/response';
+import type { IUserAdminResponse, IUserResponse } from '~~/shared/@types/response';
 
 const USER_PATH = '/api/user';
 
@@ -8,6 +8,6 @@ export function useUserApi() {
     return {
         getById: (id: number) => $api<IUserResponse>(USER_PATH, { query: { id } }),
 
-        list: () => $api<IUserResponse[]>(`${USER_PATH}/list`),
+        list: () => $api<IUserAdminResponse[]>(`${USER_PATH}/list`),
     };
 }

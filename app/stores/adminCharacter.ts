@@ -1,4 +1,4 @@
-import type { ICharacter } from '~~/shared/@types/user';
+import type { ICharacterAdminResponse } from '~~/shared/@types/response';
 
 import { useCharacterApi } from '~/composables/api/useCharacterApi';
 
@@ -13,7 +13,7 @@ import { useCharacterApi } from '~/composables/api/useCharacterApi';
 export const useAdminCharacterStore = defineStore('adminCharacter', () => {
     const api = useCharacterApi();
 
-    const character = ref<ICharacter | null>(null);
+    const character = ref<ICharacterAdminResponse | null>(null);
 
     async function fetchById(id: number) {
         character.value = await api.getById(id);

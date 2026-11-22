@@ -1,4 +1,4 @@
-import type { ICharacter, IUser } from '~~/shared/@types/user';
+import type { ICharacterAdminResponse, IUserAdminResponse } from '~~/shared/@types/response';
 import type { EUsersColumn } from '~/assets/ts/enums/user';
 
 /** Колонка таблицы игроков в админке */
@@ -14,9 +14,9 @@ export interface IUsersColumn {
 /** Строка таблицы игроков: пользователь и его персонажи, прошедшие фильтр */
 export interface IUsersRow {
     /** Пользователь */
-    user: IUser;
+    user: IUserAdminResponse;
     /** Персонаж, показанный в самой строке — самый значимый из подходящих */
-    character: ICharacter | null;
+    character: ICharacterAdminResponse | null;
     /** Остальные подходящие персонажи — раскрываются под строкой */
-    rest: ICharacter[];
+    rest: ICharacterAdminResponse[];
 }

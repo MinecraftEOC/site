@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ICharacter, IUser } from '~~/shared/@types/user';
+import type { ICharacterAdminResponse, IUserAdminResponse } from '~~/shared/@types/response';
 import type { ITagItem, TTagValue } from '~/@types/tags';
 import type { IUsersColumn, IUsersRow } from '~/@types/user';
 
@@ -14,7 +14,7 @@ import UsersAdminRow from '~/components/pages/account/admin/users/UsersAdminRow.
 
 interface IProps {
     /** Все пользователи с персонажами и привязкой Discord */
-    users: IUser[];
+    users: IUserAdminResponse[];
 }
 
 const props = defineProps<IProps>();
@@ -50,11 +50,11 @@ const rows = computed(() => filteredUsers.value
     .filter(isRowVisible)
     .sort((first, second) => compareUsersRows(first, second, sortColumn.value, sortDirection.value)));
 
-function isCharacterVisible(character: ICharacter): boolean {
+function isCharacterVisible(character: ICharacterAdminResponse): boolean {
     return !statusFilters.value.length || statusFilters.value.includes(character.status);
 }
 
-function toRow(user: IUser): IUsersRow {
+function toRow(user: IUserAdminResponse): IUsersRow {
     const [character = null, ...rest] = sortCharacters(user.characters).filter(isCharacterVisible);
 
     return { user, character, rest };
