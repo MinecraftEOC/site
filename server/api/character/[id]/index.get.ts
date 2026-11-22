@@ -1,4 +1,4 @@
-import type { ICharacterResponse } from '~~/shared/@types/response';
+import type { ICharacterAdminResponse } from '~~/shared/@types/response';
 
 import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
 
@@ -10,7 +10,7 @@ import { CHARACTER_ERRORS, CHARACTER_PUBLIC_SELECT } from '~~/server/common/cons
  * @throws 400 если id некорректен.
  * @throws 404 если персонаж не найден.
  */
-export default defineEventHandler(async (event): Promise<ICharacterResponse> => {
+export default defineEventHandler(async (event): Promise<ICharacterAdminResponse> => {
     requireAdmin(event);
 
     const characterId = Number(getRouterParam(event, 'id'));
@@ -21,12 +21,12 @@ export default defineEventHandler(async (event): Promise<ICharacterResponse> => 
 
     const character = await prisma.character.findUnique({
         where: { id: characterId },
-        select: CHARACTER_PUBLIC_SELECT,
+        select: { ...CHARACTER_PUBLIC_SELECT, uuid: true },
     });
 
     if (!character) {
         throw createError({ statusCode: 404, message: CHARACTER_ERRORS.NOT_FOUND });
     }
 
-    return toCharacterResponse(character);
+    return { ...toCharacterResponse(character), uuid: character.uuid };
 });

@@ -1,4 +1,4 @@
-import type { ICharacterResponse, ISuccessResponse } from '~~/shared/@types/response';
+import type { ICharacterAdminResponse, ICharacterResponse, ISuccessResponse } from '~~/shared/@types/response';
 import type { TCharacterStatusBody } from '~~/shared/schemas/character';
 import type { TActiveSkinBody } from '~~/shared/schemas/skin';
 import type { TCharacterForm } from '~/@types/character';
@@ -11,7 +11,7 @@ export function useCharacterApi() {
     const { $api } = useNuxtApp();
 
     return {
-        getById: (id: number) => $api<ICharacterResponse>(`${CHARACTER_PATH}/${id}`),
+        getById: (id: number) => $api<ICharacterAdminResponse>(`${CHARACTER_PATH}/${id}`),
 
         create: (form: TCharacterForm, activeFile?: File | null) => $api<ICharacterResponse>(CHARACTER_PATH, { method: 'POST', body: toCharacterFormData(form, activeFile) }),
 

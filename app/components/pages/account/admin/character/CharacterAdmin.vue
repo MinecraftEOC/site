@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CharacterStatus } from '~~/generated/prisma/enums';
-import type { ICharacter } from '~~/shared/@types/user';
+import type { ICharacterAdminResponse } from '~~/shared/@types/response';
 import type { ICharacterAdminAction } from '~/@types/character';
 
 import { CHARACTER_ADMIN_ACTIONS, CHARACTER_STATUS_COLOR } from '~/assets/ts/constants/character';
@@ -17,7 +17,7 @@ import { useCharacterApi } from '~/composables/api/useCharacterApi';
 
 interface IProps {
     /** Персонаж, которого разбирает администрация */
-    character: ICharacter;
+    character: ICharacterAdminResponse;
 }
 
 const props = defineProps<IProps>();
@@ -83,6 +83,18 @@ watch(() => props.character, () => {
             </VBadge>
         </template>
 
+        <template #header-right>
+            <div :class="$style.uuid">
+                <span :class="$style.uuidLabel">{{ CHARACTER_ADMIN.uuidLabel }}</span>
+
+                <VCopyField
+                    :value="character.uuid"
+                    :label="CHARACTER_ADMIN.copyUuid"
+                    :notification="CHARACTER_ADMIN.uuidCopied"
+                />
+            </div>
+        </template>
+
         <div :class="$style.main">
             <CharacterBiography :biography="character.biography" />
 
@@ -107,6 +119,26 @@ watch(() => props.character, () => {
 </template>
 
 <style module lang="scss">
+.uuid {
+    display: flex;
+    flex: 0 1 rem(420);
+    flex-direction: column;
+    gap: $space-4;
+    min-width: 0;
+    max-width: 100%;
+
+    @include respond-to(mobile) {
+        flex-basis: auto;
+        width: 100%;
+    }
+}
+
+.uuidLabel {
+    @include l3;
+
+    color: $text-secondary;
+}
+
 .main {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

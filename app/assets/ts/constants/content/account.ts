@@ -109,6 +109,9 @@ export const CHARACTER_DETAILS = {
 };
 
 export const CHARACTER_ADMIN = {
+    uuidLabel: 'UUID',
+    copyUuid: 'Скопировать UUID игрока',
+    uuidCopied: 'UUID игрока скопирован',
     commentTitle: 'Комментарий администрации',
     commentPlaceholder: 'Опишите решение по заявке или перечислите необходимые правки...',
     success: 'Статус персонажа обновлён',
@@ -170,7 +173,7 @@ export const CHARACTER_FORM_ITEMS = {
 
 export const USERS_ADMIN = {
     title: 'Список игроков',
-    searchPlaceholder: 'Email, Discord или имя персонажа',
+    searchPlaceholder: 'Email, Discord, имя персонажа или UUID',
     searchIcon: 'search',
     countLabel: 'Найдено игроков:',
     noCharacter: 'Нет персонажа',

@@ -4,7 +4,7 @@ import type { IUsersRow } from '~/@types/user';
 
 import { CHARACTER_STATUS_COLOR } from '~/assets/ts/constants/character';
 import { DISCORD_USER_URL } from '~/assets/ts/constants/common';
-import { CHARACTER_STATUS_LABEL, USERS_ADMIN } from '~/assets/ts/constants/content/account';
+import { CHARACTER_ADMIN, CHARACTER_STATUS_LABEL, USERS_ADMIN } from '~/assets/ts/constants/content/account';
 import { ACCOUNT_ROUTES } from '~/assets/ts/constants/routes';
 import { ESize, ETag } from '~/assets/ts/enums/common';
 
@@ -120,6 +120,14 @@ function onRowClick(character: ICharacter | null) {
                             />
                         </button>
                     </div>
+
+                    <VCopyField
+                        :value="row.character.uuid"
+                        :size="ESize.Small"
+                        :label="CHARACTER_ADMIN.copyUuid"
+                        :notification="CHARACTER_ADMIN.uuidCopied"
+                        :class="$style.uuid"
+                    />
                 </td>
 
                 <td :class="[$style.cell, $style.date]">
@@ -160,6 +168,14 @@ function onRowClick(character: ICharacter | null) {
 
                     <span :class="$style.characterName">{{ character.username }}</span>
                 </div>
+
+                <VCopyField
+                    :value="character.uuid"
+                    :size="ESize.Small"
+                    :label="CHARACTER_ADMIN.copyUuid"
+                    :notification="CHARACTER_ADMIN.uuidCopied"
+                    :class="$style.uuid"
+                />
             </td>
 
             <td :class="[$style.cell, $style.date]">
@@ -276,6 +292,10 @@ function onRowClick(character: ICharacter | null) {
     display: flex;
     gap: $space-8;
     align-items: center;
+}
+
+.uuid {
+    margin-top: $space-4;
 }
 
 .characterName {

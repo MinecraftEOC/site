@@ -42,6 +42,18 @@ export interface IMeResponse extends IUserResponse {}
 /** Ответ `POST`/`PATCH /api/character` — персонаж пользователя. */
 export interface ICharacterResponse extends ICharacter {}
 
+/** Character details returned to administrators. */
+export interface ICharacterAdminResponse extends ICharacterResponse {
+    /** Minecraft player UUID associated with the character. */
+    uuid: string;
+}
+
+/** Users and character details returned to administrators. */
+export interface IUserAdminResponse extends Omit<IUserResponse, 'characters'> {
+    /** Characters with their Minecraft player UUIDs. */
+    characters: ICharacterAdminResponse[];
+}
+
 /** Элемент ответа `GET /api/content/list` — карточка материала без текста. */
 export interface IContentItemResponse extends IContentItem {}
 

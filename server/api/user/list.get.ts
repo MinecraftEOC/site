@@ -1,5 +1,6 @@
-import type { IUserResponse } from '~~/shared/@types/response';
+import type { IUserAdminResponse } from '~~/shared/@types/response';
 
+import { CHARACTER_PUBLIC_SELECT } from '~~/server/common/constants/character';
 import { USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
 
 /**
@@ -9,13 +10,24 @@ import { USER_PUBLIC_SELECT } from '~~/server/common/constants/user';
  * @throws 401 если запрос не авторизован.
  * @throws 403 если пользователь не администратор.
  */
-export default defineEventHandler(async (event): Promise<IUserResponse[]> => {
+export default defineEventHandler(async (event): Promise<IUserAdminResponse[]> => {
     requireAdmin(event);
 
     const users = await prisma.user.findMany({
-        select: USER_PUBLIC_SELECT,
+        select: {
+            ...USER_PUBLIC_SELECT,
+            characters: {
+                select: { ...CHARACTER_PUBLIC_SELECT, uuid: true },
+            },
+        },
         orderBy: { id: 'asc' },
     });
 
-    return users.map(toUserResponse);
+    return users.map(({ characters, ...user }) => ({
+        ...toUserResponse({ ...user, characters: [] }),
+        characters: characters.map(character => ({
+            ...toCharacterResponse(character),
+            uuid: character.uuid,
+        })),
+    }));
 });
