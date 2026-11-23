@@ -44,6 +44,11 @@ const ADMIN_MENU: IMenuSection = {
             icon: 'file-search',
             to: ACCOUNT_ROUTES.adminLogs,
         },
+        {
+            title: 'Управление сессией',
+            icon: 'gamepad-2',
+            to: ACCOUNT_ROUTES.adminSession,
+        },
     ],
 };
 

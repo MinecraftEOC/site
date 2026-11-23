@@ -1,0 +1,6 @@
+export const SESSION_TOTAL_TICKS = 18000;
+export const SESSION_MIN_HOURS = 1;
+export const SESSION_MAX_HOURS = 24;
+export const SESSION_DEFAULT_START_HOUR = 6;
+export const SESSION_DEFAULT_DURATION = 7;
+export const SESSION_POLL_INTERVAL_MS = 3000;
