@@ -31,4 +31,5 @@ export const ACCOUNT_ROUTES = {
     adminContentCreate: '/account/admin/content/create',
     adminContentEdit: (id: number | string) => `/account/admin/content/${id}`,
     adminLogs: '/account/admin/logs',
+    adminSession: '/account/admin/session',
 };

@@ -83,5 +83,9 @@ export default defineNuxtConfig({
         logsApiBaseUrl: '',
         logsApiToken: '',
         logsApiTimeoutMs: 8000,
+        pterodactylBaseUrl: '',
+        pterodactylApiToken: '',
+        pterodactylServerId: '',
+        pterodactylTimeoutMs: 10000,
     },
 });
