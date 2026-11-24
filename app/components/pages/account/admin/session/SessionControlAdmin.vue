@@ -82,6 +82,8 @@ const canConfirmAction = computed(() => canConfirm(confirmation.value));
 
 const needsWhitelist = computed(() => isActive.value === false && whitelistEnabled.value === false);
 
+const operationWarning = computed(() => needsWhitelist.value ? SESSION_ADMIN.whitelistRequired : '');
+
 /**
  * Проверяет доступность действия перед открытием диалога и подтверждением.
  *
@@ -138,9 +140,17 @@ function onConfirm() {
             />
 
             <section :class="$style.card" aria-labelledby="session-actions">
-                <h2 id="session-actions" :class="$style.heading">
-                    {{ SESSION_ADMIN.controlsTitle }}
-                </h2>
+                <div :class="$style.cardHeader">
+                    <h2 id="session-actions" :class="$style.heading">
+                        {{ SESSION_ADMIN.controlsTitle }}
+                    </h2>
+
+                    <SessionOperationStatus
+                        :job="job"
+                        :error="statusError || actionError"
+                        :warning="operationWarning"
+                    />
+                </div>
 
                 <form :class="$style.form" @submit.prevent="onActionClick">
                     <div :class="$style.fields">
@@ -169,25 +179,16 @@ function onConfirm() {
                         />
                     </div>
 
-                    <p v-if="needsWhitelist">
-                        {{ SESSION_ADMIN.whitelistRequired }}
-                    </p>
-
                     <VButton
                         type="submit"
                         :color="actionColor"
                         :disabled="!canOpenConfirmation"
+                        :class="$style.submitButton"
                     >
                         {{ actionText.button }}
                     </VButton>
                 </form>
             </section>
-
-            <SessionOperationStatus
-                :job="job"
-                :error="statusError || actionError"
-                :class="$style.feedback"
-            />
         </div>
 
         <VModal
@@ -245,8 +246,18 @@ function onConfirm() {
     @include h3;
 }
 
-.form {
+.cardHeader {
     display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: $space-8;
+    align-items: center;
+    width: 100%;
+}
+
+.form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     gap: $space-12;
     width: 100%;
 }
@@ -255,8 +266,8 @@ function onConfirm() {
     width: 100%;
 }
 
-.feedback {
-    grid-column: 1 / -1;
+.submitButton {
+    margin-top: auto;
 }
 
 .actions {
