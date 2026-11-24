@@ -1,269 +1,166 @@
 <script setup lang="ts">
-import type {
-    ISessionControlResponse,
-    ISessionJobState,
-    ISessionStartParams,
-    TPterodactylServerState,
-    TSessionOperationKind,
-} from '~~/shared/@types/session-control';
+import type { ISessionControlResponse, ISessionJobState, ISessionStartParams, TSessionOperationKind } from '~~/shared/@types/session-control';
 
 import {
     SESSION_DEFAULT_DURATION,
     SESSION_DEFAULT_START_HOUR,
     SESSION_MAX_HOURS,
     SESSION_MIN_HOURS,
-    SESSION_TOTAL_TICKS,
 } from '~~/shared/constants/session-control';
 import { sessionStartSchema } from '~~/shared/schemas/session-control';
+
+import { SESSION_ADMIN } from '~/assets/ts/constants/content/account';
 import { EColor, ESize } from '~/assets/ts/enums/common';
+
 import AccountPageTemplate from '~/components/pages/account/AccountPageTemplate.vue';
+import SessionOperationStatus from '~/components/pages/account/admin/session/SessionOperationStatus.vue';
+import SessionSummary from '~/components/pages/account/admin/session/SessionSummary.vue';
 
-const props = defineProps<{
+interface IProps {
+    /** Последний ответ со сводкой сессии и состоянием сервера. */
     state: ISessionControlResponse | null;
+    /** Операция, полученная при опросе или сразу после принятия команды. */
     job: ISessionJobState | null;
+    /** Выполняется запрос состояния. */
     pending: boolean;
+    /** Отправляется команда запуска или остановки. */
     submitting: boolean;
+    /** Сообщение об ошибке чтения состояния. */
     statusError: string;
+    /** Сообщение об ошибке отправки команды. */
     actionError: string;
-}>();
+}
 
-const emit = defineEmits<{
+const props = defineProps<IProps>();
+
+const emits = defineEmits<{
     refresh: [];
     start: [params: ISessionStartParams];
     stop: [];
 }>();
 
-const SERVER_STATES: Record<
-    TPterodactylServerState,
-    { icon: string; label: string }
-> = {
-    running: {
-        icon: 'server',
-        label: 'Minecraft не отвечает или не сообщил онлайн',
-    },
-    offline: { icon: 'server-off', label: 'Сервер выключен' },
-    starting: { icon: 'server', label: 'Сервер запускается' },
-    stopping: { icon: 'server', label: 'Сервер останавливается' },
-};
+const startHourLabel = SESSION_ADMIN.withHoursRange(SESSION_ADMIN.startHour, SESSION_MIN_HOURS, SESSION_MAX_HOURS);
+const durationLabel = SESSION_ADMIN.withHoursRange(SESSION_ADMIN.duration, SESSION_MIN_HOURS, SESSION_MAX_HOURS);
 
 const startHour = ref(String(SESSION_DEFAULT_START_HOUR));
 const duration = ref(String(SESSION_DEFAULT_DURATION));
 const confirmation = ref<TSessionOperationKind>('start');
-const modalOpen = ref(false);
+const isConfirmationOpen = ref(false);
 
-const session = computed(() => props.state?.session);
-const server = computed(() => props.state?.server);
-const playerCount = computed(() =>
-    server.value?.online ? server.value.players : null,
-);
-const serverIndicator = computed(() => {
-    const serverState = server.value?.state;
-    if (serverState && serverState !== 'running') {
-        return SERVER_STATES[serverState];
+const busy = computed(() => props.pending || props.submitting || props.job?.status === 'running');
+
+const isActive = computed(() => props.state?.session?.active);
+const whitelistEnabled = computed(() => props.state?.whitelistEnabled);
+
+const action = computed<TSessionOperationKind>(() => {
+    const { job } = props;
+    if (job?.status === 'running' && job.kind) {
+        return job.kind;
     }
 
-    if (playerCount.value !== null) {
-        return {
-            icon: 'users-round',
-            label: `Игроки онлайн: ${playerCount.value}`,
-        };
-    }
-
-    return serverState
-        ? SERVER_STATES[serverState]
-        : { icon: 'server', label: 'Состояние сервера неизвестно' };
+    return isActive.value ? 'stop' : 'start';
 });
-const whitelist = computed(() => {
-    const enabled = props.state?.whitelistEnabled;
-    if (enabled === true) {
-        return { icon: 'shield-check', label: 'Вайтлист включён' };
-    }
 
-    return enabled === false
-        ? { icon: 'shield-off', label: 'Вайтлист выключен' }
-        : {
-                icon: 'shield-question-mark',
-                label: 'Состояние вайтлиста неизвестно',
-            };
-});
-const running = computed(() => props.job?.status === 'running');
-const action = computed(() => {
-    if (props.job?.status === 'running' && props.job.kind) {
-        return props.job.kind;
-    }
+const canOperate = computed(() => !busy.value && !props.statusError && props.state?.server.state === 'running');
 
-    return session.value?.active ? 'stop' : 'start';
-});
-const ready = computed(
-    () =>
-        !running.value
-        && !props.pending
-        && !props.submitting
-        && !props.statusError
-        && server.value?.state === 'running',
-);
-const canStart = computed(
-    () =>
-        ready.value
-        && session.value?.active === false
-        && props.state?.whitelistEnabled === true,
-);
-const canStop = computed(() => ready.value && session.value?.active === true);
-const params = computed(() =>
-    sessionStartSchema.safeParse({
-        startHour: Number(startHour.value),
-        duration: Number(duration.value),
-    }),
-);
-const isStartConfirmation = computed(() => confirmation.value === 'start');
-const canOpenConfirmation = computed(() =>
-    action.value === 'stop'
-        ? canStop.value
-        : canStart.value && params.value.success,
-);
+const canStart = computed(() => canOperate.value && isActive.value === false && whitelistEnabled.value === true);
 
-function openConfirmation() {
+const canStop = computed(() => canOperate.value && isActive.value === true);
+
+const params = computed(() => sessionStartSchema.safeParse({
+    startHour: Number(startHour.value),
+    duration: Number(duration.value),
+}));
+
+const actionText = computed(() => SESSION_ADMIN.actions[action.value]);
+const actionColor = computed(() => action.value === 'stop' ? EColor.Danger : EColor.Primary);
+const canOpenConfirmation = computed(() => canConfirm(action.value));
+
+const confirmationText = computed(() => SESSION_ADMIN.actions[confirmation.value]);
+const confirmationColor = computed(() => confirmation.value === 'stop' ? EColor.Danger : EColor.Primary);
+const canConfirmAction = computed(() => canConfirm(confirmation.value));
+
+const needsWhitelist = computed(() => isActive.value === false && whitelistEnabled.value === false);
+
+/**
+ * Проверяет доступность действия перед открытием диалога и подтверждением.
+ *
+ * @param kind Запуск или остановка сессии.
+ * @returns Можно ли выполнить действие с текущим состоянием и параметрами формы.
+ */
+function canConfirm(kind: TSessionOperationKind): boolean {
+    return kind === 'stop' ? canStop.value : canStart.value && params.value.success;
+}
+
+/** Сохраняет выбранное действие на время открытого диалога. */
+function onActionClick() {
     if (!canOpenConfirmation.value) {
         return;
     }
 
     confirmation.value = action.value;
-    modalOpen.value = true;
+    isConfirmationOpen.value = true;
 }
 
-function confirmAction() {
-    if (isStartConfirmation.value && canStart.value && params.value.success) {
-        emit('start', params.value.data);
+/** Отправляет подтверждённое действие, если оно всё ещё доступно. */
+function onConfirm() {
+    if (confirmation.value === 'stop' && canStop.value) {
+        emits('stop');
     }
 
-    if (!isStartConfirmation.value && canStop.value) {
-        emit('stop');
+    if (confirmation.value === 'start' && canStart.value && params.value.success) {
+        emits('start', params.value.data);
     }
 
-    modalOpen.value = false;
+    isConfirmationOpen.value = false;
 }
 </script>
 
 <template>
-    <AccountPageTemplate title="Управление сессией">
+    <AccountPageTemplate :title="SESSION_ADMIN.title" :class="$style.SessionControlAdmin">
         <template #header-right>
             <VButton
                 type="button"
                 icon="refresh-cw"
                 :color="EColor.Secondary"
-                :disabled="pending || submitting || running"
-                @click="emit('refresh')"
+                :disabled="busy"
+                @click="emits('refresh')"
             >
-                Обновить
+                {{ SESSION_ADMIN.refresh }}
             </VButton>
         </template>
 
         <div :class="$style.cards">
-            <section :class="$style.card" aria-labelledby="session-details">
-                <div :class="$style.cardHeader">
-                    <h2 id="session-details" :class="$style.heading">
-                        Сессия
-                    </h2>
-                    <div :class="$style.indicators">
-                        <VTooltip :text="serverIndicator.label">
-                            <span
-                                role="img"
-                                tabindex="0"
-                                :aria-label="serverIndicator.label"
-                                :class="[
-                                    $style.indicator,
-                                    {
-                                        [$style.offline]:
-                                            server?.state === 'offline',
-                                    },
-                                ]"
-                            >
-                                <VIcon
-                                    :name="serverIndicator.icon"
-                                    :size="18"
-                                    aria-hidden="true"
-                                />
-                                <span
-                                    v-if="
-                                        serverIndicator.icon === 'users-round'
-                                    "
-                                    aria-hidden="true"
-                                >{{ playerCount }}</span>
-                            </span>
-                        </VTooltip>
-                        <VTooltip :text="whitelist.label">
-                            <span
-                                role="img"
-                                tabindex="0"
-                                :aria-label="whitelist.label"
-                                :class="[
-                                    $style.indicator,
-                                    {
-                                        [$style.protected]:
-                                            state?.whitelistEnabled === true,
-                                    },
-                                ]"
-                            >
-                                <VIcon
-                                    :name="whitelist.icon"
-                                    :size="18"
-                                    aria-hidden="true"
-                                />
-                            </span>
-                        </VTooltip>
-                    </div>
-                </div>
-                <p v-if="pending && !state">
-                    Загрузка состояния…
-                </p>
-                <dl v-else-if="session" :class="$style.details">
-                    <dt>Номер</dt>
-                    <dd>#{{ session.index }}</dd>
-                    <dt>Статус</dt>
-                    <dd>{{ session.active ? "Активна" : "Завершена" }}</dd>
-                    <dt>Игровые дата и время</dt>
-                    <dd>
-                        {{ session.formattedDate }}, {{ session.formattedTime }}
-                    </dd>
-                    <dt>Прогресс</dt>
-                    <dd>
-                        {{ session.ticks }} / {{ SESSION_TOTAL_TICKS }} тиков
-                    </dd>
-                    <dt v-if="session.active">
-                        Осталось
-                    </dt>
-                    <dd v-if="session.active">
-                        {{ session.remainingTime }}
-                    </dd>
-                </dl>
-                <p v-else>
-                    Данные сессии недоступны.
-                </p>
-            </section>
+            <SessionSummary
+                :state="state"
+                :pending="pending"
+                :class="$style.card"
+            />
 
             <section :class="$style.card" aria-labelledby="session-actions">
                 <h2 id="session-actions" :class="$style.heading">
-                    Управление
+                    {{ SESSION_ADMIN.controlsTitle }}
                 </h2>
 
-                <form :class="$style.form" @submit.prevent="openConfirmation">
+                <form :class="$style.form" @submit.prevent="onActionClick">
                     <div :class="$style.fields">
                         <VInput
                             v-model="startHour"
                             type="number"
-                            aria-label="Час начала"
-                            label="Час начала (1–24)"
+                            :aria-label="SESSION_ADMIN.startHour"
+                            :label="startHourLabel"
                             :size="ESize.Small"
                             :min="SESSION_MIN_HOURS"
                             :max="SESSION_MAX_HOURS"
                             :disabled="!canStart"
                             required
                         />
+
                         <VInput
                             v-model="duration"
                             type="number"
-                            aria-label="Длительность в часах"
-                            label="Длительность в часах (1–24)"
+                            :aria-label="SESSION_ADMIN.duration"
+                            :label="durationLabel"
                             :size="ESize.Small"
                             :min="SESSION_MIN_HOURS"
                             :max="SESSION_MAX_HOURS"
@@ -271,104 +168,49 @@ function confirmAction() {
                             required
                         />
                     </div>
-                    <p
-                        v-if="
-                            session?.active === false
-                                && state?.whitelistEnabled === false
-                        "
-                    >
-                        Включите вайтлист в Pterodactyl перед запуском.
+
+                    <p v-if="needsWhitelist">
+                        {{ SESSION_ADMIN.whitelistRequired }}
                     </p>
+
                     <VButton
                         type="submit"
-                        :color="
-                            action === 'stop' ? EColor.Danger : EColor.Primary
-                        "
+                        :color="actionColor"
                         :disabled="!canOpenConfirmation"
                     >
-                        {{
-                            action === "stop"
-                                ? "Остановить сессию"
-                                : "Запустить сессию"
-                        }}
+                        {{ actionText.button }}
                     </VButton>
                 </form>
             </section>
 
-            <div :class="$style.feedback" aria-live="polite">
-                <div
-                    v-if="job?.step"
-                    :class="[$style.notice, $style[job.status]]"
-                >
-                    <VIcon
-                        :name="
-                            job.error
-                                ? 'circle-x'
-                                : running
-                                    ? 'loader-circle'
-                                    : 'circle-check'
-                        "
-                        :size="18"
-                        :class="{ [$style.spinner]: running }"
-                        aria-hidden="true"
-                    />
-                    <div>
-                        <strong>{{ job.step }}</strong>
-                        <p v-if="job.error">
-                            {{ job.error }}
-                        </p>
-                    </div>
-                </div>
-                <p
-                    v-if="statusError || actionError"
-                    :class="[$style.notice, $style.error]"
-                >
-                    <VIcon
-                        name="circle-x"
-                        :size="18"
-                        aria-hidden="true"
-                    />
-                    <span>{{ statusError || actionError }}</span>
-                </p>
-            </div>
+            <SessionOperationStatus
+                :job="job"
+                :error="statusError || actionError"
+                :class="$style.feedback"
+            />
         </div>
 
         <VModal
-            v-model="modalOpen"
-            :title="
-                isStartConfirmation ? 'Запустить сессию?' : 'Остановить сессию?'
-            "
-            :description="
-                isStartConfirmation
-                    ? 'Сервер перезапустится, выполнит расчёты новой сессии и откроет доступ игрокам.'
-                    : 'Сессия завершится, вайтлист включится, а сервер перезапустится и отключит игроков.'
-            "
+            v-model="isConfirmationOpen"
+            :title="confirmationText.title"
+            :description="confirmationText.description"
         >
             <div :class="$style.actions">
                 <VButton
                     type="button"
                     :color="EColor.Secondary"
-                    @click="modalOpen = false"
+                    @click="isConfirmationOpen = false"
                 >
-                    Отмена
+                    {{ SESSION_ADMIN.cancel }}
                 </VButton>
+
                 <VButton
                     type="button"
-                    :color="
-                        isStartConfirmation ? EColor.Primary : EColor.Danger
-                    "
-                    :disabled="
-                        isStartConfirmation
-                            ? !canStart || !params.success
-                            : !canStop
-                    "
-                    @click="confirmAction"
+                    :color="confirmationColor"
+                    :disabled="!canConfirmAction"
+                    @click="onConfirm"
                 >
-                    {{
-                        isStartConfirmation
-                            ? "Подтвердить запуск"
-                            : "Подтвердить остановку"
-                    }}
+                    {{ confirmationText.confirm }}
                 </VButton>
             </div>
         </VModal>
@@ -376,7 +218,7 @@ function confirmAction() {
 </template>
 
 <style module lang="scss">
-.cards,
+.SessionControlAdmin .cards,
 .fields {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -403,64 +245,7 @@ function confirmAction() {
     @include h3;
 }
 
-.cardHeader {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-8 $space-16;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.indicators {
-    display: flex;
-    gap: $space-8;
-    align-items: center;
-    margin-left: auto;
-}
-
-.indicator {
-    @include l2;
-
-    display: inline-flex;
-    gap: $space-4;
-    align-items: center;
-    min-height: $space-32;
-    padding: 0 $space-8;
-    border: 1px solid $border-subtle;
-    border-radius: $radius-8;
-    color: $text-secondary;
-
-    &.offline {
-        background-color: $danger-bg;
-        color: $danger-fg;
-    }
-
-    &.protected {
-        background-color: $success-bg;
-        color: $success-fg;
-    }
-}
-
-.details {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: $space-8 $space-16;
-    width: 100%;
-    margin: 0;
-
-    dt {
-        color: $text-secondary;
-    }
-
-    dd {
-        margin: 0;
-        text-align: right;
-    }
-}
-
-.form,
-.feedback {
+.form {
     display: grid;
     gap: $space-12;
     width: 100%;
@@ -472,55 +257,6 @@ function confirmAction() {
 
 .feedback {
     grid-column: 1 / -1;
-}
-
-.feedback:empty {
-    display: none;
-}
-
-.notice {
-    @include t3;
-
-    display: flex;
-    gap: $space-8;
-    align-items: flex-start;
-    margin: 0;
-    padding: $space-12;
-    border-radius: $radius-8;
-    background-color: $info-bg;
-    color: $info-fg;
-
-    svg {
-        flex: none;
-    }
-
-    p {
-        margin: $space-4 0 0;
-    }
-
-    &.success {
-        background-color: $success-bg;
-        color: $success-fg;
-    }
-
-    &.error {
-        background-color: $danger-bg;
-        color: $danger-fg;
-    }
-}
-
-.spinner {
-    animation: session-status-spin 1s linear infinite;
-
-    @media (prefers-reduced-motion: reduce) {
-        animation: none;
-    }
-}
-
-@keyframes session-status-spin {
-    to {
-        transform: rotate(1turn);
-    }
 }
 
 .actions {

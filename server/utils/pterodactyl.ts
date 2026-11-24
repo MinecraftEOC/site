@@ -16,30 +16,53 @@ const resourcesSchema = z.object({
     }),
 });
 
+/**
+ * Проверяет, что URL панели указывает на HTTP(S)-адрес без дополнительных частей.
+ *
+ * @param value Адрес панели из окружения.
+ * @returns Проверенный URL или `null`, если адрес непригоден.
+ */
+function parsePanelOrigin(value: string): URL | null {
+    if (!URL.canParse(value)) {
+        return null;
+    }
+
+    const url = new URL(value);
+    const hasHttpProtocol = url.protocol === 'https:' || url.protocol === 'http:';
+    const isBareOrigin = url.pathname === '/' && !url.search && !url.hash;
+    const hasUserInfo = url.username || url.password;
+
+    return hasHttpProtocol && isBareOrigin && !hasUserInfo ? url : null;
+}
+
+/**
+ * Создаёт клиент Pterodactyl для игрового сервера из приватной конфигурации сайта.
+ *
+ * @param event Событие Nitro для чтения окружения.
+ * @throws 503 если параметры подключения некорректны.
+ */
 export function createPterodactylClient(event: H3Event) {
     const config = useRuntimeConfig(event);
     const { pterodactylBaseUrl, pterodactylApiToken, pterodactylServerId } = config;
     const timeout = Number(config.pterodactylTimeoutMs);
-    const base = URL.canParse(pterodactylBaseUrl) ? new URL(pterodactylBaseUrl) : null;
+    const base = parsePanelOrigin(pterodactylBaseUrl);
+    const hasCredentials = pterodactylApiToken.trim() && SERVER_ID_PATTERN.test(pterodactylServerId);
+    const hasTimeout = Number.isSafeInteger(timeout) && timeout > 0;
 
-    if (
-        !base
-        || !['https:', 'http:'].includes(base.protocol)
-        || base.username
-        || base.password
-        || base.pathname !== '/'
-        || base.search
-        || base.hash
-        || !pterodactylApiToken.trim()
-        || !SERVER_ID_PATTERN.test(pterodactylServerId)
-        || !Number.isSafeInteger(timeout)
-        || timeout < 1
-    ) {
+    if (!base || !hasCredentials || !hasTimeout) {
         throw createError({ statusCode: 503, message: 'Подключение к Pterodactyl не настроено' });
     }
 
     const endpoint = `${base.origin}/api/client/servers/${pterodactylServerId}`;
 
+    /**
+     * Отправляет запрос к панели без перенаправлений и повторов.
+     *
+     * @param path Путь внутри API игрового сервера.
+     * @param body Тело POST-запроса. Без тела выполняется GET.
+     * @returns Текст ответа GET или пустая строка после подтверждённой команды.
+     * @throws 502 при ошибке панели, 504 при таймауте.
+     */
     async function request(path: string, body?: Record<string, string>): Promise<string> {
         const signal = AbortSignal.timeout(timeout);
         try {
@@ -55,7 +78,9 @@ export function createPterodactylClient(event: H3Event) {
                 signal,
             });
 
-            if (body ? response.status !== 204 : !response.ok) {
+            const accepted = body ? response.status === 204 : response.ok;
+
+            if (!accepted) {
                 await response.body?.cancel();
                 throw new Error('Unexpected Pterodactyl response status');
             }
@@ -71,6 +96,7 @@ export function createPterodactylClient(event: H3Event) {
         }
     }
 
+    /** Преобразует ошибку разбора ответа панели в HTTP 502. */
     function parseJson(text: string, message: string): unknown {
         try {
             return JSON.parse(text);
@@ -79,6 +105,7 @@ export function createPterodactylClient(event: H3Event) {
         }
     }
 
+    /** Читает состояние процесса Minecraft и время его работы. */
     async function getServerResources() {
         const message = 'Pterodactyl вернул некорректный статус сервера';
         const result = resourcesSchema.safeParse(parseJson(await request('/resources'), message));
@@ -92,10 +119,16 @@ export function createPterodactylClient(event: H3Event) {
         };
     }
 
+    /**
+     * Читает файл из контейнера сервера через Pterodactyl.
+     *
+     * @param path Абсолютный путь внутри контейнера.
+     */
     function readServerFile(path: string) {
         return request(`/files/contents?file=${encodeURIComponent(path)}`);
     }
 
+    /** Читает и проверяет данные игровой сессии из `global.json`. */
     async function readGlobalSession() {
         const message = 'Не удалось прочитать состояние сессии из global.json';
         const result = globalSessionSchema.safeParse(parseJson(await readServerFile(GLOBAL_SESSION_PATH), message));
@@ -106,6 +139,7 @@ export function createPterodactylClient(event: H3Event) {
         return result.data.session;
     }
 
+    /** Проверяет, что в `server.properties` однозначно задано состояние вайтлиста. */
     async function readWhitelistEnabled() {
         const properties = await readServerFile(SERVER_PROPERTIES_PATH);
         const values = properties
