@@ -589,7 +589,7 @@ export const SESSION_ADMIN = {
         off: { icon: 'shield-off', label: 'Вайтлист выключен', tone: 'neutral', value: null },
         unknown: { icon: 'shield-question-mark', label: 'Состояние вайтлиста неизвестно', tone: 'neutral', value: null },
     },
-    whitelistRequired: 'Включите вайтлист в Pterodactyl перед запуском.',
+    whitelistRequired: 'Включите вайтлист перед запуском.',
     cancel: 'Отмена',
     actions: {
         start: {

@@ -6,56 +6,66 @@ interface IProps {
     job: ISessionJobState | null;
     /** Ошибка чтения состояния или отправки команды. */
     error: string;
+    /** Причина, по которой запуск сейчас недоступен. */
+    warning: string;
 }
 
 const props = defineProps<IProps>();
 
-const STATUS_ICON_SIZE = 18;
+const STATUS_ICON_SIZE = 16;
 
-const icon = computed(() => {
-    if (props.job?.status === 'running') {
-        return 'loader-circle';
+const status = computed(() => {
+    const { error, job, warning } = props;
+
+    if (error) {
+        return { icon: 'circle-x', tone: 'error', title: error };
     }
 
-    return props.job?.status === 'error' ? 'circle-x' : 'circle-check';
+    if (job?.status === 'error') {
+        return { icon: 'circle-x', tone: 'error', title: job.step, detail: job.error };
+    }
+
+    if (job?.status === 'running') {
+        return { icon: 'loader-circle', tone: 'running', title: job.step };
+    }
+
+    // Блокировка нового запуска важнее результата предыдущей операции.
+    if (warning) {
+        return { icon: 'shield-off', tone: 'warning', title: warning };
+    }
+
+    return job?.status === 'success'
+        ? { icon: 'circle-check', tone: 'success', title: job.step }
+        : null;
 });
 </script>
 
 <template>
     <div :class="$style.SessionOperationStatus" aria-live="polite">
-        <div v-if="job?.step" :class="[$style.notice, $style[job.status]]">
+        <div v-if="status?.title" :class="[$style.notice, $style[status.tone]]">
             <VIcon
-                :name="icon"
+                :name="status.icon"
                 :size="STATUS_ICON_SIZE"
                 :class="$style.icon"
                 aria-hidden="true"
             />
 
             <div>
-                <strong>{{ job.step }}</strong>
+                <strong>{{ status.title }}</strong>
 
-                <p v-if="job.error">
-                    {{ job.error }}
+                <p v-if="status.detail">
+                    {{ status.detail }}
                 </p>
             </div>
         </div>
-
-        <p v-if="error" :class="[$style.notice, $style.error]">
-            <VIcon
-                name="circle-x"
-                :size="STATUS_ICON_SIZE"
-                aria-hidden="true"
-            />
-            <span>{{ error }}</span>
-        </p>
     </div>
 </template>
 
 <style module lang="scss">
 .SessionOperationStatus {
-    display: grid;
-    gap: $space-12;
-    width: 100%;
+    justify-self: end;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .SessionOperationStatus:empty {
@@ -67,16 +77,13 @@ const icon = computed(() => {
 
     display: flex;
     gap: $space-8;
-    align-items: flex-start;
-    margin: 0;
-    padding: $space-12;
+    align-items: center;
+    min-height: $space-32;
+    padding: $space-4 $space-8;
     border-radius: $radius-8;
     background-color: $info-bg;
     color: $info-fg;
-
-    svg {
-        flex: none;
-    }
+    overflow-wrap: anywhere;
 
     p {
         margin: $space-4 0 0;
@@ -91,6 +98,15 @@ const icon = computed(() => {
         background-color: $danger-bg;
         color: $danger-fg;
     }
+
+    &.warning {
+        background-color: $warning-bg;
+        color: $warning-fg;
+    }
+}
+
+.icon {
+    flex: none;
 }
 
 .running .icon {
