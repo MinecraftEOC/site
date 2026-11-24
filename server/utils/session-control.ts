@@ -10,10 +10,9 @@ import type {
 import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 
-import { SESSION_TOTAL_TICKS } from '~~/shared/constants/session-control';
-
 import { pingMinecraftServer } from './minecraft';
 import { createPterodactylClient } from './pterodactyl';
+import { formatGameSession } from './session-time';
 
 const OFFLINE_POLL_MS = 2000;
 const ONLINE_POLL_MS = 3000;
@@ -23,16 +22,6 @@ const SERVER_SETTLE_MS = 5000;
 const START_CHECK_ATTEMPTS = 4;
 const STOP_CHECK_ATTEMPTS = 3;
 const WHITELIST_SETTLE_MS = 1000;
-const GAME_TICKS_PER_HOUR = 1000;
-const MINUTES_PER_HOUR = 60;
-const SECONDS_PER_HOUR = 3600;
-const SECONDS_PER_MINUTE = 60;
-const GAME_HOURS_PER_DAY = 24;
-const SESSION_TICK_INTERVAL_SECONDS = 10;
-const EPOCH_YEAR = 1000;
-const DAYS_PER_GAME_YEAR = 365;
-const GAME_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
 type TPterodactylClient = ReturnType<typeof createPterodactylClient>;
 type TPingServer = ReturnType<typeof createMinecraftPing>;
 type TSessionOperation = { kind: 'start'; params: ISessionStartParams } | { kind: 'stop' };
@@ -48,53 +37,29 @@ let currentJob: ISessionJobState = {
     error: null,
 };
 
+/**
+ * Подготавливает проверку доступности Minecraft для фоновой операции.
+ *
+ * @param event Событие Nitro для получения адреса игрового сервера.
+ * @returns Функция пинга, которая возвращает `null`, когда Minecraft недоступен.
+ */
 function createMinecraftPing(event: H3Event) {
     const { minecraftHost, minecraftPort } = useRuntimeConfig(event);
+
     return () => pingMinecraftServer(minecraftHost, Number(minecraftPort)).catch(() => null);
 }
 
-function formatSession(session: IGameSession) {
-    const gameMinutes
-        = (session.start_hour * MINUTES_PER_HOUR + Math.floor((session.ticks * MINUTES_PER_HOUR) / GAME_TICKS_PER_HOUR))
-            % (GAME_HOURS_PER_DAY * MINUTES_PER_HOUR);
-    const pad = (value: number) => String(value).padStart(2, '0');
-    const formattedTime = `${pad(Math.floor(gameMinutes / MINUTES_PER_HOUR))}:${pad(gameMinutes % MINUTES_PER_HOUR)}`;
-
-    const year = EPOCH_YEAR + Math.floor(session.index / DAYS_PER_GAME_YEAR);
-    let days = session.index % DAYS_PER_GAME_YEAR;
-    let month = 1;
-    for (const monthDays of GAME_MONTH_DAYS) {
-        if (days < monthDays) {
-            break;
-        }
-
-        days -= monthDays;
-        month++;
-    }
-
-    const ticksPerCall = Math.floor(
-        SESSION_TOTAL_TICKS / ((session.duration * SECONDS_PER_HOUR) / SESSION_TICK_INTERVAL_SECONDS),
-    );
-    const minutesLeft = session.active
-        ? Math.floor(
-                (((SESSION_TOTAL_TICKS - session.ticks) / ticksPerCall) * SESSION_TICK_INTERVAL_SECONDS)
-                / SECONDS_PER_MINUTE,
-            )
-        : 0;
-    const hoursLeft = Math.floor(minutesLeft / MINUTES_PER_HOUR);
-    const remainingMinutes = minutesLeft % MINUTES_PER_HOUR;
-
-    return {
-        ...session,
-        formattedDate: `${pad(days + 1)}.${pad(month)}.${year}`,
-        formattedTime,
-        remainingTime: hoursLeft ? `${hoursLeft}ч ${remainingMinutes}м` : `${remainingMinutes}м`,
-    };
-}
-
+/**
+ * Собирает сводку сессии, сохраняя снимок операции до запросов к серверу.
+ * Так опрос продолжится, если операция завершится во время чтения сводки.
+ *
+ * @param event Событие Nitro для чтения окружения.
+ * @returns Состояние игры, вайтлиста и фоновой операции для админки.
+ */
 export async function getSessionControlStatus(event: H3Event): Promise<ISessionControlResponse> {
     const pterodactyl = createPterodactylClient(event);
     const job = { ...currentJob };
+
     const [session, whitelistEnabled, resources, ping] = await Promise.all([
         pterodactyl.readGlobalSession().catch(() => null),
         pterodactyl.readWhitelistEnabled().catch(() => null),
@@ -103,7 +68,7 @@ export async function getSessionControlStatus(event: H3Event): Promise<ISessionC
     ]);
 
     return {
-        session: session && formatSession(session),
+        session: session && formatGameSession(session),
         whitelistEnabled,
         server: {
             state: resources?.currentState ?? null,
@@ -115,8 +80,17 @@ export async function getSessionControlStatus(event: H3Event): Promise<ISessionC
     };
 }
 
+/**
+ * Опрашивает сервер до выполнения условия или истечения таймаута.
+ *
+ * @param check Проверяемое условие.
+ * @param interval Пауза между попытками в миллисекундах.
+ * @param timeout Бюджет ожидания в миллисекундах.
+ * @param message Ошибка, которую увидит администратор при таймауте.
+ */
 async function waitUntil(check: () => Promise<boolean>, interval: number, timeout: number, message: string) {
     const deadline = Date.now() + timeout;
+
     while (Date.now() < deadline) {
         if (await check()) {
             return;
@@ -128,6 +102,12 @@ async function waitUntil(check: () => Promise<boolean>, interval: number, timeou
     throw new Error(message);
 }
 
+/**
+ * Перезапускает сервер, дожидается остановки старого процесса и готовности нового.
+ *
+ * @param pterodactyl Клиент панели для команды перезапуска и чтения состояния.
+ * @param ping Функция проверки доступности Minecraft.
+ */
 async function restartServer(pterodactyl: TPterodactylClient, ping: TPingServer) {
     currentJob.step = 'Перезапуск сервера';
     await pterodactyl.sendPowerSignal('restart');
@@ -164,6 +144,15 @@ async function restartServer(pterodactyl: TPterodactylClient, ping: TPingServer)
     );
 }
 
+/**
+ * Проверяет, что Mappet записал ожидаемое состояние сессии в файл.
+ *
+ * @param pterodactyl Клиент панели для чтения файла сессии.
+ * @param check Условие, которое подтверждает выполнение команды.
+ * @param attempts Максимальное количество запросов.
+ * @param interval Пауза перед каждой проверкой в миллисекундах.
+ * @param message Ошибка, которую увидит администратор при неподтверждённой команде.
+ */
 async function verifySession(
     pterodactyl: TPterodactylClient,
     check: (session: IGameSession) => boolean,
@@ -182,6 +171,12 @@ async function verifySession(
     throw new Error(message);
 }
 
+/**
+ * Меняет вайтлист через консоль и подтверждает изменение по `server.properties`.
+ *
+ * @param pterodactyl Клиент панели для отправки команды и чтения файла.
+ * @param enabled Целевое состояние вайтлиста.
+ */
 async function setWhitelist(pterodactyl: TPterodactylClient, enabled: boolean) {
     currentJob.step = enabled ? 'Включение вайтлиста' : 'Выключение вайтлиста';
     await pterodactyl.sendConsoleCommand(enabled ? 'whitelist on' : 'whitelist off');
@@ -192,44 +187,65 @@ async function setWhitelist(pterodactyl: TPterodactylClient, enabled: boolean) {
     }
 }
 
-async function runOperation(
-    operation: TSessionOperation,
-    previousSession: IGameSession,
+/** Перезапускает Minecraft, запускает новую сессию и выключает вайтлист после подтверждения. */
+async function runStart(
+    params: ISessionStartParams,
+    previousIndex: number,
     pterodactyl: TPterodactylClient,
     ping: TPingServer,
-) {
+): Promise<void> {
+    await restartServer(pterodactyl, ping);
+
+    currentJob.step = 'Запуск скрипта новой сессии';
+
+    // Повтор команды после успешного старта может снова увеличить индекс и запустить расчёты.
+    await pterodactyl.sendConsoleCommand(
+        `mp script exec ~ handlers/session/handleSessionStart.js main {start_hour:${params.startHour},duration:${params.duration}}`,
+    );
+    await verifySession(
+        pterodactyl,
+        session => session.index > previousIndex && session.active,
+        START_CHECK_ATTEMPTS,
+        ONLINE_POLL_MS,
+        'Не удалось подтвердить запуск игровой сессии',
+    );
+
+    await setWhitelist(pterodactyl, false);
+}
+
+/** Завершает сессию, включает вайтлист и перезапускает Minecraft. */
+async function runStop(
+    previousIndex: number,
+    pterodactyl: TPterodactylClient,
+    ping: TPingServer,
+): Promise<void> {
+    currentJob.step = 'Остановка сессии на сервере';
+
+    await pterodactyl.sendConsoleCommand('mp script exec ~ handlers/session/handleSessionStop.js');
+    await verifySession(
+        pterodactyl,
+        session => session.index === previousIndex && !session.active,
+        STOP_CHECK_ATTEMPTS,
+        OFFLINE_POLL_MS,
+        'Не удалось подтвердить остановку игровой сессии',
+    );
+
+    await setWhitelist(pterodactyl, true);
+    await restartServer(pterodactyl, ping);
+}
+
+/** Выполняет операцию, записывает результат и освобождает блокировку. */
+async function runOperation(
+    operation: TSessionOperation,
+    previousIndex: number,
+    pterodactyl: TPterodactylClient,
+    ping: TPingServer,
+): Promise<void> {
     try {
         if (operation.kind === 'start') {
-            await restartServer(pterodactyl, ping);
-
-            currentJob.step = 'Запуск скрипта новой сессии';
-            const { startHour, duration } = operation.params;
-            // After a successful start, another command can advance the session index again.
-            await pterodactyl.sendConsoleCommand(
-                `mp script exec ~ handlers/session/handleSessionStart.js main {start_hour:${startHour},duration:${duration}}`,
-            );
-            await verifySession(
-                pterodactyl,
-                session => session.index > previousSession.index && session.active,
-                START_CHECK_ATTEMPTS,
-                ONLINE_POLL_MS,
-                'Не удалось подтвердить запуск игровой сессии',
-            );
-
-            await setWhitelist(pterodactyl, false);
+            await runStart(operation.params, previousIndex, pterodactyl, ping);
         } else {
-            currentJob.step = 'Остановка сессии на сервере';
-            await pterodactyl.sendConsoleCommand('mp script exec ~ handlers/session/handleSessionStop.js');
-            await verifySession(
-                pterodactyl,
-                session => session.index === previousSession.index && !session.active,
-                STOP_CHECK_ATTEMPTS,
-                OFFLINE_POLL_MS,
-                'Не удалось подтвердить остановку игровой сессии',
-            );
-
-            await setWhitelist(pterodactyl, true);
-            await restartServer(pterodactyl, ping);
+            await runStop(previousIndex, pterodactyl, ping);
         }
 
         currentJob.status = 'success';
@@ -243,6 +259,14 @@ async function runOperation(
     }
 }
 
+/**
+ * Захватывает блокировку перед проверкой состояния и передаёт операцию в фон.
+ *
+ * @param event Событие Nitro, к которому привязывается фоновая задача.
+ * @param operation Действие администратора и параметры новой сессии при запуске.
+ * @returns Начальный снимок принятой операции.
+ * @throws 409 если операция уже идёт или состояние сервера не позволяет её выполнить.
+ */
 export async function startSessionOperation(event: H3Event, operation: TSessionOperation): Promise<ISessionJobState> {
     if (reserved) {
         throw createError({ statusCode: 409, message: 'Уже выполняется операция над сессией' });
@@ -280,7 +304,7 @@ export async function startSessionOperation(event: H3Event, operation: TSessionO
             finishedAt: null,
             error: null,
         };
-        event.waitUntil(runOperation(operation, previousSession, pterodactyl, ping));
+        event.waitUntil(runOperation(operation, previousSession.index, pterodactyl, ping));
 
         return { ...currentJob };
     } catch (error) {
